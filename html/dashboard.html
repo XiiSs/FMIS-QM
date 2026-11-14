@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e3556">
+  <title>Dashboard | FMIS Portal</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="dashboard-page">
+  <div class="dashboard-app">
+    <aside class="dashboard-sidebar">
+      <a class="sidebar-brand" href="dashboard.html" aria-label="Swift Foods Financial Management Workspace">
+        <svg class="sidebar-brand-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 9 12 4l9 5M5 10v8m5-8v8m4-8v8m5-8v8M3 20h18M2 9h20" />
+        </svg>
+        <span class="sidebar-brand-copy"><strong>SWIFT FOODS</strong><small>Financial Management<br>Workspace</small></span>
+      </a>
+
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a class="nav-link is-active" href="dashboard.html" aria-current="page" data-permission="dashboard">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link" href="income.html" data-permission="income">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17 10 11l4 4 6-8"/><path d="M14 7h6v6"/></svg>
+          <span>Income</span>
+        </a>
+        <a class="nav-link" href="transaction-history.html" data-permission="transactions">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5"/><path d="M4 4v4.5h4.5M12 7v5l3 2"/></svg>
+          <span>Transaction History</span>
+        </a>
+        <a class="nav-link" href="expenses.html" data-permission="expenses">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 17 7-7 4 4 5-7"/><path d="M14 7h6v6"/></svg>
+          <span>Expenses</span>
+        </a>
+        <a class="nav-link" href="approvals.html" data-permission="approvals">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg>
+          <span>Approvals</span>
+        </a>
+        <a class="nav-link" href="budgets.html" data-permission="budgets">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9m7 10V5m7 14v-7"/><path d="M3 19h18"/></svg>
+          <span>Budgets</span>
+        </a>
+        <a class="nav-link" href="cashforecast.html" data-permission="cashforecast">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h13l-3-3m3 3-3 3M21 17H8l3 3m-3-3 3-3"/></svg>
+          <span>Cash Forecast</span>
+        </a>
+        <a class="nav-link" href="reports.html" data-permission="reports">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6m-6 4h6"/></svg>
+          <span>Reports</span>
+        </a>
+        <a class="nav-link" href="audit.html" data-permission="audit">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8m-8 4h8m-8 4h5"/></svg>
+          <span>Audit Trail</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-user">
+        <span class="user-avatar user-avatar-small" aria-hidden="true">MG</span>
+        <span class="sidebar-user-name" id="sidebar-user-name">Management</span>
+        <a class="sidebar-logout" href="login.html" aria-label="Sign out" title="Sign out">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5m5-3 4-4-4-4m4 4H9"/></svg>
+        </a>
+      </div>
+    </aside>
+
+    <div class="dashboard-main">
+      <header class="dashboard-topbar">
+        <button class="mobile-menu-toggle" id="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <h1 class="topbar-title">Dashboard</h1>
+        <div class="topbar-spacer"></div>
+        <a class="notification-button" href="#alerts-title" aria-label="View notifications: 5 pending approvals">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4"/></svg>
+          <span class="notification-count" aria-hidden="true">5</span>
+        </a>
+        <span class="user-avatar" aria-hidden="true">MG</span>
+        <div class="topbar-user">
+          <strong id="profile-name">Maria G. Santos</strong>
+          <span id="profile-role">Management / Read-only</span>
+        </div>
+        <span class="profile-toggle" aria-hidden="true">⌄</span>
+      </header>
+
+      <main class="dashboard-content">
+        <section class="dashboard-heading" aria-labelledby="welcome-title">
+          <div>
+            <h2 id="welcome-title">Welcome, <span id="welcome-name">Maria</span>!</h2>
+            <p>Here is the latest financial overview for <span data-report-period>October 2026</span>.</p>
+          </div>
+          <label class="period-select-wrap" for="report-period">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg>
+            <select id="report-period" aria-label="Reporting period">
+              <option value="2026-12">December 2026</option>
+              <option value="2026-11">November 2026</option>
+              <option value="2026-10" selected>October 2026</option>
+              <option value="2026-09">September 2026</option>
+              <option value="2026-08">August 2026</option>
+              <option value="2026-07">July 2026</option>
+              <option value="2026-06">June 2026</option>
+              <option value="2026-05">May 2026</option>
+              <option value="2026-04">April 2026</option>
+              <option value="2026-03">March 2026</option>
+              <option value="2026-02">February 2026</option>
+              <option value="2026-01">January 2026</option>
+            </select>
+            <span class="period-caret" aria-hidden="true">⌄</span>
+          </label>
+        </section>
+
+        <p class="dashboard-data-note">Illustrative prototype data · Reporting period: <span data-report-period>October 2026</span></p>
+        <p id="period-empty" class="period-empty" role="status" hidden>No illustrative data is available for this reporting period. Select October 2026 to view the dashboard.</p>
+
+        <div id="report-data">
+          <section class="summary-grid" aria-label="Financial summary">
+          <a class="summary-card" href="cashforecast.html" data-permission="cashforecast">
+            <span class="summary-icon icon-teal"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 9.5c0-1-1.3-1.5-3-1.5s-3 .7-3 2 1.4 1.7 3 2 3 .7 3 2-1.2 2-3 2-3-.6-3-1.5M12.5 6v12"/></svg></span>
+            <span class="summary-copy"><span class="summary-label">Cash Position</span><strong>₱ 5,000,000</strong><span class="summary-change"><b>↑ 8%</b><span>vs. previous period</span></span></span>
+          </a>
+          <a class="summary-card" href="income.html" data-permission="income">
+            <span class="summary-icon icon-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V4m-6 6 6-6 6 6"/></svg></span>
+            <span class="summary-copy"><span class="summary-label">Total Income</span><strong>₱ 1,200,000</strong><span class="summary-change"><b>↑ 12%</b><span>vs. previous period</span></span></span>
+          </a>
+          <a class="summary-card" href="expenses.html" data-permission="expenses">
+            <span class="summary-icon icon-red"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16m6-6-6 6-6-6"/></svg></span>
+            <span class="summary-copy"><span class="summary-label">Total Expenses</span><strong>₱ 850,000</strong><span class="summary-change"><b>↓ 5%</b><span>vs. previous period</span></span></span>
+          </a>
+          <a class="summary-card" href="income.html" data-permission="income">
+            <span class="summary-icon icon-navy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6m-6 3h4"/></svg></span>
+            <span class="summary-copy"><span class="summary-label">Accounts Receivable</span><strong>₱ 1,350,000</strong><span class="summary-detail">12 invoices outstanding</span></span>
+          </a>
+          <a class="summary-card" href="expenses.html" data-permission="expenses">
+            <span class="summary-icon icon-orange"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6m-6 3h4"/></svg></span>
+            <span class="summary-copy"><span class="summary-label">Accounts Payable</span><strong>₱ 780,000</strong><span class="summary-detail">5 payables outstanding</span></span>
+          </a>
+          <a class="summary-card" href="approvals.html" data-permission="approvals">
+            <span class="summary-icon icon-pink"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span class="summary-copy"><span class="summary-label">Pending Approvals</span><strong>5 requests</strong><span class="summary-detail">Awaiting review</span></span>
+          </a>
+        </section>
+
+        <section class="charts-grid" aria-label="Financial charts">
+          <article class="dashboard-panel chart-panel">
+            <h3>Income vs Expenses</h3>
+            <div class="chart-plot">
+              <div class="chart-y-labels" aria-hidden="true"><span>₱ 2M</span><span>₱ 1.5M</span><span>₱ 1M</span><span>₱ 500K</span><span>₱ 0</span></div>
+              <svg class="bar-chart" viewBox="0 0 300 120" role="img" aria-label="Monthly income and expense comparison from April to October 2026">
+                <path class="chart-gridline" d="M0 5H300M0 31H300M0 57H300M0 83H300M0 109H300"/>
+                <g class="income-bars"><rect x="8" y="82" width="10" height="27"/><rect x="48" y="75" width="10" height="34"/><rect x="88" y="70" width="10" height="39"/><rect x="128" y="63" width="10" height="46"/><rect x="168" y="57" width="10" height="52"/><rect x="208" y="51" width="10" height="58"/><rect x="248" y="47" width="10" height="62"/></g>
+                <g class="expense-bars"><rect x="20" y="89" width="10" height="20"/><rect x="60" y="85" width="10" height="24"/><rect x="100" y="80" width="10" height="29"/><rect x="140" y="75" width="10" height="34"/><rect x="180" y="71" width="10" height="38"/><rect x="220" y="68" width="10" height="41"/><rect x="260" y="65" width="10" height="44"/></g>
+              </svg>
+              <div class="chart-x-labels" aria-hidden="true"><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span></div>
+            </div>
+            <div class="chart-legend"><span><i class="legend-dot legend-income"></i>Income</span><span><i class="legend-dot legend-expense"></i>Expenses</span></div>
+          </article>
+
+          <article class="dashboard-panel chart-panel budget-panel" data-permission="budgets">
+            <h3>Budget Utilization</h3>
+            <div class="budget-chart-content">
+              <svg class="budget-donut" viewBox="0 0 120 120" role="img" aria-label="92.5 percent of the 2 million peso budget has been utilized">
+                <circle class="donut-track" cx="60" cy="60" r="48"/>
+                <circle class="donut-progress" cx="60" cy="60" r="48"/>
+                <text x="60" y="54" text-anchor="middle" class="donut-percent">85%</text>
+                <text x="60" y="70" text-anchor="middle" class="donut-amount">₱ 850,000</text>
+                <text x="60" y="83" text-anchor="middle" class="donut-caption">of ₱ 1,000,000</text>
+              </svg>
+              <div class="budget-legend">
+                <span><i class="legend-dot legend-income"></i><span>Actual Expenses<strong>₱ 850,000</strong></span></span>
+                <span><i class="legend-dot legend-blue"></i><span>Remaining Budget<strong>₱ 150,000</strong></span></span>
+                <span class="variance"><i class="legend-dot legend-orange"></i><span>Variance<strong>Raw materials: + ₱ 50,000 (5.3%)</strong></span></span>
+              </div>
+            </div>
+          </article>
+
+          <article class="dashboard-panel chart-panel forecast-panel" data-permission="cashforecast">
+            <h3>Cash Flow Forecast (Next 4 Weeks)</h3>
+            <div class="forecast-plot">
+              <div class="forecast-y-labels" aria-hidden="true"><span>₱ 8M</span><span>₱ 6M</span><span>₱ 4M</span><span>₱ 2M</span><span>₱ 0</span></div>
+              <svg class="line-chart" viewBox="0 0 300 120" role="img" aria-label="Projected cash trends downward over weeks 10 to 13, with a low-cash threshold of 3 million pesos">
+                <path class="chart-gridline" d="M0 5H300M0 31H300M0 57H300M0 83H300M0 109H300"/>
+                <path class="threshold-line" d="M0 70H300"/>
+                <path class="cash-line" d="M10 39 82 51 154 62 226 73"/>
+                <g class="cash-points"><circle cx="10" cy="39" r="3.5"/><circle cx="82" cy="51" r="3.5"/><circle cx="154" cy="62" r="3.5"/><circle cx="226" cy="73" r="3.5"/></g>
+              </svg>
+              <div class="forecast-x-labels" aria-hidden="true"><span>Week 10</span><span>Week 11</span><span>Week 12</span><span>Week 13</span></div>
+            </div>
+            <div class="chart-legend forecast-legend"><span><i class="legend-dot legend-income"></i>Projected Cash</span><span><i class="legend-dash"></i>Low-cash Threshold (₱ 3,000,000)</span></div>
+          </article>
+        </section>
+
+        <section class="bottom-grid">
+          <article class="dashboard-panel transactions-panel">
+            <div class="panel-heading">
+              <h3>Recent Financial Transactions</h3>
+              <a href="transaction-history.html" class="panel-link" data-permission="transactions">View All</a>
+            </div>
+            <div class="table-wrap">
+              <table class="transactions-table">
+                <thead><tr><th>Date</th><th>Reference No.</th><th>Type</th><th>Description</th><th>Amount (₱)</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Oct 28, 2026</td><td class="reference-cell">INV-2026-1045</td><td>Income</td><td>Sale to ABC Retail</td><td>180,000</td><td><span class="status-chip status-blue">Invoiced</span></td></tr>
+                  <tr><td>Oct 27, 2026</td><td class="reference-cell">EXP-2026-0311</td><td>Expense</td><td>Raw Materials Purchase</td><td>75,000</td><td><span class="status-chip status-orange">Pending Approval</span></td></tr>
+                  <tr><td>Oct 26, 2026</td><td class="reference-cell">PR-2026-0012</td><td>Payment Request</td><td>Supplier Payment - XYZ</td><td>120,000</td><td><span class="status-chip status-orange">Pending Approval</span></td></tr>
+                  <tr><td>Oct 25, 2026</td><td class="reference-cell">INC-2026-1044</td><td>Income</td><td>Sale to DEF Mart</td><td>95,000</td><td><span class="status-chip status-blue">Partially Paid</span></td></tr>
+                  <tr><td>Oct 24, 2026</td><td class="reference-cell">EXP-2026-0330</td><td>Expense</td><td>Utilities Expense</td><td>22,000</td><td><span class="status-chip status-green">Approved</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="dashboard-panel alerts-panel">
+            <div class="panel-heading">
+              <h3 id="alerts-title">Alerts and Notifications</h3>
+              <a href="reports.html" class="panel-link" data-permission="reports">View All</a>
+            </div>
+            <ul class="alert-list">
+              <li class="alert-item alert-danger"><span class="alert-icon" aria-hidden="true">!</span><span>Projected cash below the ₱ 3,000,000 threshold in Week 13 (₱ 2,950,000).</span></li>
+              <li class="alert-item alert-warning" data-permission="budgets"><span class="alert-icon" aria-hidden="true">!</span><span>Raw Materials budget exceeded by ₱ 50,000 (16.7%).</span></li>
+              <li class="alert-item alert-info" data-permission="approvals"><span class="alert-icon" aria-hidden="true">i</span><span>5 payment requests pending approval.</span></li>
+              <li class="alert-item alert-neutral"><span class="alert-icon" aria-hidden="true">i</span><span>3 invoices are past due.</span></li>
+            </ul>
+          </article>
+          </section>
+        </div>
+        <footer class="dashboard-footer">Illustrative data for demonstration only. Verify financial information in its source module.</footer>
+      </main>
+    </div>
+  </div>
+  <script src="../js/dashboard.js" defer></script>
+</body>
+</html>

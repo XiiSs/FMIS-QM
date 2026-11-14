@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Sign in | FMIS Portal</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <aside class="login-intro" aria-label="FMIS Portal">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>FMIS PORTAL</span>
+      </div>
+
+      <div class="intro-copy">
+        <h1>One secure place<br>for financial<br>clarity.</h1>
+        <p>Access authorized financial records, approvals, budgets and reports through a role-based workspace.</p>
+      </div>
+
+      <div class="system-badge">PROPOSED SYSTEM <span aria-hidden="true">•</span> 2026</div>
+    </aside>
+
+    <section class="login-content" aria-labelledby="welcome-heading">
+      <div class="login-form-wrap">
+        <header class="login-header">
+          <h2 id="welcome-heading">Welcome back</h2>
+          <p>Sign in to access your authorized FMIS workspace.</p>
+        </header>
+
+        <form id="login-form" novalidate>
+          <div class="form-field">
+            <label for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="name@swiftfoods.example" autocomplete="username" required>
+          </div>
+
+          <div class="form-field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
+          </div>
+
+          <p class="form-hint">Credentials are verified before access.</p>
+          <p id="login-error" class="login-error" role="alert" aria-live="polite" hidden></p>
+
+          <button class="sign-in-button" type="submit">
+            <span>Sign in</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <p class="prototype-note">Prototype only — no live authentication</p>
+      </div>
+    </section>
+  </main>
+  <script src="../js/login.js" defer></script>
+</body>
+</html>
