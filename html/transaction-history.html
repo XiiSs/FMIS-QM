@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e3556">
+  <title>Transaction History | FMIS Portal</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="dashboard-page transaction-page history-page">
+  <div class="dashboard-app">
+    <aside class="dashboard-sidebar">
+      <a class="sidebar-brand" href="dashboard.html" aria-label="Swift Foods Financial Management Workspace">
+        <svg class="sidebar-brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9 12 4l9 5M5 10v8m5-8v8m4-8v8m5-8v8M3 20h18M2 9h20"/></svg>
+        <span class="sidebar-brand-copy"><strong>SWIFT FOODS</strong><small>Financial Management<br>Workspace</small></span>
+      </a>
+      <span class="sidebar-section-label">WORKSPACE</span>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a class="nav-link" href="dashboard.html" data-permission="dashboard"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span>Dashboard</span></a>
+        <a class="nav-link" href="income.html" data-permission="income"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17 10 11l4 4 6-8"/><path d="M14 7h6v6"/></svg><span>Income</span></a>
+        <a class="nav-link is-active" href="transaction-history.html" aria-current="page" data-permission="transactions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5"/><path d="M4 4v4.5h4.5M12 7v5l3 2"/></svg><span>Transaction History</span></a>
+        <a class="nav-link" href="expenses.html" data-permission="expenses"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 17 7-7 4 4 5-7"/><path d="M14 7h6v6"/></svg><span>Expenses</span></a>
+        <a class="nav-link" href="approvals.html" data-permission="approvals"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><span>Approvals</span></a>
+        <a class="nav-link" href="budgets.html" data-permission="budgets"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9m7 10V5m7 14v-7"/><path d="M3 19h18"/></svg><span>Budgets</span></a>
+        <a class="nav-link" href="cashforecast.html" data-permission="cashforecast"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h13l-3-3m3 3-3 3M21 17H8l3 3m-3-3 3-3"/></svg><span>Cash Forecast</span></a>
+        <a class="nav-link" href="reports.html" data-permission="reports"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6m-6 4h6"/></svg><span>Reports</span></a>
+        <a class="nav-link" href="audit.html" data-permission="audit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8m-8 4h8m-8 4h5"/></svg><span>Audit Trail</span></a>
+      </nav>
+      <div class="sidebar-user">
+        <span class="user-avatar user-avatar-small" aria-hidden="true">MG</span>
+        <span class="sidebar-user-name" id="sidebar-user-name">Finance Preparer</span>
+        <a class="sidebar-logout" href="login.html" aria-label="Sign out" title="Sign out"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5m5-3 4-4-4-4m4 4H9"/></svg></a>
+      </div>
+    </aside>
+
+    <div class="dashboard-main">
+      <header class="dashboard-topbar">
+        <button class="mobile-menu-toggle" id="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <h1 class="topbar-title">Transaction History</h1>
+        <div class="topbar-spacer"></div>
+        <a class="notification-button" href="#transaction-table" aria-label="Go to transaction records"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4"/></svg><span class="notification-count" aria-hidden="true">5</span></a>
+        <span class="user-avatar" aria-hidden="true">MG</span>
+        <div class="topbar-user"><strong id="profile-name">Maria G. Santos</strong><span id="profile-role">Finance Preparer</span></div>
+        <span class="profile-toggle" aria-hidden="true">⌄</span>
+      </header>
+
+      <main class="history-content">
+        <div class="history-breadcrumb"><a href="dashboard.html">Transaction History</a></div>
+        <section class="history-heading">
+          <span class="history-heading-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 3"/></svg></span>
+          <div><h2>Transaction History</h2><p>View and manage all income and expense transactions.</p></div>
+          <a class="history-new-revenue" href="transaction.html" data-permission="transactions">＋ Revenue Entry</a>
+        </section>
+        <p id="history-feedback" class="history-feedback" role="status" aria-live="polite" hidden></p>
+
+        <section class="dashboard-panel transaction-history-panel" aria-label="Search and filter transactions">
+          <label class="history-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4 4"/></svg><input id="history-search" type="search" placeholder="Search by transaction ID, customer, reference, or description..." aria-label="Search transactions"></label>
+          <div class="history-filter-grid">
+            <label class="history-filter"><span>Date Range</span><span class="history-filter-control"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><select id="date-range" aria-label="Date range"><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="all">All time</option></select></span></label>
+            <label class="history-filter"><span>Category</span><span class="history-filter-control"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg><select id="history-category" aria-label="Transaction category"><option value="">All Categories</option><option>Sales Revenue</option><option>Service Income</option><option>Product Sales</option><option>Other Income</option><option>Raw Materials</option><option>Utilities</option><option>Rent</option><option>Transportation</option><option>Salaries</option><option>Office Supplies</option><option>Other Expense</option></select></span></label>
+            <label class="history-filter"><span>Type</span><span class="history-filter-control"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg><select id="history-type" aria-label="Transaction type"><option value="">All Types</option><option value="Income">Income</option><option value="Expense">Expense</option></select></span></label>
+            <label class="history-filter"><span>Status / Collection Status</span><span class="history-filter-control"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg><select id="history-status" aria-label="Transaction or collection status"><option value="">All Statuses</option><option>Collected</option><option>Pending</option><option>Partially Collected</option><option>Overdue</option><option>Payment Requested</option></select></span></label>
+          </div>
+          <div class="history-filter-actions"><button id="apply-history-filters" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg>Apply Filters</button></div>
+        </section>
+
+        <section id="transaction-table" class="dashboard-panel history-table-panel" aria-label="Transaction records">
+          <div class="history-table-wrap">
+            <table class="transactions-table history-table">
+              <thead><tr>
+                <th><button type="button" data-sort="id">Transaction ID <span>↕</span></button></th>
+                <th><button type="button" data-sort="date">Date <span>↕</span></button></th>
+                <th><button type="button" data-sort="customer">Customer / Source <span>↕</span></button></th>
+                <th><button type="button" data-sort="type">Type <span>↕</span></button></th>
+                <th><button type="button" data-sort="category">Category <span>↕</span></button></th>
+                <th><button type="button" data-sort="amount">Amount <span>↕</span></button></th>
+                <th><button type="button" data-sort="status">Collection Status <span>↕</span></button></th>
+                <th>Actions</th>
+              </tr></thead>
+              <tbody id="history-records"></tbody>
+            </table>
+            <p id="history-empty" class="history-empty" role="status" hidden>No transactions match your search and filters.</p>
+          </div>
+          <div class="history-table-footer"><span id="history-count">Showing 0 transactions</span><nav class="history-pagination" aria-label="Transaction pages"><button id="history-prev" type="button" aria-label="Previous page">‹</button><span id="history-page">1</span><button id="history-next" type="button" aria-label="Next page">›</button></nav></div>
+        </section>
+        <p class="history-prototype-note">Illustrative records are shown for demonstration. Saved revenue and expense entries appear here from their workspaces.</p>
+      </main>
+    </div>
+  </div>
+  <script src="../js/transaction-history.js" defer></script>
+</body>
+</html>
