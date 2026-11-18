@@ -19,9 +19,9 @@ function initializeCashForecast() {
 
   const permissions = new Set(session.permissions);
   const email = session.email.toLowerCase();
-  const name = email.startsWith("management@") || email.startsWith("preparer@")
+  const name = session.fullName || (email.startsWith("management@") || email.startsWith("preparer@")
     ? "Maria G. Santos"
-    : email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+    : email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()));
   const initials = name.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
   document.querySelector("#profile-name").textContent = name;
   document.querySelector("#profile-role").textContent = session.role;

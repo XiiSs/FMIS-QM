@@ -132,9 +132,9 @@ function initializeTransactionHistory(session) {
   const firstName = email.startsWith("management@")
     ? "Maria"
     : email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-  const fullName = email.startsWith("management@") || email.startsWith("preparer@")
+  const fullName = session.fullName || (email.startsWith("management@") || email.startsWith("preparer@")
     ? "Maria G. Santos"
-    : firstName;
+    : firstName);
   const initials = fullName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
   const canEdit = session.role !== "Management / Read-only";
 

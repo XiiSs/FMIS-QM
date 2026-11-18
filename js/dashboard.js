@@ -20,10 +20,12 @@ function initializeDashboard() {
 
   const permissions = new Set(session.permissions);
   const email = session.email.toLowerCase();
-  const firstName = email.startsWith("management@") ? "Maria" : email.split("@")[0];
-  const fullName = email.startsWith("management@")
+  const firstName = session.fullName
+    ? session.fullName.trim().split(/\s+/)[0]
+    : email.startsWith("management@") ? "Maria" : email.split("@")[0];
+  const fullName = session.fullName || (email.startsWith("management@")
     ? "Maria G. Santos"
-    : firstName.replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+    : firstName.replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()));
   const initials = fullName
     .split(/\s+/)
     .filter(Boolean)

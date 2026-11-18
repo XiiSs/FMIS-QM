@@ -187,6 +187,31 @@ body {
   line-height: 1.4;
 }
 
+.login-status {
+  margin: 10px 2px 0;
+  color: #0e6f67;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.login-switch {
+  margin: 18px 0 0;
+  color: #71839d;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.login-switch a {
+  color: #117d74;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-switch a:hover {
+  text-decoration: underline;
+}
+
 .sign-in-button {
   display: flex;
   width: 100%;
@@ -278,6 +303,10 @@ body {
 
   #login-form {
     margin-top: 30px;
+  }
+
+  #signup-form {
+    margin-top: 26px;
   }
 }
 

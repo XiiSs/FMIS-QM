@@ -34,11 +34,11 @@ function initializeApprovals(session) {
   const permissions = new Set(session.permissions);
   const email = session.email.toLowerCase();
   const isApprover = session.role === "Approver";
-  const actorName = email === "approver@fmis.example"
+  const actorName = session.fullName || (email === "approver@fmis.example"
     ? "David L. Cruz"
     : email.startsWith("management@")
       ? "Maria G. Santos"
-      : email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+      : email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()));
   const initials = actorName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 
   document.querySelector("#profile-name").textContent = actorName;

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Create account | FMIS Portal</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <aside class="login-intro" aria-label="FMIS Portal">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>FMIS PORTAL</span>
+      </div>
+
+      <div class="intro-copy">
+        <h1>One secure place<br>for financial<br>clarity.</h1>
+        <p>Access authorized financial records, approvals, budgets and reports through a role-based workspace.</p>
+      </div>
+
+      <div class="system-badge">PROPOSED SYSTEM <span aria-hidden="true">•</span> 2026</div>
+    </aside>
+
+    <section class="login-content" aria-labelledby="signup-heading">
+      <div class="login-form-wrap">
+        <header class="login-header">
+          <h2 id="signup-heading">Create your account</h2>
+          <p>Register to access the FMIS workspace.</p>
+        </header>
+
+        <form id="signup-form" novalidate>
+          <div class="form-field">
+            <label for="full-name">Full name</label>
+            <input id="full-name" name="fullName" type="text" placeholder="Your full name" autocomplete="name" maxlength="100" required>
+          </div>
+
+          <div class="form-field">
+            <label for="signup-email">Email address</label>
+            <input id="signup-email" name="email" type="email" placeholder="name@example.com" autocomplete="email" maxlength="254" required>
+          </div>
+
+          <div class="form-field">
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" placeholder="Choose a username" autocomplete="username" minlength="3" maxlength="30" pattern="[A-Za-z0-9._\x2d]{3,30}" title="Use 3–30 letters, numbers, periods, underscores, or hyphens." required>
+          </div>
+
+          <div class="form-field">
+            <label for="signup-password">Password</label>
+            <input id="signup-password" name="password" type="password" placeholder="At least 8 characters" autocomplete="new-password" minlength="8" required>
+          </div>
+
+          <p class="form-hint">Accounts are saved in this browser for this prototype. Do not use a real password.</p>
+          <p id="signup-error" class="login-error" role="alert" aria-live="polite" hidden></p>
+
+          <button class="sign-in-button" type="submit">
+            <span>Create account</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <p class="login-switch">Already registered? <a href="login.html">Sign in</a></p>
+        <p class="prototype-note">Prototype only — no live authentication</p>
+      </div>
+    </section>
+  </main>
+  <script src="../js/signup.js" defer></script>
+</body>
+</html>

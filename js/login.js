@@ -2,18 +2,21 @@ const demoAccounts = [
   {
     email: "preparer@fmis.example",
     password: "Prepare2026!",
+    fullName: "Maria G. Santos",
     role: "Finance Preparer",
     permissions: ["dashboard", "income", "transactions", "expenses", "budgets", "reports"],
   },
   {
     email: "approver@fmis.example",
     password: "Approve2026!",
+    fullName: "David L. Cruz",
     role: "Approver",
     permissions: ["dashboard", "approvals", "reports"],
   },
   {
     email: "management@fmis.example",
     password: "Manage2026!",
+    fullName: "Maria G. Santos",
     role: "Management / Read-only",
     permissions: [
       "dashboard",
@@ -31,23 +34,52 @@ const demoAccounts = [
 
 const loginForm = document.querySelector("#login-form");
 const errorMessage = document.querySelector("#login-error");
+const statusMessage = document.querySelector("#login-status");
+const registeredUsersKey = "fmisRegisteredUsers";
+
+const params = new URLSearchParams(window.location.search);
+if (params.get("registered") === "1") {
+  statusMessage.textContent = "Account created. Sign in with your email or username.";
+  statusMessage.hidden = false;
+  document.querySelector("#email").value = params.get("email") || "";
+}
 
 loginForm.addEventListener("submit", (event) => {
   event.preventDefault();
   sessionStorage.removeItem("fmisSession");
   errorMessage.hidden = true;
   errorMessage.textContent = "";
+  statusMessage.hidden = true;
+  statusMessage.textContent = "";
 
   if (!loginForm.reportValidity()) {
     return;
   }
 
   const formData = new FormData(loginForm);
-  const email = String(formData.get("email")).trim().toLowerCase();
+  const identifier = String(formData.get("email")).trim().toLowerCase();
   const password = String(formData.get("password"));
+  let registeredUsers = [];
+  try {
+    const savedUsers = localStorage.getItem(registeredUsersKey);
+    registeredUsers = savedUsers ? JSON.parse(savedUsers) : [];
+    if (!Array.isArray(registeredUsers)) {
+      throw new Error("Stored accounts are not a list.");
+    }
+  } catch {
+    errorMessage.textContent =
+      "Saved account data could not be read. Clear this browser's prototype account data and try again.";
+    errorMessage.hidden = false;
+    return;
+  }
+
   const account = demoAccounts.find(
     (candidate) =>
-      candidate.email === email && candidate.password === password,
+      candidate.email === identifier && candidate.password === password,
+  ) || registeredUsers.find(
+    (candidate) =>
+      (candidate.email === identifier || candidate.username === identifier) &&
+      candidate.password === password,
   );
 
   if (!account) {
@@ -61,6 +93,7 @@ loginForm.addEventListener("submit", (event) => {
     "fmisSession",
     JSON.stringify({
       email: account.email,
+      fullName: account.fullName,
       role: account.role,
       permissions: account.permissions,
     }),

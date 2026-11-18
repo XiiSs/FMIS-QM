@@ -1,8 +1,8 @@
 # FMIS-QM
 
-## Login prototype
+## Login and signup prototype
 
-Open `html/login.html` to view the responsive sign-in screen. This is a front-end prototype only; its sample credential checks run in the browser and are not suitable for real authentication.
+Open `html/login.html` to view the responsive sign-in screen, or `html/signup.html` to create a prototype account using a full name, email, username, and password. Registered accounts are stored in browser local storage and receive the Finance Preparer role; they can sign in with their email or username. This is a front-end prototype only: credentials are not securely stored, and this flow is not suitable for real authentication. Do not use a real password.
 
 | Demo role | Email | Password |
 |---|---|---|
