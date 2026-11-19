@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Create account | FMIS Portal</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/register.css">
+</head>
+<body class="login-page register-page">
+  <main class="login-shell">
+    <aside class="login-intro" aria-label="FMIS Portal">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>FMIS PORTAL</span>
+      </div>
+
+      <div class="intro-copy">
+        <h1>One secure place<br>for financial<br>clarity.</h1>
+        <p>Access authorized financial records, approvals, budgets and reports through a role-based workspace.</p>
+      </div>
+
+      <div class="system-badge">PROPOSED SYSTEM <span aria-hidden="true">•</span> 2026</div>
+    </aside>
+
+    <section class="login-content" aria-labelledby="register-heading">
+      <div class="login-form-wrap">
+        <header class="login-header">
+          <h2 id="register-heading">Create an account</h2>
+          <p>Complete the registration form below.</p>
+        </header>
+
+        <form id="register-form" novalidate>
+          <div class="form-field">
+            <label for="register-email">Email address</label>
+            <input id="register-email" name="email" type="email" placeholder="name@swiftfoods.example" autocomplete="email" maxlength="254" required>
+          </div>
+
+          <div class="form-field">
+            <label for="register-name">Full name / Username</label>
+            <input id="register-name" name="name" type="text" placeholder="Enter your full name or username" autocomplete="name" minlength="2" maxlength="80" required>
+          </div>
+
+          <div class="form-field">
+            <label for="register-password">Password</label>
+            <input id="register-password" name="password" type="password" placeholder="Create a password" autocomplete="new-password" minlength="8" required>
+          </div>
+
+          <div class="form-field">
+            <label for="register-confirm">Verify password</label>
+            <input id="register-confirm" name="confirmPassword" type="password" placeholder="Re-enter your password" autocomplete="new-password" minlength="8" required>
+          </div>
+
+          <p class="register-hint">Use at least 8 characters for your password.</p>
+          <label class="register-password-toggle" for="show-passwords">
+            <input id="show-passwords" type="checkbox">
+            <span>Show passwords</span>
+          </label>
+
+          <p id="register-feedback" class="register-feedback" role="status" aria-live="polite" hidden></p>
+
+          <button class="sign-in-button" type="submit">
+            <span>Register account</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <p class="register-switch">Already have an account? <a href="login.html">Sign in</a></p>
+        <p class="prototype-note register-prototype-note">Prototype only — validates form input but does not save an account. A backend is required to create logins.</p>
+      </div>
+    </section>
+  </main>
+  <script src="../js/register.js" defer></script>
+</body>
+</html>

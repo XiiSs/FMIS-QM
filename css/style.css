@@ -2554,6 +2554,7 @@ body {
 .income-table-wrap {
   width: 100%;
   overflow-x: auto;
+  contain: paint;
 }
 
 .income-table {
@@ -6765,4 +6766,1066 @@ body {
   .audit-page .audit-table {
     min-width: 0;
   }
+}
+
+@media (min-width: 1100px) {
+  .dashboard-app {
+    grid-template-columns: 244px minmax(0, 1fr);
+  }
+
+  .dashboard-sidebar {
+    min-height: 100vh;
+  }
+
+  .sidebar-brand {
+    min-height: 82px;
+    gap: 12px;
+    padding: 18px 16px 14px 20px;
+  }
+
+  .sidebar-brand-icon {
+    width: 26px;
+    height: 28px;
+    flex-basis: 26px;
+  }
+
+  .sidebar-brand-copy strong { font-size: 14px; }
+  .sidebar-brand-copy small { font-size: 11px; }
+  .sidebar-nav { gap: 7px; padding: 14px 12px; }
+  .nav-link { min-height: 42px; gap: 12px; padding: 8px 11px; border-radius: 6px; font-size: 13px; }
+  .nav-link svg { width: 19px; height: 19px; flex-basis: 19px; }
+  .sidebar-user { min-height: 52px; gap: 10px; padding: 9px 14px; }
+  .sidebar-user-name { font-size: 11px; }
+  .user-avatar-small { width: 28px; height: 28px; flex-basis: 28px; font-size: 10px; }
+  .dashboard-topbar { height: 56px; gap: 12px; padding: 0 26px 0 22px; }
+  .topbar-title { font-size: 16px; }
+  .notification-button { width: 32px; height: 34px; }
+  .notification-button svg { width: 20px; height: 20px; }
+  .notification-count { width: 14px; height: 14px; font-size: 9px; }
+  .user-avatar { width: 34px; height: 34px; flex-basis: 34px; font-size: 10px; }
+  .topbar-user strong { font-size: 12px; }
+  .topbar-user span { font-size: 10px; }
+
+  .dashboard-content {
+    min-height: calc(100vh - 56px);
+    gap: 18px;
+    padding: 24px clamp(22px, 2.4vw, 40px) 22px;
+  }
+
+  .dashboard-heading { min-height: 58px; gap: 20px; }
+  .dashboard-heading h2 { margin-bottom: 5px; font-size: 26px; }
+  .dashboard-heading p { font-size: 14px; }
+  .period-select-wrap { height: 42px; gap: 9px; padding: 0 13px; border-radius: 6px; }
+  .period-select-wrap > svg { width: 17px; height: 17px; }
+  .period-select-wrap select { max-width: 160px; font-size: 12px; }
+  .period-caret { right: 10px; font-size: 15px; }
+
+  .summary-grid { gap: 14px; }
+  .summary-card { min-height: 104px; gap: 12px; padding: 16px 14px; border-radius: 8px; }
+  .summary-icon { width: 36px; height: 36px; flex-basis: 36px; border-radius: 8px; }
+  .summary-icon svg { width: 21px; height: 21px; }
+  .summary-copy { gap: 5px; }
+  .summary-label { font-size: 12px; }
+  .summary-copy > strong { font-size: 16px; }
+  .summary-change, .summary-detail { gap: 2px; font-size: 10px; }
+  .summary-change b { font-size: 11px; }
+
+  .charts-grid { gap: 16px; }
+  .chart-panel { min-height: 250px; padding: 18px; border-radius: 8px; }
+  .dashboard-panel h3 { font-size: 15px; }
+  .chart-plot, .forecast-plot { height: 145px; margin: 14px 0 0 36px; }
+  .chart-y-labels, .forecast-y-labels { left: -36px; font-size: 10px; }
+  .chart-x-labels, .forecast-x-labels { bottom: -17px; font-size: 10px; }
+  .chart-legend { gap: 22px; margin-top: 23px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; flex-basis: 10px; }
+  .budget-chart-content { min-height: 190px; gap: 12px; }
+  .budget-donut { width: min(52%, 165px); flex-basis: 165px; }
+  .donut-percent { font-size: 17px; }
+  .donut-amount { font-size: 7px; }
+  .donut-caption { font-size: 6px; }
+  .budget-legend { gap: 12px; font-size: 11px; }
+  .budget-legend strong { font-size: 11px; }
+  .forecast-legend { gap: 14px; margin-top: 23px; font-size: 10px; }
+
+  .bottom-grid { gap: 16px; grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr); }
+  .transactions-panel, .alerts-panel { min-height: 205px; border-radius: 8px; }
+  .panel-heading { min-height: 44px; padding: 0 15px; }
+  .panel-heading h3 { font-size: 15px; }
+  .panel-link { font-size: 12px; }
+  .transactions-table { font-size: 11px; }
+  .transactions-table th, .transactions-table td { height: 37px; padding: 7px 10px; }
+  .status-chip { padding: 4px 7px; font-size: 10px; }
+  .alert-list { gap: 8px; padding: 12px; }
+  .alert-item { min-height: 38px; gap: 9px; padding: 8px 10px; border-radius: 6px; font-size: 12px; }
+  .alert-icon { width: 18px; height: 18px; flex-basis: 18px; font-size: 11px; }
+  .dashboard-footer { font-size: 10px; }
+}
+
+@media (min-width: 1100px) and (max-width: 1459px) {
+  .summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .charts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .forecast-panel { grid-column: 1 / -1; }
+}
+
+@media (min-width: 1460px) {
+  .summary-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .charts-grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.95fr) minmax(0, 1.05fr); }
+  .forecast-panel { grid-column: auto; }
+}
+
+@media (min-width: 621px) and (max-width: 1099px) {
+  .dashboard-app { grid-template-columns: 220px minmax(0, 1fr); }
+  .sidebar-brand { min-height: 76px; gap: 10px; padding: 16px 14px; }
+  .sidebar-brand-icon { width: 24px; height: 26px; flex-basis: 24px; }
+  .sidebar-brand-copy strong { font-size: 13px; }
+  .sidebar-brand-copy small { font-size: 10px; }
+  .sidebar-nav { gap: 5px; padding: 10px; }
+  .nav-link { min-height: 38px; gap: 10px; padding: 7px 10px; font-size: 12px; }
+  .nav-link svg { width: 18px; height: 18px; flex-basis: 18px; }
+  .sidebar-user { min-height: 46px; gap: 8px; padding: 8px 10px; }
+  .sidebar-user-name { font-size: 10px; }
+  .dashboard-topbar { height: 50px; gap: 10px; padding: 0 18px; }
+  .topbar-title { font-size: 15px; }
+  .notification-button { width: 28px; height: 30px; }
+  .notification-button svg { width: 18px; height: 18px; }
+  .user-avatar { width: 30px; height: 30px; flex-basis: 30px; font-size: 9px; }
+  .topbar-user strong { font-size: 11px; }
+  .topbar-user span { font-size: 9px; }
+
+  .dashboard-content { gap: 14px; padding: 18px 20px; }
+  .dashboard-heading { min-height: 50px; gap: 12px; }
+  .dashboard-heading h2 { font-size: 22px; }
+  .dashboard-heading p { font-size: 12px; }
+  .period-select-wrap { height: 38px; padding: 0 10px; }
+  .period-select-wrap select { max-width: 145px; font-size: 11px; }
+  .period-select-wrap > svg { width: 15px; height: 15px; }
+  .summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .summary-card { min-height: 92px; gap: 10px; padding: 13px; border-radius: 7px; }
+  .summary-icon { width: 32px; height: 32px; flex-basis: 32px; }
+  .summary-icon svg { width: 19px; height: 19px; }
+  .summary-copy { gap: 4px; }
+  .summary-label { font-size: 11px; }
+  .summary-copy > strong { font-size: 15px; }
+  .summary-change, .summary-detail { font-size: 9px; }
+  .summary-change b { font-size: 10px; }
+  .dashboard-panel h3 { font-size: 14px; }
+
+  .charts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .chart-panel { min-height: 220px; padding: 15px; border-radius: 7px; }
+  .forecast-panel { grid-column: 1 / -1; }
+  .chart-plot, .forecast-plot { height: 125px; margin: 12px 0 0 32px; }
+  .chart-y-labels, .forecast-y-labels { left: -32px; font-size: 9px; }
+  .chart-x-labels, .forecast-x-labels { bottom: -15px; font-size: 9px; }
+  .chart-legend { gap: 18px; margin-top: 21px; font-size: 11px; }
+  .budget-chart-content { min-height: 165px; gap: 10px; }
+  .budget-donut { width: min(48%, 145px); flex-basis: 145px; }
+  .budget-legend, .budget-legend strong { font-size: 10px; }
+  .budget-legend { gap: 10px; }
+  .forecast-legend { gap: 12px; margin-top: 21px; font-size: 9px; }
+
+  .bottom-grid { grid-template-columns: minmax(0, 1.55fr) minmax(240px, 1fr); gap: 12px; }
+  .transactions-panel, .alerts-panel { min-height: 180px; }
+  .panel-heading { min-height: 38px; padding: 0 12px; }
+  .panel-heading h3 { font-size: 13px; }
+  .panel-link { font-size: 11px; }
+  .transactions-table { font-size: 10px; }
+  .transactions-table th, .transactions-table td { height: 31px; padding: 5px 8px; }
+  .status-chip { font-size: 9px; }
+  .alert-list { gap: 6px; padding: 9px; }
+  .alert-item { min-height: 32px; gap: 7px; padding: 6px 8px; font-size: 10px; }
+  .alert-icon { width: 16px; height: 16px; flex-basis: 16px; }
+  .dashboard-footer { font-size: 9px; }
+}
+
+@media (min-width: 901px) and (max-width: 1099px) {
+  .summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 621px) and (max-width: 900px) {
+  .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 621px) and (max-width: 767px) {
+  .dashboard-heading { align-items: flex-start; flex-direction: column; }
+  .dashboard-heading p { max-width: none; }
+  .period-select-wrap { align-self: flex-start; }
+  .charts-grid, .bottom-grid { grid-template-columns: minmax(0, 1fr); }
+  .forecast-panel { grid-column: auto; }
+}
+
+@media (max-width: 620px) {
+  .dashboard-page { min-width: 0; }
+  .dashboard-app { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-sidebar { width: min(250px, 86vw); }
+  .sidebar-brand { min-height: 68px; }
+  .sidebar-brand-copy strong { font-size: 13px; }
+  .sidebar-brand-copy small { font-size: 10px; }
+  .nav-link { min-height: 40px; font-size: 12px; }
+  .dashboard-topbar { height: 50px; gap: 10px; padding: 0 12px; }
+  .topbar-title { font-size: 15px; }
+  .notification-button { width: 28px; height: 30px; }
+  .notification-button svg { width: 18px; height: 18px; }
+  .notification-count { width: 13px; height: 13px; font-size: 8px; }
+  .user-avatar { width: 28px; height: 28px; flex-basis: 28px; font-size: 9px; }
+  .topbar-user strong { font-size: 10px; }
+  .topbar-user span { font-size: 8px; }
+
+  .dashboard-content { gap: 14px; padding: 16px 14px 20px; }
+  .dashboard-heading { min-height: 0; gap: 12px; }
+  .dashboard-heading h2 { margin-bottom: 4px; font-size: 21px; }
+  .dashboard-heading p { max-width: none; font-size: 12px; }
+  .period-select-wrap { height: 38px; gap: 8px; padding: 0 10px; }
+  .period-select-wrap > svg { width: 15px; height: 15px; }
+  .period-select-wrap select { max-width: 150px; font-size: 11px; }
+  .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .summary-card { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; min-height: 118px; gap: 8px; padding: 12px; border-radius: 7px; }
+  .summary-icon { grid-column: 1; grid-row: 1; width: 30px; height: 30px; }
+  .summary-icon svg { width: 18px; height: 18px; }
+  .summary-copy { grid-column: 1; grid-row: 2; gap: 4px; }
+  .summary-label { font-size: 10px; }
+  .summary-copy > strong { font-size: 14px; }
+  .summary-change, .summary-detail { font-size: 9px; }
+  .summary-change b { font-size: 10px; }
+
+  .charts-grid, .bottom-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .forecast-panel { grid-column: auto; }
+  .chart-panel { min-height: 210px; padding: 14px; border-radius: 7px; }
+  .dashboard-panel h3 { font-size: 13px; }
+  .chart-plot, .forecast-plot { height: 125px; margin: 12px 0 0 30px; }
+  .chart-y-labels, .forecast-y-labels { left: -30px; font-size: 9px; }
+  .chart-x-labels, .forecast-x-labels { bottom: -15px; font-size: 9px; }
+  .chart-legend { gap: 16px; margin-top: 21px; font-size: 10px; }
+  .budget-chart-content { min-height: 160px; justify-content: center; gap: 12px; }
+  .budget-donut { width: min(46%, 135px); flex-basis: 135px; }
+  .budget-legend, .budget-legend strong { font-size: 9px; }
+  .budget-legend { gap: 9px; }
+  .forecast-legend { flex-wrap: wrap; gap: 10px; margin-top: 21px; font-size: 9px; }
+
+  .transactions-panel, .alerts-panel { min-height: 0; border-radius: 7px; }
+  .panel-heading { min-height: 38px; gap: 6px; padding: 0 10px; }
+  .panel-heading h3 { font-size: 12px; }
+  .panel-link { font-size: 10px; }
+  .table-wrap { min-width: 0; }
+  .transactions-table { min-width: 680px; font-size: 9px; }
+  .transactions-table th, .transactions-table td { height: 32px; padding: 5px 8px; }
+  .status-chip { font-size: 8px; }
+  .alert-list { gap: 7px; padding: 9px; }
+  .alert-item { min-height: 34px; gap: 8px; padding: 7px 8px; font-size: 10px; }
+  .alert-icon { width: 16px; height: 16px; flex-basis: 16px; }
+  .dashboard-footer { font-size: 9px; }
+}
+
+@media (max-width: 380px) {
+  .dashboard-content { padding-right: 10px; padding-left: 10px; }
+  .summary-grid { gap: 8px; }
+  .summary-card { min-height: 112px; padding: 10px; }
+  .summary-copy > strong { font-size: 13px; }
+  .topbar-user span { display: none; }
+}
+
+@media (max-height: 560px) {
+  .dashboard-sidebar {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+
+@media screen and (min-width: 1100px) {
+  .income-content,
+  .history-content,
+  .transaction-content,
+  .expense-content,
+  .approval-content,
+  .budget-content,
+  .cashflow-content,
+  .report-content,
+  .audit-content {
+    min-height: calc(100vh - 56px);
+    gap: 16px;
+    padding: 24px clamp(22px, 2.4vw, 40px) 28px;
+  }
+
+  .sidebar-section-label { padding: 16px 18px 6px; font-size: 10px; }
+
+  .history-breadcrumb,
+  .history-heading p,
+  .history-filter > span:first-child,
+  .history-filter-control select,
+  .history-filter-actions button,
+  .history-table,
+  .history-table-footer,
+  .history-prototype-note { font-size: 12px; }
+  .history-heading { min-height: 68px; gap: 16px; }
+  .history-heading-icon { width: 52px; height: 52px; flex-basis: 52px; }
+  .history-heading-icon svg { width: 32px; height: 32px; }
+  .history-heading h2 { font-size: 25px; }
+  .history-new-revenue { min-height: 42px; padding: 8px 14px; font-size: 12px; }
+  .transaction-history-panel { gap: 14px; padding: 18px; }
+  .history-search { min-height: 44px; padding: 6px 12px; }
+  .history-search input { font-size: 12px; }
+  .history-filter-grid { gap: 16px; }
+  .history-filter { gap: 7px; }
+  .history-filter-control { min-height: 42px; gap: 9px; padding: 4px 10px; }
+  .history-filter-control select { height: 34px; }
+  .history-filter-actions button { min-height: 40px; padding: 7px 14px; }
+  .history-table { min-width: 1050px; }
+  .history-table th,
+  .history-table td { height: 42px; padding: 9px 12px; }
+  .history-type-chip,
+  .history-status-chip { min-height: 24px; padding: 4px 10px; font-size: 10px; }
+  .history-table-footer { min-height: 44px; }
+  .history-pagination button,
+  .history-pagination span { width: 34px; height: 32px; }
+
+  .income-tabs { min-height: 44px; border-radius: 7px; }
+  .income-tab { padding: 10px 14px 12px; font-size: 13px; }
+  .income-content,
+  .income-view { gap: 14px; }
+  .income-top-grid { gap: 16px; }
+  .invoice-form-panel { padding: 18px 20px; }
+  .invoice-form-panel > h2,
+  .income-summary-heading h2,
+  .income-records-heading h2,
+  .income-secondary-heading h2 { font-size: 15px; }
+  .invoice-form { gap: 12px 20px; margin-top: 12px; }
+  .income-field { gap: 6px; }
+  .income-field label,
+  .income-field input,
+  .income-field select,
+  .income-search input,
+  .income-tool-button,
+  .income-filters label,
+  .income-filters select,
+  .income-table,
+  .income-table-footer,
+  .income-prototype-note { font-size: 12px; }
+  .income-field input,
+  .income-field select { height: 40px; padding: 6px 10px; }
+  .income-field textarea { height: 68px; min-height: 68px; padding: 8px 10px; font-size: 12px; }
+  .reference-input { height: 40px; }
+  .reference-input > span { padding-left: 10px; font-size: 12px; }
+  .reference-input input { height: 38px; }
+  .description-input > span { right: 8px; bottom: 7px; font-size: 10px; }
+  .income-button { min-height: 40px; padding: 7px 14px; font-size: 12px; }
+  .income-button svg,
+  .income-tool-button svg { width: 16px; height: 16px; }
+  .income-summary-panel { padding: 18px 18px 10px; }
+  .income-summary-heading { gap: 10px; padding-bottom: 12px; }
+  .income-period-select { height: 36px; gap: 7px; padding: 0 9px; }
+  .income-period-select > svg { width: 15px; height: 15px; }
+  .income-period-select select { max-width: 130px; font-size: 11px; }
+  .income-metric { min-height: 64px; gap: 12px; padding: 8px 3px; }
+  .income-metric-icon { width: 40px; height: 40px; flex-basis: 40px; }
+  .income-metric-icon svg { width: 21px; height: 21px; }
+  .income-metric-label { font-size: 11px; }
+  .income-metric strong { font-size: 17px; }
+  .metric-change { font-size: 10px; }
+  .metric-change small { font-size: 9px; }
+  .income-records-heading { gap: 10px 16px; padding: 14px 16px; }
+  .income-search { min-height: 40px; gap: 8px; padding: 5px 10px; }
+  .income-search svg { width: 16px; height: 16px; flex-basis: 16px; }
+  .income-tool-button { min-height: 40px; padding: 6px 11px; }
+  .income-filters { gap: 14px; padding-top: 6px; }
+  .income-filters select { height: 36px; padding: 5px 24px 5px 8px; }
+  .income-table { min-width: 1200px; }
+  .income-table th,
+  .income-table td { height: 40px; padding: 8px 11px; }
+  .income-table .status-chip { font-size: 10px; }
+  .income-table-footer { min-height: 42px; padding: 6px 12px; }
+  .income-pagination button,
+  .income-pagination span { width: 30px; height: 28px; }
+  .income-secondary-panel { min-height: 190px; }
+  .income-secondary-heading { padding: 18px; }
+  .income-secondary-heading p,
+  .invoice-list-search input,
+  .income-report-cards span,
+  .income-report-empty { font-size: 12px; }
+  .invoice-list-search { margin: 0 18px 12px; }
+  .collection-form input,
+  .collection-form button { height: 34px; font-size: 11px; }
+  .income-report-cards { gap: 12px; padding: 8px 18px 20px; }
+  .income-report-cards article { gap: 10px; padding: 16px; }
+  .income-report-cards strong { font-size: 19px; }
+  .report-breakdown-title { padding: 0 18px 10px; font-size: 14px; }
+
+  .transaction-breadcrumb { gap: 8px; font-size: 12px; }
+  .transaction-breadcrumb svg { width: 15px; height: 15px; }
+  .revenue-heading { min-height: 68px; gap: 16px; }
+  .revenue-heading-icon { width: 50px; height: 50px; flex-basis: 50px; }
+  .revenue-heading-icon svg { width: 32px; height: 32px; }
+  .revenue-heading h2 { font-size: 25px; }
+  .revenue-heading p { font-size: 13px; }
+  .revenue-entry-panel { padding: 18px 20px 20px; }
+  .revenue-entry-panel > h3 { margin-bottom: 14px; padding: 10px 12px; font-size: 15px; }
+  .revenue-form-grid { gap: 14px 24px; }
+  .revenue-field { gap: 6px; }
+  .revenue-field label { font-size: 12px; }
+  .revenue-input-with-icon { min-height: 42px; }
+  .revenue-input-with-icon > svg { width: 18px; height: 18px; margin: 0 11px; }
+  .revenue-input-with-icon input,
+  .revenue-input-with-icon select { height: 40px; padding: 6px 10px; font-size: 12px; }
+  .revenue-currency { width: 38px; height: 40px; flex-basis: 38px; font-size: 14px; }
+  .revenue-field-error { font-size: 11px; }
+  .revenue-form-actions { gap: 14px; padding-top: 6px; }
+  .revenue-reset-button,
+  .revenue-save-button,
+  .revenue-history-button { min-height: 44px; font-size: 12px; }
+  .transaction-feedback { grid-template-columns: 22px minmax(0, 1fr) 24px; gap: 12px; padding: 14px 16px; }
+  .transaction-feedback strong { font-size: 13px; }
+  .transaction-feedback p,
+  .transaction-prototype-note { font-size: 11px; }
+  .transaction-feedback-icon { width: 21px; height: 21px; }
+  .expense-content { gap: 16px; }
+  .expense-heading { min-height: 68px; }
+  .expense-heading .expense-role-badge { font-size: 12px; }
+  .expense-entry-panel { padding: 18px 20px 20px; }
+  .expense-entry-panel > h3 { margin-bottom: 14px; padding: 10px 12px; font-size: 15px; }
+  .expense-form-grid { gap: 14px 24px; }
+  .expense-document-control { min-height: 42px; gap: 10px; padding: 0 12px; }
+  .expense-document-control > svg { width: 18px; height: 18px; flex-basis: 18px; }
+  .expense-document-pick,
+  .expense-document-control > span { font-size: 12px; }
+  .expense-document-help,
+  .expense-info-banner p,
+  .expense-message p { font-size: 11px; }
+  .expense-form-actions { gap: 14px; padding-top: 6px; }
+  .expense-form-actions > button { min-height: 44px; padding: 8px 12px; font-size: 12px; }
+  .expense-info-banner,
+  .expense-message { grid-template-columns: 22px minmax(0, 1fr) 24px; gap: 10px; padding: 14px 16px; }
+  .expense-message strong { font-size: 13px; }
+  .expense-warning-actions { gap: 8px; }
+  .expense-warning-actions button { min-height: 36px; padding: 6px 10px; font-size: 11px; }
+  .expense-request-hint { font-size: 10px; }
+
+  .approval-open-row { gap: 12px; font-size: 12px; }
+  .approval-open-row select { height: 40px; padding: 6px 10px; font-size: 12px; }
+  .approval-layout { grid-template-columns: minmax(0, 2.1fr) minmax(300px, 0.9fr); gap: 16px; }
+  .approval-main-column,
+  .approval-side-column { gap: 14px; }
+  .approval-details-panel,
+  .approval-actions-panel,
+  .approval-status-panel,
+  .approval-history-panel { padding: 16px 18px; border-radius: 8px; }
+  .approval-details-panel > h3,
+  .approval-actions-panel > h3,
+  .approval-status-panel > h3,
+  .approval-history-panel > h3,
+  .approval-subheading { margin-bottom: 12px; padding: 9px 11px; font-size: 14px; }
+  .approval-detail-grid { gap: 12px 14px; }
+  .approval-detail { gap: 5px; }
+  .approval-detail-label,
+  .approval-detail-value,
+  .approval-meta-person,
+  .approval-meta-value,
+  .approval-caution p,
+  .approval-role-notice p,
+  .approval-status-summary p,
+  .approval-comment-label,
+  .approval-feedback { font-size: 11px; }
+  .approval-detail-value { min-height: 40px; gap: 8px; padding: 6px 9px; }
+  .approval-detail-value > svg,
+  .approval-meta-value > svg { width: 16px; height: 16px; flex-basis: 16px; }
+  .approval-document-note,
+  .approval-meta-person small,
+  .approval-action-note,
+  .approval-no-transfer { font-size: 10px; }
+  .approval-request-meta { gap: 14px; padding-bottom: 12px; }
+  .approval-meta-person strong { font-size: 12px; }
+  .approval-status-chip,
+  .approval-history-status { padding: 6px 10px; font-size: 10px; }
+  .approval-caution { gap: 10px; padding: 12px; }
+  .approval-actor { gap: 8px; font-size: 12px; }
+  .approval-role-notice { gap: 9px; margin-bottom: 12px; padding: 10px; }
+  .approval-action-buttons { gap: 9px; }
+  .approval-action-button,
+  .approval-submit-button { min-height: 42px; gap: 8px; padding: 8px 12px; font-size: 12px; }
+  .approval-action-button svg,
+  .approval-submit-button svg { width: 17px; height: 17px; flex-basis: 17px; }
+  .approval-comment-label { margin-bottom: 7px; }
+  #approval-comment { min-height: 76px; padding: 9px 10px; font-size: 12px; }
+  .approval-status-clock { width: 34px; height: 34px; flex-basis: 34px; font-size: 27px; }
+  .approval-history-table { min-width: 850px; font-size: 11px; }
+  .approval-history-table th,
+  .approval-history-table td { padding: 9px 8px; }
+  .approval-history-status { font-size: 10px; }
+
+  .budget-page-heading h2,
+  .cashflow-heading h2 { font-size: 25px; }
+  .budget-page-heading p,
+  .cashflow-heading p { font-size: 13px; }
+  .budget-period-form { min-width: 245px; gap: 6px; }
+  .budget-period-form > label { font-size: 11px; }
+  .budget-period-actions { gap: 8px; }
+  .budget-period-actions select,
+  .budget-period-actions button { height: 40px; padding: 6px 10px; font-size: 12px; }
+  .budget-period-actions select { width: 150px; }
+  .budget-summary-grid { gap: 14px; }
+  .budget-summary-card { min-height: 96px; gap: 7px; padding: 14px 16px; border-radius: 8px; }
+  .budget-summary-card > span { font-size: 12px; }
+  .budget-summary-card > strong { font-size: 21px; }
+  .budget-summary-card > small { font-size: 11px; }
+  .budget-chart-panel,
+  .budget-table-panel { padding: 16px 18px; border-radius: 8px; }
+  .budget-panel-heading { gap: 16px; }
+  .budget-panel-heading h3 { font-size: 14px; }
+  .budget-panel-heading > p,
+  .budget-category-count,
+  .budget-legend { font-size: 11px; }
+  .budget-legend { gap: 14px; }
+  .budget-legend i { width: 10px; height: 10px; }
+  .budget-chart { height: 205px; gap: 16px; margin-top: 12px; padding: 10px 8px 0; }
+  .budget-chart-category { grid-template-rows: minmax(0, 1fr) 24px; }
+  .budget-chart-bars { gap: 8px; }
+  .budget-chart-bar { min-width: 12px; }
+  .budget-chart-label { padding-top: 6px; font-size: 11px; }
+  .budget-table-wrap { margin-top: 12px; }
+  .budget-table { min-width: 850px; font-size: 12px; }
+  .budget-table th { font-size: 11px; }
+  .budget-table th,
+  .budget-table td { padding: 10px 12px; }
+  .budget-status-chip { padding: 5px 9px; font-size: 10px; }
+  .budget-alert { gap: 10px; padding: 12px 14px; }
+  .budget-alert > span { width: 19px; height: 19px; flex-basis: 19px; font-size: 12px; }
+  .budget-alert p,
+  .budget-note { font-size: 11px; }
+  .budget-forecast-link { min-height: 42px; padding: 9px 14px; font-size: 12px; }
+
+  .cashflow-heading { gap: 16px; }
+  .cashflow-readonly-badge { padding: 7px 11px; font-size: 11px; }
+  .cashflow-summary-grid { gap: 14px; }
+  .cashflow-summary-card { min-height: 96px; gap: 7px; padding: 14px 16px; border-radius: 8px; }
+  .cashflow-summary-card > span { font-size: 12px; }
+  .cashflow-summary-card > strong { font-size: 20px; }
+  .cashflow-summary-card > small { font-size: 11px; }
+  .cashflow-main-grid { grid-template-columns: minmax(0, 2.2fr) minmax(320px, 0.95fr); gap: 16px; }
+  .cashflow-table-panel,
+  .cashflow-chart-panel { padding: 16px; border-radius: 8px; }
+  .cashflow-panel-heading { gap: 12px; margin-bottom: 10px; }
+  .cashflow-panel-heading h3,
+  .cashflow-chart-heading h3 { font-size: 14px; }
+  .cashflow-panel-heading p,
+  .cashflow-panel-heading > span,
+  .cashflow-chart-heading p { font-size: 10px; }
+  .cashflow-table { min-width: 950px; font-size: 11px; }
+  .cashflow-table th { font-size: 10px; }
+  .cashflow-table th,
+  .cashflow-table td { padding: 9px 8px; }
+  .cashflow-status { padding: 4px 7px; font-size: 9px; }
+  .cashflow-chart { margin-top: 12px; }
+  .cashflow-axis-label,
+  .cashflow-week-label { font-size: 10px; }
+  .cashflow-chart-legend,
+  .cashflow-chart-alert p,
+  .cashflow-warning p,
+  .cashflow-note { font-size: 11px; }
+  .cashflow-chart-legend { gap: 8px; margin-top: 8px; }
+  .cashflow-chart-alert { gap: 8px; margin-top: 12px; padding: 9px; }
+  .cashflow-chart-alert > span,
+  .cashflow-warning > span { width: 18px; height: 18px; flex-basis: 18px; }
+  .cashflow-warning { gap: 10px; padding: 12px 14px; }
+  .cashflow-back-link,
+  .cashflow-reports-link { min-height: 40px; gap: 8px; padding: 8px 12px; font-size: 11px; }
+
+  .report-content { gap: 16px; }
+  .report-toolbar { grid-template-columns: minmax(150px, 1fr) minmax(145px, 1fr) minmax(160px, 1fr) auto auto auto; gap: 12px; padding: 14px; }
+  .report-control { gap: 7px; font-size: 11px; }
+  .report-control select,
+  .report-control input { height: 40px; padding: 0 10px; font-size: 12px; }
+  .report-generate-button,
+  .report-print-button,
+  .report-export-button { min-height: 40px; gap: 7px; padding: 0 13px; font-size: 11px; }
+  .report-export-button svg { width: 16px; height: 16px; }
+  .report-summary-grid { gap: 14px; }
+  .report-summary-card { min-height: 112px; gap: 8px; padding: 14px; border-radius: 8px; }
+  .report-summary-card > span { min-height: 28px; font-size: 11px; }
+  .report-summary-card > strong { font-size: 21px; }
+  .report-summary-card > a,
+  .report-summary-card > small { font-size: 10px; }
+  .report-detail-grid { gap: 16px; }
+  .report-table-panel { padding: 16px 18px 10px; border-radius: 8px; }
+  .report-table-panel > h2 { margin-bottom: 12px; font-size: 16px; }
+  .report-table { min-width: 680px; font-size: 11px; }
+  .report-table th,
+  .report-table td { padding: 10px 9px; }
+  .report-table thead th { font-size: 10px; }
+  .report-record-cell strong { font-size: 11px; }
+  .report-record-cell small { font-size: 10px; }
+  .report-status-chip,
+  .report-overdue-badge { padding: 5px 8px; font-size: 9px; }
+  .report-empty,
+  .report-note { font-size: 11px; }
+
+  .audit-alert-grid { gap: 14px; }
+  .audit-alert-card { min-height: 108px; gap: 12px; padding: 14px; border-radius: 8px; }
+  .audit-alert-copy p { font-size: 12px; }
+  .audit-alert-audience,
+  .audit-critical-label { font-size: 11px; }
+  .audit-alert-view { min-height: 36px; padding: 6px 11px; font-size: 11px; }
+  .audit-filter-panel { gap: 14px; padding: 16px; }
+  .audit-filter > span:first-child { font-size: 11px; }
+  .audit-filter select,
+  .audit-date-range,
+  .audit-search-control,
+  .audit-apply-button { min-height: 40px; }
+  .audit-filter select,
+  .audit-date-range input,
+  .audit-search-control input,
+  .audit-apply-button,
+  .audit-clear-button { font-size: 11px; }
+  .audit-filter-actions { gap: 10px; }
+  .audit-apply-button,
+  .audit-clear-button { padding: 7px 12px; }
+  .audit-log-panel { padding: 16px 18px 0; border-radius: 8px; }
+  .audit-log-heading { min-height: 44px; }
+  .audit-log-heading h2 { font-size: 17px; }
+  .audit-log-heading span,
+  .audit-table,
+  .audit-table-footer,
+  .audit-note p,
+  .audit-prototype-note { font-size: 11px; }
+  .audit-table { min-width: 1100px; }
+  .audit-table th,
+  .audit-table td { padding: 10px 11px; }
+  .audit-status-chip { padding: 5px 8px; font-size: 10px; }
+  .audit-table-footer { min-height: 44px; }
+  .audit-pagination { gap: 7px; }
+  .audit-pagination button,
+  .audit-pagination > span { min-width: 30px; height: 30px; padding: 0 8px; font-size: 11px; }
+  .audit-note { gap: 10px; padding: 12px 14px; }
+}
+
+@media screen and (min-width: 621px) and (max-width: 1099px) {
+  .income-content,
+  .history-content,
+  .transaction-content,
+  .expense-content,
+  .approval-content,
+  .budget-content,
+  .cashflow-content,
+  .report-content,
+  .audit-content {
+    min-height: calc(100vh - 50px);
+    gap: 14px;
+    padding: 18px 20px 24px;
+  }
+
+  .sidebar-section-label { padding: 12px 15px 5px; font-size: 9px; }
+
+  .income-tabs { min-height: 40px; }
+  .income-tab { padding: 8px; font-size: 11px; }
+  .income-field label,
+  .income-table,
+  .history-table,
+  .budget-table,
+  .cashflow-table,
+  .report-table,
+  .audit-table { font-size: 11px; }
+  .income-field input,
+  .income-field select,
+  .income-search input,
+  .income-filters select,
+  .revenue-input-with-icon input,
+  .revenue-input-with-icon select,
+  .approval-open-row select,
+  .budget-period-actions select,
+  .budget-period-actions button,
+  .report-control select,
+  .report-control input { min-height: 36px; font-size: 11px; }
+  .income-field input,
+  .income-field select { height: 36px; }
+  .income-field textarea { min-height: 60px; font-size: 11px; }
+  .income-button,
+  .income-tool-button,
+  .history-filter-actions button,
+  .revenue-reset-button,
+  .revenue-save-button,
+  .revenue-history-button,
+  .expense-form-actions > button,
+  .approval-action-button,
+  .approval-submit-button,
+  .report-generate-button,
+  .report-print-button,
+  .report-export-button { min-height: 38px; font-size: 11px; }
+  .income-summary-heading h2,
+  .income-records-heading h2,
+  .invoice-form-panel > h2,
+  .income-secondary-heading h2 { font-size: 14px; }
+  .income-metric { min-height: 56px; gap: 9px; }
+  .income-metric-label { font-size: 10px; }
+  .income-metric strong { font-size: 15px; }
+  .income-table { min-width: 1100px; }
+  .income-table th,
+  .income-table td,
+  .history-table th,
+  .history-table td,
+  .budget-table th,
+  .budget-table td,
+  .cashflow-table th,
+  .cashflow-table td,
+  .report-table th,
+  .report-table td,
+  .audit-table th,
+  .audit-table td { padding: 8px; }
+  .history-heading h2,
+  .revenue-heading h2,
+  .budget-page-heading h2,
+  .cashflow-heading h2 { font-size: 22px; }
+  .history-heading p,
+  .revenue-heading p,
+  .budget-page-heading p,
+  .cashflow-heading p { font-size: 12px; }
+  .history-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .history-search,
+  .history-filter-control { min-height: 38px; }
+  .history-search input,
+  .history-filter > span:first-child,
+  .history-filter-control select { font-size: 11px; }
+  .history-table { min-width: 950px; }
+  .revenue-entry-panel,
+  .expense-entry-panel { padding: 16px; }
+  .revenue-entry-panel > h3,
+  .expense-entry-panel > h3,
+  .approval-details-panel > h3,
+  .approval-actions-panel > h3,
+  .approval-status-panel > h3,
+  .approval-history-panel > h3 { font-size: 13px; }
+  .revenue-field label,
+  .expense-document-pick,
+  .expense-document-control > span { font-size: 11px; }
+  .revenue-input-with-icon { min-height: 38px; }
+  .revenue-input-with-icon input,
+  .revenue-input-with-icon select { height: 36px; }
+  .expense-document-control { min-height: 38px; }
+  .expense-document-help,
+  .expense-info-banner p,
+  .expense-message p,
+  .transaction-feedback p { font-size: 10px; }
+  .expense-message strong,
+  .transaction-feedback strong { font-size: 12px; }
+  .approval-open-row,
+  .approval-detail-label,
+  .approval-detail-value,
+  .approval-meta-person,
+  .approval-meta-value,
+  .approval-caution p,
+  .approval-role-notice p,
+  .approval-comment-label,
+  .approval-history-table { font-size: 10px; }
+  .approval-detail-value { min-height: 34px; }
+  .approval-layout { grid-template-columns: minmax(0, 1fr); }
+  .approval-side-column { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .approval-action-button,
+  .approval-submit-button { min-height: 38px; font-size: 11px; }
+  .approval-history-table { min-width: 750px; }
+
+  .budget-summary-grid,
+  .cashflow-summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .budget-summary-card,
+  .cashflow-summary-card { min-height: 82px; padding: 11px; }
+  .budget-summary-card > span,
+  .cashflow-summary-card > span { font-size: 10px; }
+  .budget-summary-card > strong,
+  .cashflow-summary-card > strong { font-size: 17px; }
+  .budget-summary-card > small,
+  .cashflow-summary-card > small { font-size: 10px; }
+  .budget-chart-panel,
+  .budget-table-panel,
+  .cashflow-table-panel,
+  .cashflow-chart-panel { padding: 14px; }
+  .budget-panel-heading h3,
+  .cashflow-panel-heading h3,
+  .cashflow-chart-heading h3 { font-size: 13px; }
+  .budget-panel-heading > p,
+  .budget-category-count,
+  .budget-legend,
+  .budget-alert p,
+  .budget-note,
+  .cashflow-panel-heading p,
+  .cashflow-panel-heading > span,
+  .cashflow-chart-heading p,
+  .cashflow-chart-legend,
+  .cashflow-chart-alert p,
+  .cashflow-warning p { font-size: 10px; }
+  .budget-chart { height: 180px; }
+  .budget-chart-label { font-size: 9px; }
+  .budget-table,
+  .cashflow-table { min-width: 760px; }
+  .budget-status-chip,
+  .cashflow-status { font-size: 9px; }
+  .cashflow-main-grid { grid-template-columns: minmax(0, 1fr); }
+  .cashflow-chart-panel { min-height: 300px; }
+  .cashflow-back-link,
+  .cashflow-reports-link { min-height: 38px; font-size: 10px; }
+
+  .report-toolbar { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 12px; }
+  .report-control { font-size: 10px; }
+  .report-generate-button,
+  .report-print-button,
+  .report-export-button { min-height: 36px; font-size: 10px; }
+  .report-summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .report-summary-card { min-height: 88px; padding: 12px; }
+  .report-summary-card > span,
+  .report-summary-card > a,
+  .report-summary-card > small { font-size: 10px; }
+  .report-summary-card > strong { font-size: 17px; }
+  .report-table-panel > h2 { font-size: 15px; }
+  .report-detail-grid { grid-template-columns: minmax(0, 1fr); }
+  .report-table { min-width: 650px; }
+  .report-table thead th { font-size: 10px; }
+  .audit-alert-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .audit-alert-card { min-height: 88px; padding: 11px; }
+  .audit-alert-copy p,
+  .audit-filter select,
+  .audit-date-range input,
+  .audit-search-control input,
+  .audit-apply-button,
+  .audit-clear-button,
+  .audit-note p { font-size: 10px; }
+  .audit-filter-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 12px; }
+  .audit-reference-filter,
+  .audit-filter-actions { grid-column: span 2; }
+  .audit-table { min-width: 950px; }
+  .audit-log-heading h2 { font-size: 16px; }
+  .audit-log-heading span,
+  .audit-table-footer,
+  .audit-prototype-note { font-size: 10px; }
+}
+
+@media screen and (min-width: 621px) and (max-width: 900px) {
+  .budget-summary-grid,
+  .cashflow-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .approval-layout { grid-template-columns: minmax(0, 1fr); }
+  .approval-side-column { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .report-summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .report-detail-grid,
+  .cashflow-main-grid { grid-template-columns: minmax(0, 1fr); }
+  .cashflow-chart-panel { min-height: 280px; }
+  .audit-alert-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media screen and (max-width: 620px) {
+  .income-content,
+  .history-content,
+  .transaction-content,
+  .expense-content,
+  .approval-content,
+  .budget-content,
+  .cashflow-content,
+  .report-content,
+  .audit-content {
+    min-height: calc(100vh - 50px);
+    gap: 14px;
+    padding: 16px 12px 22px;
+  }
+
+  .income-tabs { min-height: 42px; }
+  .income-tab { padding: 9px 5px; font-size: 11px; }
+  .invoice-form-panel,
+  .income-summary-panel,
+  .expense-entry-panel,
+  .revenue-entry-panel { padding: 14px; }
+  .income-field label,
+  .revenue-field label,
+  .expense-document-pick,
+  .expense-document-control > span,
+  .income-table { font-size: 11px; }
+  .income-field input,
+  .income-field select,
+  .income-field textarea,
+  .revenue-input-with-icon input,
+  .revenue-input-with-icon select { min-height: 40px; font-size: 12px; }
+  .income-field textarea { height: 72px; }
+  .income-button,
+  .income-tool-button,
+  .expense-form-actions > button,
+  .revenue-reset-button,
+  .revenue-save-button,
+  .revenue-history-button { min-height: 40px; font-size: 11px; }
+  .income-summary-heading h2,
+  .income-records-heading h2,
+  .invoice-form-panel > h2,
+  .income-secondary-heading h2 { font-size: 14px; }
+  .income-metric { min-height: 58px; }
+  .income-metric-label { font-size: 10px; }
+  .income-metric strong { font-size: 15px; }
+  .income-table { min-width: 900px; }
+  .income-table th,
+  .income-table td { height: 36px; padding: 7px 9px; }
+  .history-heading h2,
+  .revenue-heading h2,
+  .budget-page-heading h2,
+  .cashflow-heading h2 { font-size: 21px; }
+  .history-heading p,
+  .revenue-heading p,
+  .budget-page-heading p,
+  .cashflow-heading p { font-size: 12px; }
+  .history-heading { min-height: 58px; flex-wrap: wrap; }
+  .history-new-revenue { min-height: 38px; font-size: 11px; }
+  .history-search,
+  .history-filter-control { min-height: 40px; }
+  .history-search input,
+  .history-filter > span:first-child,
+  .history-filter-control select,
+  .history-filter-actions button { font-size: 10px; }
+  .history-table { min-width: 900px; font-size: 10px; }
+  .history-table th,
+  .history-table td { padding: 8px; }
+  .history-table-footer,
+  .history-prototype-note { font-size: 10px; }
+  .history-pagination button,
+  .history-pagination span { width: 30px; height: 30px; }
+  .revenue-entry-panel > h3,
+  .expense-entry-panel > h3 { font-size: 14px; }
+  .revenue-form-grid,
+  .expense-form-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .revenue-input-with-icon,
+  .expense-document-control { min-height: 42px; }
+  .revenue-input-with-icon input,
+  .revenue-input-with-icon select { height: 40px; }
+  .revenue-form-actions { gap: 8px; }
+  .revenue-reset-button,
+  .revenue-save-button,
+  .revenue-history-button { min-height: 42px; font-size: 10px; }
+  .expense-document-help,
+  .expense-info-banner p,
+  .expense-message p,
+  .transaction-feedback p,
+  .transaction-prototype-note { font-size: 10px; }
+  .expense-message strong,
+  .transaction-feedback strong { font-size: 12px; }
+  .expense-info-banner,
+  .expense-message { gap: 9px; padding: 12px; }
+  .expense-warning-actions { flex-wrap: wrap; }
+  .expense-warning-actions button { min-height: 34px; font-size: 10px; }
+
+  .approval-open-row,
+  .approval-detail-label,
+  .approval-detail-value,
+  .approval-meta-person,
+  .approval-meta-value,
+  .approval-caution p,
+  .approval-role-notice p,
+  .approval-comment-label,
+  .approval-history-table { font-size: 10px; }
+  .approval-open-row { align-items: flex-start; flex-direction: column; }
+  .approval-open-row select { width: 100%; height: 40px; font-size: 11px; }
+  .approval-layout,
+  .approval-side-column { grid-template-columns: minmax(0, 1fr); }
+  .approval-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .approval-detail-value { min-height: 40px; padding: 6px 8px; }
+  .approval-request-meta { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .approval-action-button,
+  .approval-submit-button { min-height: 42px; font-size: 11px; }
+  #approval-comment { min-height: 68px; font-size: 11px; }
+  .approval-history-table { min-width: 750px; }
+  .approval-history-table th,
+  .approval-history-table td { padding: 8px 7px; }
+
+  .budget-page-heading { gap: 12px; }
+  .budget-period-form,
+  .budget-period-actions,
+  .budget-period-actions select { width: 100%; }
+  .budget-period-form > label { font-size: 11px; }
+  .budget-period-actions select,
+  .budget-period-actions button { height: 40px; font-size: 11px; }
+  .budget-summary-grid,
+  .cashflow-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .budget-summary-card,
+  .cashflow-summary-card { min-height: 78px; padding: 11px; }
+  .budget-summary-card > span,
+  .cashflow-summary-card > span { font-size: 10px; }
+  .budget-summary-card > strong,
+  .cashflow-summary-card > strong { font-size: 16px; }
+  .budget-summary-card > small,
+  .cashflow-summary-card > small { font-size: 9px; }
+  .budget-chart-panel,
+  .budget-table-panel,
+  .cashflow-table-panel,
+  .cashflow-chart-panel { padding: 12px; }
+  .budget-panel-heading h3,
+  .cashflow-panel-heading h3,
+  .cashflow-chart-heading h3 { font-size: 12px; }
+  .budget-panel-heading > p,
+  .budget-category-count,
+  .budget-legend,
+  .budget-alert p,
+  .budget-note,
+  .cashflow-panel-heading p,
+  .cashflow-panel-heading > span,
+  .cashflow-chart-heading p,
+  .cashflow-chart-legend,
+  .cashflow-chart-alert p,
+  .cashflow-warning p { font-size: 9px; }
+  .budget-chart { height: 160px; gap: 6px; }
+  .budget-chart-label { font-size: 8px; }
+  .budget-table { min-width: 700px; font-size: 10px; }
+  .budget-table th { font-size: 9px; }
+  .budget-table th,
+  .budget-table td { padding: 8px 7px; }
+  .budget-forecast-link { min-height: 40px; font-size: 11px; }
+  .cashflow-heading { align-items: flex-start; flex-direction: column; }
+  .cashflow-readonly-badge { font-size: 10px; }
+  .cashflow-main-grid { grid-template-columns: minmax(0, 1fr); }
+  .cashflow-table { min-width: 760px; font-size: 10px; }
+  .cashflow-table th { font-size: 9px; }
+  .cashflow-table th,
+  .cashflow-table td { padding: 8px 7px; }
+  .cashflow-chart-panel { min-height: 270px; }
+  .cashflow-chart-legend { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cashflow-back-link,
+  .cashflow-reports-link { min-height: 40px; font-size: 10px; }
+
+  .report-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; padding: 11px; }
+  .report-control { font-size: 10px; }
+  .report-control select,
+  .report-control input { height: 40px; font-size: 11px; }
+  .report-generate-button,
+  .report-print-button,
+  .report-export-button { min-height: 40px; padding: 0 9px; font-size: 10px; }
+  .report-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .report-summary-card { min-height: 88px; gap: 6px; padding: 11px; }
+  .report-summary-card > span,
+  .report-summary-card > a,
+  .report-summary-card > small { font-size: 9px; }
+  .report-summary-card > strong { font-size: 16px; }
+  .report-detail-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .report-table-panel { padding: 12px; }
+  .report-table-panel > h2 { font-size: 14px; }
+  .report-table { min-width: 650px; font-size: 10px; }
+  .report-table thead th { font-size: 9px; }
+  .report-table th,
+  .report-table td { padding: 8px 7px; }
+  .report-record-cell strong { font-size: 10px; }
+  .report-record-cell small,
+  .report-empty,
+  .report-note { font-size: 9px; }
+  .audit-alert-grid { grid-template-columns: minmax(0, 1fr); gap: 9px; }
+  .audit-alert-card { min-height: 74px; gap: 9px; padding: 10px; }
+  .audit-alert-copy p { font-size: 10px; }
+  .audit-alert-audience,
+  .audit-critical-label { font-size: 10px; }
+  .audit-alert-view { min-height: 34px; font-size: 10px; }
+  .audit-filter-panel { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 12px; }
+  .audit-reference-filter,
+  .audit-filter-actions { grid-column: 1; }
+  .audit-filter select,
+  .audit-date-range,
+  .audit-search-control,
+  .audit-apply-button { min-height: 40px; }
+  .audit-filter select,
+  .audit-date-range input,
+  .audit-search-control input,
+  .audit-apply-button,
+  .audit-clear-button { font-size: 10px; }
+  .audit-filter-actions { gap: 8px; }
+  .audit-apply-button,
+  .audit-clear-button { min-height: 38px; }
+  .audit-table { min-width: 950px; font-size: 10px; }
+  .audit-table th,
+  .audit-table td { padding: 8px 7px; }
+  .audit-table-footer,
+  .audit-note p,
+  .audit-prototype-note { font-size: 9px; }
+  .audit-log-heading h2 { font-size: 15px; }
+  .audit-note { gap: 9px; padding: 10px; }
 }
