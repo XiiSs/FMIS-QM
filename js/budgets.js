@@ -95,7 +95,18 @@ function initializeBudgetPage(session) {
   });
 
   function renderBudget(period) {
-    const categories = budgetData[period] || [];
+    const categories = (budgetData[period] || []).map((item) => ({ ...item }));
+    if (window.FMIS) {
+      const expenseRecords = window.FMIS.read(window.FMIS.keys.expenses, []);
+      expenseRecords
+        .filter((expense) => String(expense.date || "").startsWith(period))
+        .forEach((expense) => {
+          const category = categories.find((item) =>
+            item.category.toLowerCase() === String(expense.category || "").toLowerCase(),
+          );
+          if (category) category.actual += Number(expense.amount || 0);
+        });
+    }
     const rows = document.querySelector("#budget-rows");
     const chart = document.querySelector("#budget-chart");
     const empty = document.querySelector("#budget-empty");

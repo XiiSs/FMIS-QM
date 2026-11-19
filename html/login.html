@@ -11,16 +11,35 @@
   <main class="login-shell">
     <aside class="login-intro" aria-label="FMIS Portal">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span>FMIS PORTAL</span>
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 21V9l8-5 8 5v12M8 21v-7h8v7M8 10h8M12 4v17"/></svg>
+        </span>
+        <span class="brand-copy"><strong>Swift Foods</strong><small></small></span>
       </div>
 
       <div class="intro-copy">
-        <h1>One secure place<br>for financial<br>clarity.</h1>
-        <p>Access authorized financial records, approvals, budgets and reports through a role-based workspace.</p>
+        <span class="intro-eyebrow">FINANCIAL MANAGEMENT</span>
+        <h1>Financial clarity,<br><span>built for better decisions.</span></h1>
+        <p>Monitor cash, manage transactions and keep every financial workflow moving with confidence.</p>
       </div>
 
-      <div class="system-badge">PROPOSED SYSTEM <span aria-hidden="true">•</span> 2026</div>
+      <div class="intro-visual" aria-hidden="true">
+        <div class="visual-card visual-card-main">
+          <div class="visual-card-head"><span>Cash position</span><small>LIVE</small></div>
+          <strong>₱ 5,000,000</strong>
+          <svg viewBox="0 0 260 84" preserveAspectRatio="none">
+            <defs><linearGradient id="loginChartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#54d6c5" stop-opacity=".35"/><stop offset="1" stop-color="#54d6c5" stop-opacity="0"/></linearGradient></defs>
+            <path class="visual-chart-fill" d="M0 68 C25 58 38 63 58 48 S90 55 110 38 S145 43 165 27 S200 36 260 8 L260 84 L0 84Z"/>
+            <path class="visual-chart-line" d="M0 68 C25 58 38 63 58 48 S90 55 110 38 S145 43 165 27 S200 36 260 8"/>
+          </svg>
+        </div>
+        <div class="visual-card visual-card-status"><span></span><div><small>System status</small><strong>All modules ready</strong></div></div>
+      </div>
+
+      <div class="intro-footer">
+        <span>SWIFT FOODS, INC.</span>
+        <span>SECURE WORKSPACE <i></i> 2026</span>
+      </div>
     </aside>
 
     <section class="login-content" aria-labelledby="welcome-heading">
@@ -51,11 +70,12 @@
           </button>
         </form>
 
-        <p class="login-switch">New to FMIS? <a href="signup.html">Create an account</a></p>
+        <p class="login-switch">Don't have an account? <a href="signup.html">Create an account</a></p>
         <p class="prototype-note">Prototype only — no live authentication</p>
       </div>
     </section>
   </main>
+  <script src="../js/fmis-core.js" defer></script>
   <script src="../js/login.js" defer></script>
 </body>
 </html>

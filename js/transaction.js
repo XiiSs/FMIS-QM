@@ -336,6 +336,13 @@ function initializeTransactionPage(session) {
       previousSummaryStorage = localStorage.getItem(transactionSummaryKey);
       localStorage.setItem(transactionRecordsKey, JSON.stringify(records));
       localStorage.setItem(transactionSummaryKey, JSON.stringify(reportSummary));
+      if (window.FMIS) window.FMIS.logActivity({
+        action: "Recorded revenue",
+        reference: reference,
+        before: "",
+        after: `${data.status}; ₱${amount.toFixed(2)}`,
+        type: "Income",
+      });
     } catch (error) {
       records.shift();
       reportSummary = previousSummaryData;

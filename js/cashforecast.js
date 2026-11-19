@@ -60,7 +60,9 @@ function initializeCashForecast() {
 }
 
 function renderCashForecast() {
-  const openingBalance = 5000000;
+  const openingBalance = window.FMIS
+    ? window.FMIS.summarize().cash
+    : 5000000;
   const minimumBalance = 3000000;
   const expectedReceipts = [
     1200000, 1100000, 1300000, 1250000, 1150000, 1200000, 1500000,

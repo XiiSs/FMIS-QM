@@ -70,6 +70,24 @@ function initializeDashboard() {
     link.addEventListener("click", () => sessionStorage.removeItem("fmisSession"));
   });
 
+  function updateLiveSummary() {
+    if (!window.FMIS) return;
+    const summary = window.FMIS.summarize();
+    const cards = document.querySelectorAll(".summary-card");
+    if (cards.length >= 6) {
+      cards[0].querySelector("strong").textContent = window.FMIS.money(summary.cash);
+      cards[1].querySelector("strong").textContent = window.FMIS.money(summary.incomeTotal);
+      cards[2].querySelector("strong").textContent = window.FMIS.money(summary.expenseTotal);
+      cards[3].querySelector("strong").textContent = window.FMIS.money(summary.receivables);
+      cards[4].querySelector("strong").textContent = window.FMIS.money(summary.payables);
+      cards[5].querySelector("strong").textContent = `${summary.pending} requests`;
+    }
+    const notificationCount = document.querySelector(".notification-count");
+    if (notificationCount) notificationCount.textContent = String(summary.pending);
+  }
+  updateLiveSummary();
+  window.addEventListener("storage", updateLiveSummary);
+
   const reportPeriod = document.querySelector("#report-period");
   const reportData = document.querySelector("#report-data");
   const emptyPeriodMessage = document.querySelector("#period-empty");

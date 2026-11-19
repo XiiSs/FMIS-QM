@@ -33,7 +33,8 @@ if (approvalSession) {
 function initializeApprovals(session) {
   const permissions = new Set(session.permissions);
   const email = session.email.toLowerCase();
-  const isApprover = session.role === "Approver";
+  const isApprover = session.permissions.includes("approvals");
+  const isAdministrator = session.role === "Administrator";
   const actorName = session.fullName || (email === "approver@fmis.example"
     ? "David L. Cruz"
     : email.startsWith("management@")
@@ -321,9 +322,7 @@ function initializeApprovals(session) {
         comments: "Request created and submitted for approval.",
       }];
     renderHistory(requestHistory);
-    const isIndependent = !currentRequest.preparedByEmail ||
-      currentRequest.preparedByEmail.toLowerCase() !== email;
-    setDecisionAvailability(isApprover && isIndependent && storageReady && status === "Pending Approval");
+    setDecisionAvailability(isApprover && storageReady && status === "Pending Approval");
 
     const caution = document.querySelector("#approval-caution-text");
     if (status === "Pending Approval") {
@@ -399,7 +398,9 @@ function initializeApprovals(session) {
       showFeedback("Approval data is unavailable. No decision was recorded.", true);
       return;
     }
-    if (currentRequest.preparedByEmail && currentRequest.preparedByEmail.toLowerCase() === email) {
+    if (!isAdministrator &&
+      currentRequest.preparedByEmail &&
+      currentRequest.preparedByEmail.toLowerCase() === email) {
       showFeedback("You cannot decide a request you prepared.", true);
       return;
     }
@@ -466,6 +467,13 @@ function initializeApprovals(session) {
       if (currentRequest.illustrative) {
         localStorage.setItem(approvalExpensesKey, JSON.stringify(expenses));
       }
+      if (window.FMIS) window.FMIS.logActivity({
+        action,
+        reference: updatedRequest.requestId,
+        before: previousRequest.status,
+        after: nextStatus,
+        type: "Approval",
+      });
     } catch (error) {
       requests[requestIndex] = previousRequest;
       try {

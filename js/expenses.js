@@ -369,6 +369,8 @@ function initializeExpensePage(session) {
       reference: data.reference,
       documentName: data.document.name,
       documentSize: data.document.size,
+      createdAt: new Date().toISOString(),
+      createdBy: session.fullName || session.email,
       payableStatus: "Open",
       paymentRequestId: null,
     };
@@ -378,6 +380,13 @@ function initializeExpensePage(session) {
       previousRecords = localStorage.getItem(expenseRecordsKey);
       records.unshift(newRecord);
       localStorage.setItem(expenseRecordsKey, JSON.stringify(records));
+      if (window.FMIS) window.FMIS.logActivity({
+        action: "Saved expense",
+        reference: data.reference,
+        before: "",
+        after: `Saved; ₱${data.amount.toFixed(2)}`,
+        type: "Expense",
+      });
     } catch (error) {
       records = records.filter((record) => record.expenseId !== expenseId);
       let rollbackMessage = "";
@@ -469,6 +478,13 @@ function initializeExpensePage(session) {
       requests.push(request);
       localStorage.setItem(paymentRequestsKey, JSON.stringify(requests));
       localStorage.setItem(expenseRecordsKey, JSON.stringify(records));
+      if (window.FMIS) window.FMIS.logActivity({
+        action: "Submitted payment request",
+        reference: requestId,
+        before: "Saved",
+        after: "Pending Approval",
+        type: "Payment Request",
+      });
     } catch (error) {
       expense.payableStatus = "Open";
       expense.paymentRequestId = null;

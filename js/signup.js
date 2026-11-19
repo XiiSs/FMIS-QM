@@ -6,8 +6,11 @@ const preparerPermissions = [
   "income",
   "transactions",
   "expenses",
+  "approvals",
   "budgets",
+  "cashforecast",
   "reports",
+  "audit",
 ];
 
 signupForm.addEventListener("submit", (event) => {
@@ -67,7 +70,7 @@ signupForm.addEventListener("submit", (event) => {
     fullName,
     username,
     password,
-    role: "Finance Preparer",
+    role: "Administrator",
     permissions: preparerPermissions,
   });
 

@@ -198,7 +198,52 @@ function initializeReports() {
     const period = periodSelect.value;
     const reportType = typeSelect.value;
     const dates = getPeriodDates(period);
-    const snapshot = reportSnapshots[period];
+    let snapshot = reportSnapshots[period];
+    if (snapshot && window.FMIS) {
+      const summary = window.FMIS.summarize();
+      const incomeRecords = window.FMIS.read(window.FMIS.keys.income, []);
+      const expenseRecords = window.FMIS.read(window.FMIS.keys.expenses, []);
+      const liveReceivables = incomeRecords
+        .filter((record) => String(record.date || "").startsWith(period))
+        .map((record) => ({
+          invoice: record.invoice,
+          customer: record.customer,
+          status: record.status,
+          balance: Math.max(0, Number(record.amount || 0) - Number(record.received || 0)),
+          dueDate: record.dueDate || `${period}-28`,
+        }))
+        .filter((record) => record.balance > 0);
+      const livePayables = expenseRecords
+        .filter((record) => String(record.date || "").startsWith(period) && record.payableStatus !== "Paid")
+        .map((record) => ({
+          expense: record.expenseId,
+          supplier: record.vendor,
+          balance: Number(record.amount || 0),
+          dueDate: record.dueDate || `${period}-28`,
+        }));
+      const liveBudgets = snapshot.budgets.map((budget) => ({ ...budget }));
+      expenseRecords
+        .filter((record) => String(record.date || "").startsWith(period))
+        .forEach((record) => {
+          const budget = liveBudgets.find((item) =>
+            item.category.toLowerCase() === String(record.category || "").toLowerCase(),
+          );
+          if (budget) budget.actual += Number(record.amount || 0);
+        });
+      snapshot = {
+        ...snapshot,
+        income: incomeRecords
+          .filter((record) => String(record.date || "").startsWith(period))
+          .reduce((total, record) => total + Number(record.received || 0), 0) || snapshot.income,
+        expenses: expenseRecords
+          .filter((record) => String(record.date || "").startsWith(period))
+          .reduce((total, record) => total + Number(record.amount || 0), 0) || snapshot.expenses,
+        cash: summary.cash,
+        receivables: liveReceivables.length ? liveReceivables : snapshot.receivables,
+        payables: livePayables.length ? livePayables : snapshot.payables,
+        budgets: liveBudgets,
+      };
+    }
     const reportEnd = dates.periodEnd;
     document.querySelector("#report-as-of").value = dates.asOf;
     document.querySelector("#report-card-date").textContent = dates.asOf;

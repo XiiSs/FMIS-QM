@@ -1,23 +1,24 @@
 const demoAccounts = [
+  // Each demo account is an administrator-level account in this single-admin system.
   {
     email: "preparer@fmis.example",
     password: "Prepare2026!",
     fullName: "Maria G. Santos",
-    role: "Finance Preparer",
-    permissions: ["dashboard", "income", "transactions", "expenses", "budgets", "reports"],
+    role: "Administrator",
+    permissions: ["dashboard", "income", "transactions", "expenses", "approvals", "budgets", "cashforecast", "reports", "audit"],
   },
   {
     email: "approver@fmis.example",
     password: "Approve2026!",
     fullName: "David L. Cruz",
-    role: "Approver",
-    permissions: ["dashboard", "approvals", "reports"],
+    role: "Administrator",
+    permissions: ["dashboard", "income", "transactions", "expenses", "approvals", "budgets", "cashforecast", "reports", "audit"],
   },
   {
     email: "management@fmis.example",
     password: "Manage2026!",
     fullName: "Maria G. Santos",
-    role: "Management / Read-only",
+    role: "Administrator",
     permissions: [
       "dashboard",
       "income",

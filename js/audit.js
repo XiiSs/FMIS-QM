@@ -132,6 +132,14 @@ function initializeAuditPage() {
 
   function loadSavedActivity() {
     try {
+      if (window.FMIS) {
+        const liveEvents = window.FMIS.read(window.FMIS.keys.audit, []);
+        liveEvents.forEach((event) => {
+          if (!eventExists(event.reference, event.action, event.at)) {
+            allEvents.unshift(event);
+          }
+        });
+      }
       const expenses = readLocalRecords("fmisExpenseRecords", "Saved expense records");
       expenses.forEach((expense) => {
         if (

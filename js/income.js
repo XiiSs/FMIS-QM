@@ -514,6 +514,13 @@ function initializeIncomePage(session) {
       }
       return;
     }
+    if (window.FMIS) window.FMIS.logActivity({
+      action: "Saved income",
+      reference: invoice,
+      before: "",
+      after: `${newRecord.status}; ₱${amount.toFixed(2)}`,
+      type: "Income",
+    });
     renderRows();
     form.reset();
     selectTab("record");
@@ -575,6 +582,13 @@ function initializeIncomePage(session) {
         }
         return;
       }
+      if (window.FMIS) window.FMIS.logActivity({
+        action: "Recorded customer collection",
+        reference: invoice,
+        before: previousStatus,
+        after: record.status,
+        type: "Income",
+      });
       renderRows();
       showFeedback(`Collection of ${formatMoney(payment)} recorded for ${invoice}.`);
     });
