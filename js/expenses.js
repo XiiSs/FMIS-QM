@@ -40,7 +40,6 @@ function initializeExpensePage(session) {
     ? "Maria G. Santos"
     : firstName);
   const initials = fullName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
-  const canEdit = session.role === "Finance Preparer";
 
   document.querySelector("#profile-name").textContent = fullName;
   document.querySelector("#profile-role").textContent = session.role;
@@ -89,6 +88,7 @@ function initializeExpensePage(session) {
   const dateInput = document.querySelector("#expense-date");
   const dueDateInput = document.querySelector("#expense-due-date");
   const vendorInput = document.querySelector("#expense-vendor");
+  const referenceInput = document.querySelector("#expense-reference");
   const documentInput = document.querySelector("#expense-document");
   const documentName = document.querySelector("#expense-document-name");
   const removeDocumentButton = document.querySelector("#remove-expense-document");
@@ -322,10 +322,6 @@ function initializeExpensePage(session) {
     dismissFeedback();
     clearDuplicateWarning();
 
-    if (!canEdit) {
-      showFeedback("error", "Read-only access", "Only a Finance Preparer can record expenses or create payment requests.");
-      return;
-    }
     if (!storageReady) {
       showFeedback("error", "Expense storage is unavailable", "Resolve the saved expense data error before continuing.");
       return;
@@ -404,12 +400,20 @@ function initializeExpensePage(session) {
       return;
     }
 
+    // Keep the real attached file so it can be viewed again from the register / history.
+    if (window.FMISQM) {
+      window.FMISQM.saveDoc(expenseId, data.document).catch((error) => {
+        showFeedback("warning", "Expense saved, but the document copy could not be stored", `${error.message} The file name is still recorded on the expense.`);
+      });
+    }
+
     lastSavedExpenseId = expenseId;
     paymentRequestButton.disabled = false;
     paymentRequestButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg>Create Payment Request';
     keepFeedbackAfterReset = true;
     form.reset();
     clearDuplicateWarning();
+    renderPayables();
     showFeedback(
       "success",
       "Expense recorded successfully!",
@@ -417,12 +421,13 @@ function initializeExpensePage(session) {
     );
   }
 
-  function createPaymentRequest() {
-    if (!canEdit || !lastSavedExpenseId) {
+  function createPaymentRequest(targetExpenseId) {
+    const expenseKey = targetExpenseId || lastSavedExpenseId;
+    if (!expenseKey) {
       showFeedback("error", "Payment request unavailable", "Save an expense first. Payment requests are a separate step.");
       return;
     }
-    const expense = records.find((record) => record.expenseId === lastSavedExpenseId);
+    const expense = records.find((record) => record.expenseId === expenseKey);
     if (!expense) {
       showFeedback("error", "Payable record not found", "The saved expense could not be located. Refresh the Expenses page and try again.");
       return;
@@ -507,14 +512,148 @@ function initializeExpensePage(session) {
       return;
     }
 
-    paymentRequestButton.disabled = true;
-    paymentRequestButton.textContent = "Request Created";
+    if (expenseKey === lastSavedExpenseId) {
+      paymentRequestButton.disabled = true;
+      paymentRequestButton.textContent = "Request Created";
+    }
+    renderPayables();
     showFeedback(
       "success",
       "Payment request created separately",
       `Request ID: ${requestId}  |  Payable: ${expense.expenseId}  |  Status: Submitted. No payment was made.`,
     );
   }
+
+  /* ---------- Payables register ---------- */
+  const payablesBody = document.querySelector("#payables-body");
+  const payablesEmpty = document.querySelector("#payables-empty");
+  const payablesKpis = document.querySelector("#payables-kpis");
+  const payablesAging = document.querySelector("#payables-aging");
+
+  function agingLabel(expense) {
+    if (expense.payableStatus === "Paid") {
+      return "Settled";
+    }
+    const days = window.FMISQM.daysUntil(expense.dueDate);
+    if (days < 0) {
+      return `Overdue ${Math.abs(days)} d`;
+    }
+    return days === 0 ? "Due today" : `Due in ${days} d`;
+  }
+
+  function payableChipClass(expense) {
+    if (expense.payableStatus === "Paid") {
+      return "status-paid";
+    }
+    return window.FMISQM.daysUntil(expense.dueDate) < 0 ? "status-overdue" : "status-pending";
+  }
+
+  function renderPayables() {
+    if (!payablesBody || !window.FMISQM) {
+      return;
+    }
+    const Q = window.FMISQM;
+    const summary = Q.payablesSummary(records);
+
+    payablesKpis.replaceChildren(
+      Q.kpi("Open payables", Q.peso(summary.openTotal), `${summary.openCount} record${summary.openCount === 1 ? "" : "s"} not yet paid`),
+      Q.kpi("Overdue", Q.peso(summary.overdueTotal), `${summary.overdueCount} record${summary.overdueCount === 1 ? "" : "s"} · ${Q.pct(summary.overdueShare, 0)} of open payables`, summary.overdueCount ? "bad" : "good"),
+      Q.kpi("Due in 7 days", Q.peso(summary.dueSoonTotal), `${summary.dueSoonCount} record${summary.dueSoonCount === 1 ? "" : "s"}`, summary.dueSoonCount ? "warn" : ""),
+    );
+
+    const buckets = Q.payablesAging(records);
+    const maxAmount = Math.max(...buckets.map((bucket) => bucket.amount), 1);
+    payablesAging.replaceChildren(...buckets.map((bucket) => {
+      const row = document.createElement("div");
+      row.className = "qm-aging-row";
+      row.dataset.bucket = bucket.key;
+      const label = document.createElement("span");
+      label.textContent = bucket.label;
+      const track = document.createElement("div");
+      track.className = "qm-aging-track";
+      const fill = document.createElement("div");
+      fill.className = "qm-aging-fill";
+      fill.style.width = `${(bucket.amount / maxAmount) * 100}%`;
+      track.append(fill);
+      const value = document.createElement("span");
+      value.className = "qm-aging-value";
+      value.textContent = `${Q.peso(bucket.amount)} · ${bucket.count}`;
+      row.append(label, track, value);
+      return row;
+    }));
+
+    const sorted = [...records].sort((left, right) => (left.dueDate || "").localeCompare(right.dueDate || ""));
+    payablesEmpty.hidden = sorted.length > 0;
+    payablesBody.replaceChildren(...sorted.map((expense) => {
+      const row = document.createElement("tr");
+      const cell = (text, className) => {
+        const td = document.createElement("td");
+        if (className) td.className = className;
+        td.textContent = text;
+        return td;
+      };
+      row.append(
+        cell(expense.expenseId, "qm-id"),
+        cell(expense.vendor),
+        cell(expense.category || "-"),
+        cell(expense.reference),
+        cell(Q.peso(expense.amount), "qm-num"),
+      );
+
+      const due = document.createElement("td");
+      due.textContent = expense.dueDate || "-";
+      const hint = document.createElement("span");
+      hint.className = "qm-aging-hint";
+      hint.textContent = agingLabel(expense);
+      due.append(hint);
+      row.append(due);
+
+      const statusCell = document.createElement("td");
+      const chip = document.createElement("span");
+      chip.className = `history-status-chip ${payableChipClass(expense)}`;
+      chip.textContent = expense.payableStatus || "Open";
+      statusCell.append(chip);
+      row.append(statusCell);
+
+      const docCell = document.createElement("td");
+      if (expense.documentName) {
+        const view = document.createElement("button");
+        view.type = "button";
+        view.className = "qm-button qm-button-ghost qm-button-small";
+        view.textContent = "View";
+        view.title = expense.documentName;
+        view.addEventListener("click", () => {
+          Q.openDoc(expense.expenseId).then((opened) => {
+            if (!opened) {
+              showFeedback("info", "Document copy not available", `${expense.documentName} is recorded on this expense, but the file itself is not stored in this browser.`);
+            }
+          }).catch((error) => showFeedback("error", "Document could not be opened", error.message));
+        });
+        docCell.append(view);
+      } else {
+        docCell.textContent = "-";
+      }
+      row.append(docCell);
+
+      const actionCell = document.createElement("td");
+      if (expense.paymentRequestId) {
+        actionCell.textContent = expense.paymentRequestId;
+      } else if (expense.payableStatus !== "Paid") {
+        const request = document.createElement("button");
+        request.type = "button";
+        request.className = "qm-button qm-button-small";
+        request.textContent = "Create Payment Request";
+        request.addEventListener("click", () => createPaymentRequest(expense.expenseId));
+        actionCell.append(request);
+      } else {
+        actionCell.textContent = "-";
+      }
+      row.append(actionCell);
+      return row;
+    }));
+  }
+
+  renderPayables();
 
   form.addEventListener("submit", handleSubmit);
   confirmSaveButton.addEventListener("click", () => {
@@ -528,19 +667,8 @@ function initializeExpensePage(session) {
     clearDuplicateWarning();
     vendorInput.focus();
   });
-  paymentRequestButton.addEventListener("click", createPaymentRequest);
+  paymentRequestButton.addEventListener("click", () => createPaymentRequest());
   document.querySelector("#dismiss-expense-feedback").addEventListener("click", dismissFeedback);
-
-  if (!canEdit) {
-    form.querySelectorAll("input, select, button").forEach((control) => {
-      control.disabled = true;
-    });
-    paymentRequestButton.disabled = true;
-    document.querySelector(".expense-entry-panel").insertAdjacentHTML(
-      "beforebegin",
-      '<p class="transaction-readonly-note">Management / Read-only — expense entry and payment requests are available to Finance Preparers.</p>',
-    );
-  }
 }
 
 function createExpenseId(year, records) {

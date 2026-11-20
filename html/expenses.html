@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#0e3556">
   <title>Record Expenses | FMIS Portal</title>
   <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/modules-th-exp.css">
 </head>
 <body class="dashboard-page transaction-page expense-page">
   <div class="dashboard-app">
@@ -120,11 +121,24 @@
           <div><strong id="expense-feedback-title"></strong><p id="expense-feedback-message"></p></div>
           <button type="button" id="dismiss-expense-feedback" aria-label="Dismiss message">×</button>
         </div>
+        <section class="dashboard-panel qm-panel" aria-labelledby="payables-title">
+  <div class="qm-panel-head"><h3 id="payables-title">Payables Register</h3><p>Expense/payable records with aging. Payment requests are created per record, never automatically.</p></div>
+  <div class="qm-kpis" id="payables-kpis"></div>
+  <div class="qm-aging" id="payables-aging" aria-label="Payables aging"></div>
+  <div class="qm-table-wrap">
+    <table class="qm-table">
+      <thead><tr><th>Expense ID</th><th>Vendor</th><th>Category</th><th>Reference</th><th class="qm-num">Amount</th><th>Due Date</th><th>Payable Status</th><th>Document</th><th>Action</th></tr></thead>
+      <tbody id="payables-body"></tbody>
+    </table>
+    <p id="payables-empty" class="qm-empty" role="status">No expenses recorded yet. Saved expenses appear here as payables.</p>
+  </div>
+</section>
         <p class="transaction-prototype-note">Expense and payment request records are stored in this browser prototype. Uploaded document contents are not transferred to a server.</p>
       </main>
     </div>
   </div>
   <script src="../js/fmis-core.js" defer></script>
+  <script src="../js/fmis-qm.js" defer></script>
   <script src="../js/expenses.js" defer></script>
 </body>
 </html>

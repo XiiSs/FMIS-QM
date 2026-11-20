@@ -198,6 +198,9 @@ function initializeTransactionHistory(session) {
   const statusFilter = document.querySelector("#history-status");
   const emptyMessage = document.querySelector("#history-empty");
   const applyButton = document.querySelector("#apply-history-filters");
+  const customRange = document.querySelector("#history-custom-range");
+  const fromInput = document.querySelector("#history-from");
+  const toInput = document.querySelector("#history-to");
   const previousButton = document.querySelector("#history-prev");
   const nextButton = document.querySelector("#history-next");
   const pageLabel = document.querySelector("#history-page");
@@ -248,6 +251,7 @@ function initializeTransactionHistory(session) {
           category,
           amount: record.amount,
           received: record.received,
+          dueDate: record.dueDate,
           status,
           description: record.description || `${category} — ${record.customer}`,
         };
@@ -283,7 +287,13 @@ function initializeTransactionHistory(session) {
       type: "Expense",
       category: record.category || "Other Expense",
       amount: record.amount,
-      status: record.payableStatus === "Payment Requested"
+      dueDate: record.dueDate,
+      documentName: record.documentName,
+      paymentRequestId: record.paymentRequestId,
+      hasStoredRecord: true,
+      status: record.payableStatus === "Paid"
+        ? "Paid"
+        : record.payableStatus === "Payment Requested"
         ? "Payment Requested"
         : record.dueDate && record.dueDate < formatDateValue(new Date())
           ? "Overdue"
@@ -321,7 +331,9 @@ function initializeTransactionHistory(session) {
 
   function applyFilters() {
     const query = search.value.trim().toLowerCase();
-    const days = dateRange.value === "all" ? null : Number(dateRange.value);
+    const isCustom = dateRange.value === "custom";
+    customRange.hidden = !isCustom;
+    const days = dateRange.value === "all" || isCustom ? null : Number(dateRange.value);
     const cutoff = days === null ? null : new Date();
     if (cutoff) {
       cutoff.setDate(cutoff.getDate() - days);
@@ -344,6 +356,7 @@ function initializeTransactionHistory(session) {
       return (
         matchesSearch &&
         (!cutoff || recordDate >= cutoff) &&
+        (!isCustom || ((!fromInput.value || record.date >= fromInput.value) && (!toInput.value || record.date <= toInput.value))) &&
         (!categoryFilter.value || record.category === categoryFilter.value) &&
         (!typeFilter.value || record.type === typeFilter.value) &&
         (!statusFilter.value || record.status === statusFilter.value)
@@ -407,6 +420,7 @@ function initializeTransactionHistory(session) {
       const cell = document.createElement("td");
       if (index === 0) {
         cell.className = "history-id-cell";
+        cell.textContent = value;
       } else if (index === 3) {
         const type = document.createElement("span");
         type.className = `history-type-chip ${record.type === "Income" ? "type-income" : "type-expense"}`;
@@ -419,7 +433,12 @@ function initializeTransactionHistory(session) {
         const status = document.createElement("span");
         status.className = `history-status-chip ${getStatusClass(record.status)}`;
         status.textContent = value;
+        status.title = record.type === "Income" ? "Collection status" : "Payable status";
         cell.append(status);
+        const kind = document.createElement("small");
+        kind.className = "history-status-kind";
+        kind.textContent = record.type === "Income" ? "Collection" : "Payable";
+        cell.append(kind);
       } else {
         cell.textContent = value;
       }
@@ -441,10 +460,88 @@ function initializeTransactionHistory(session) {
   }
 
   function showTransactionDetails(record) {
-    const description = record.description ? ` · ${record.description}` : "";
-    document.querySelector("#history-feedback").textContent =
-      `${record.transactionId} · ${record.customer} · ${record.invoice} · ${record.status}${description}`;
-    document.querySelector("#history-feedback").hidden = false;
+    const panel = document.querySelector("#history-detail");
+    const fields = document.querySelector("#history-detail-fields");
+    const actions = document.querySelector("#history-detail-actions");
+    const Q = window.FMISQM;
+    document.querySelector("#history-detail-title").textContent = `${record.transactionId} · ${record.type}`;
+
+    const rows = [
+      ["Customer / Vendor", record.customer],
+      ["Date", formatHistoryDate(record.date)],
+      ["Reference / Invoice", record.invoice],
+      ["Category", record.category],
+      ["Amount", `₱${moneyFormat.format(record.amount)}`],
+      [record.type === "Income" ? "Collection status" : "Payable status", record.status],
+    ];
+    if (record.type === "Income") {
+      const received = Number(record.received) || 0;
+      rows.push(["Amount received", `₱${moneyFormat.format(received)}`]);
+      rows.push(["Balance due", `₱${moneyFormat.format(Math.max(0, record.amount - received))}`]);
+    } else {
+      if (record.dueDate) rows.push(["Due date", formatHistoryDate(record.dueDate)]);
+      if (record.paymentRequestId) rows.push(["Payment request", record.paymentRequestId]);
+      if (record.documentName) rows.push(["Supporting document", record.documentName]);
+    }
+    if (record.description) rows.push(["Description", record.description]);
+
+    fields.replaceChildren(...rows.map(([label, value]) => {
+      const item = document.createElement("div");
+      const dt = document.createElement("dt");
+      dt.textContent = label;
+      const dd = document.createElement("dd");
+      dd.textContent = value;
+      item.append(dt, dd);
+      return item;
+    }));
+
+    actions.replaceChildren();
+    if (record.type === "Expense" && record.documentName && record.hasStoredRecord && Q) {
+      const view = document.createElement("button");
+      view.type = "button";
+      view.className = "qm-button";
+      view.textContent = "View supporting document";
+      view.addEventListener("click", () => {
+        Q.openDoc(record.transactionId).then((opened) => {
+          if (!opened) showHistoryError(`${record.documentName} is recorded, but the file itself is not stored in this browser.`);
+        }).catch((error) => showHistoryError(error.message));
+      });
+      actions.append(view);
+    }
+    if (record.type === "Expense") {
+      const link = document.createElement("a");
+      link.className = "qm-button qm-button-ghost";
+      link.style.cssText = "display:inline-flex;align-items:center;text-decoration:none";
+      link.href = "expenses.html";
+      link.textContent = "Open Expenses & Payables";
+      actions.append(link);
+    }
+    panel.hidden = false;
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function csvCell(value) {
+    let text = String(value ?? "");
+    // Prevent spreadsheet formula injection from user-entered text.
+    if (/^[=+\-@]/.test(text)) {
+      text = `'${text}`;
+    }
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+
+  function exportCsv() {
+    const header = ["Transaction ID", "Date", "Customer / Vendor", "Reference", "Type", "Category", "Amount", "Status"];
+    const lines = [header, ...filteredRecords.map((record) => [
+      record.transactionId, record.date, record.customer, record.invoice,
+      record.type, record.category, record.amount.toFixed(2), record.status,
+    ])].map((row) => row.map(csvCell).join(","));
+    const blob = new Blob(["\ufeff" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `transactions-${formatDateValue(new Date())}.csv`;
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 10000);
   }
 
   function getStatusClass(status) {
@@ -454,6 +551,7 @@ function initializeTransactionHistory(session) {
       Pending: "status-pending",
       Overdue: "status-overdue",
       "Payment Requested": "status-pending",
+      Paid: "status-paid",
     }[status] || "status-pending";
   }
 
@@ -462,6 +560,11 @@ function initializeTransactionHistory(session) {
     filter.addEventListener("change", applyFilters);
   });
   applyButton.addEventListener("click", applyFilters);
+  [fromInput, toInput].forEach((input) => input.addEventListener("change", applyFilters));
+  document.querySelector("#export-history").addEventListener("click", exportCsv);
+  document.querySelector("#history-detail-close").addEventListener("click", () => {
+    document.querySelector("#history-detail").hidden = true;
+  });
 
   document.querySelectorAll("[data-sort]").forEach((button) => {
     button.addEventListener("click", () => {

@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#0e3556">
   <title>Transaction History | FMIS Portal</title>
   <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/modules-th-exp.css">
 </head>
 <body class="dashboard-page transaction-page history-page">
   <div class="dashboard-app">
@@ -56,13 +57,24 @@
         <section class="dashboard-panel transaction-history-panel" aria-label="Search and filter transactions">
           <label class="history-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4 4"/></svg><input id="history-search" type="search" placeholder="Search by transaction ID, customer, reference, or description..." aria-label="Search transactions"></label>
           <div class="history-filter-grid">
-            <label class="history-filter"><span>Date Range</span><span class="history-filter-control"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><select id="date-range" aria-label="Date range"><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="all">All time</option></select></span></label>
+            <label class="history-filter"><span>Date Range</span><span class="history-filter-control"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><select id="date-range" aria-label="Date range"><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="all">All time</option><option value="custom">Custom range…</option></select></span></label>
             <label class="history-filter"><span>Category</span><span class="history-filter-control"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg><select id="history-category" aria-label="Transaction category"><option value="">All Categories</option><option>Sales Revenue</option><option>Service Income</option><option>Product Sales</option><option>Other Income</option><option>Raw Materials</option><option>Utilities</option><option>Rent</option><option>Transportation</option><option>Salaries</option><option>Office Supplies</option><option>Other Expense</option></select></span></label>
             <label class="history-filter"><span>Type</span><span class="history-filter-control"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg><select id="history-type" aria-label="Transaction type"><option value="">All Types</option><option value="Income">Income</option><option value="Expense">Expense</option></select></span></label>
-            <label class="history-filter"><span>Status / Collection Status</span><span class="history-filter-control"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg><select id="history-status" aria-label="Transaction or collection status"><option value="">All Statuses</option><option>Collected</option><option>Pending</option><option>Partially Collected</option><option>Overdue</option><option>Payment Requested</option></select></span></label>
+            <label class="history-filter"><span>Status / Collection Status</span><span class="history-filter-control"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg><select id="history-status" aria-label="Transaction or collection status"><option value="">All Statuses</option><option>Collected</option><option>Pending</option><option>Partially Collected</option><option>Overdue</option><option>Payment Requested</option><option>Paid</option></select></span></label>
           </div>
-          <div class="history-filter-actions"><button id="apply-history-filters" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg>Apply Filters</button></div>
-        </section>
+          <div class="history-custom-range" id="history-custom-range" hidden>
+  <label>From<input id="history-from" type="date" aria-label="From date"></label>
+  <label>To<input id="history-to" type="date" aria-label="To date"></label>
+</div>
+<div class="history-custom-range" id="history-custom-range" hidden>
+  <label>From<input id="history-from" type="date" aria-label="From date"></label>
+  <label>To<input id="history-to" type="date" aria-label="To date"></label>
+</div>
+<div class="history-filter-actions">
+  <button id="export-history" class="history-export-button" type="button">Export CSV</button>
+  <button id="apply-history-filters" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg>Apply Filters</button>
+</div>
+</section>
 
         <section id="transaction-table" class="dashboard-panel history-table-panel" aria-label="Transaction records">
           <div class="history-table-wrap">
@@ -83,11 +95,17 @@
           </div>
           <div class="history-table-footer"><span id="history-count">Showing 0 transactions</span><nav class="history-pagination" aria-label="Transaction pages"><button id="history-prev" type="button" aria-label="Previous page">‹</button><span id="history-page">1</span><button id="history-next" type="button" aria-label="Next page">›</button></nav></div>
         </section>
+        <section id="history-detail" class="dashboard-panel history-detail" aria-live="polite" hidden>
+  <div class="history-detail-head"><h3 id="history-detail-title">Transaction details</h3><button type="button" id="history-detail-close" class="qm-button qm-button-ghost qm-button-small">Close</button></div>
+  <dl id="history-detail-fields"></dl>
+  <div class="history-detail-actions" id="history-detail-actions"></div>
+</section>
         <p class="history-prototype-note">Illustrative records are shown for demonstration. Saved revenue and expense entries appear here from their workspaces.</p>
       </main>
     </div>
   </div>
   <script src="../js/fmis-core.js" defer></script>
+  <script src="../js/fmis-qm.js" defer></script>
   <script src="../js/transaction-history.js" defer></script>
 </body>
 </html>
