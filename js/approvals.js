@@ -35,12 +35,8 @@ function initializeApprovals(session) {
   const email = session.email.toLowerCase();
   const isApprover = session.permissions.includes("approvals");
   const isAdministrator = session.role === "Administrator";
-  const actorName = session.fullName || (email === "approver@fmis.example"
-    ? "David L. Cruz"
-    : email.startsWith("management@")
-      ? "Maria G. Santos"
-      : email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()));
-  const initials = actorName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+  const actorName = window.FMIS.getDisplayName(session);
+  const initials = window.FMIS.getInitials(actorName);
 
   document.querySelector("#profile-name").textContent = actorName;
   document.querySelector("#profile-role").textContent = session.role;
@@ -401,6 +397,20 @@ function initializeApprovals(session) {
     if (!isAdministrator &&
       currentRequest.preparedByEmail &&
       currentRequest.preparedByEmail.toLowerCase() === email) {
+      try {
+        window.FMIS.logActivity({
+          action: "Blocked self-approval attempt",
+          reference: currentRequest.requestId,
+          result: "Blocked",
+          before: currentRequest.status,
+          after: currentRequest.status,
+          type: "Access Control",
+          description: "Approval was blocked because the request preparer cannot approve their own request.",
+        });
+      } catch (error) {
+        showFeedback(`You cannot decide a request you prepared. The blocked action could not be recorded: ${error.message}`, true);
+        return;
+      }
       showFeedback("You cannot decide a request you prepared.", true);
       return;
     }
@@ -441,13 +451,14 @@ function initializeApprovals(session) {
       status: nextStatus,
       decidedAt: new Date().toISOString(),
       decidedBy: actorName,
-      decidedByRole: "Approver",
+      decidedByRole: session.role,
       history: [
         ...previousHistory,
         {
           at: new Date().toISOString(),
           user: actorName,
-          role: "Approver",
+          role: session.role,
+          account: session.email,
           action,
           status: nextStatus,
           comments: comments || (action === "Approved" ? "Approved after review." : ""),
@@ -473,6 +484,7 @@ function initializeApprovals(session) {
         before: previousRequest.status,
         after: nextStatus,
         type: "Approval",
+        description: `${action} ${updatedRequest.requestId}.${comments ? ` Comment: ${comments}` : ""}`,
       });
     } catch (error) {
       requests[requestIndex] = previousRequest;

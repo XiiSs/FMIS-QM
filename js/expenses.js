@@ -32,14 +32,9 @@ if (expenseSession) {
 
 function initializeExpensePage(session) {
   const permissions = new Set(session.permissions);
-  const email = session.email.toLowerCase();
-  const firstName = email.startsWith("management@")
-    ? "Maria"
-    : email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-  const fullName = session.fullName || (email.startsWith("management@") || email.startsWith("preparer@")
-    ? "Maria G. Santos"
-    : firstName);
-  const initials = fullName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+  const fullName = window.FMIS.getDisplayName(session);
+  const initials = window.FMIS.getInitials(fullName);
+  const canEdit = session.role === "Finance Preparer";
 
   document.querySelector("#profile-name").textContent = fullName;
   document.querySelector("#profile-role").textContent = session.role;
@@ -366,7 +361,9 @@ function initializeExpensePage(session) {
       documentName: data.document.name,
       documentSize: data.document.size,
       createdAt: new Date().toISOString(),
-      createdBy: session.fullName || session.email,
+      createdBy: window.FMIS.getDisplayName(session),
+      createdByEmail: session.email,
+      createdByRole: session.role,
       payableStatus: "Open",
       paymentRequestId: null,
     };
@@ -382,6 +379,7 @@ function initializeExpensePage(session) {
         before: "",
         after: `Saved; ₱${data.amount.toFixed(2)}`,
         type: "Expense",
+        description: `Saved expense ${data.reference} for ${data.vendor}; amount ₱${data.amount.toFixed(2)}.`,
       });
     } catch (error) {
       records = records.filter((record) => record.expenseId !== expenseId);
@@ -459,13 +457,14 @@ function initializeExpensePage(session) {
       documentName: expense.documentName,
       requestedDate: formatDateValue(new Date()),
       comments: "",
-      preparedBy: session.role === "Finance Preparer" ? "Maria G. Santos" : session.email,
+      preparedBy: window.FMIS.getDisplayName(session),
       preparedByEmail: session.email,
       preparedRole: session.role,
       submittedAt: new Date().toISOString(),
       history: [{
         at: new Date().toISOString(),
-        user: session.role === "Finance Preparer" ? "Maria G. Santos" : session.email,
+        user: window.FMIS.getDisplayName(session),
+        account: session.email,
         role: session.role,
         action: "Submitted",
         status: "Pending Approval",
@@ -489,6 +488,7 @@ function initializeExpensePage(session) {
         before: "Saved",
         after: "Pending Approval",
         type: "Payment Request",
+        description: `Submitted payment request ${requestId} for ${expense.reference}.`,
       });
     } catch (error) {
       expense.payableStatus = "Open";

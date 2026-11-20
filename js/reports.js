@@ -42,11 +42,8 @@ function initializeReports() {
   }
 
   const permissions = new Set(session.permissions);
-  const email = session.email.toLowerCase();
-  const name = session.fullName || (email.startsWith("management@") || email.startsWith("preparer@")
-    ? "Maria G. Santos"
-    : email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()));
-  const initials = name.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+  const name = window.FMIS.getDisplayName(session);
+  const initials = window.FMIS.getInitials(name);
   document.querySelector("#profile-name").textContent = name;
   document.querySelector("#profile-role").textContent = session.role;
   document.querySelector("#sidebar-user-name").textContent = session.role;

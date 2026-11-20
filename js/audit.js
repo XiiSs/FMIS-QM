@@ -1,30 +1,3 @@
-const sampleAuditEvents = [
-  { at: "2026-10-20T09:14:00", user: "A. Reyes", role: "Finance Preparer", action: "Saved expense", reference: "EXP-2001", result: "Recorded", before: "", after: "Saved", type: "Expense" },
-  { at: "2026-10-20T09:33:00", user: "A. Reyes", role: "Finance Preparer", action: "Submitted payment request", reference: "PR-3001", result: "Recorded", before: "Saved", after: "Pending Approval", type: "Payment Request" },
-  { at: "2026-10-20T16:06:00", user: "M. Santos", role: "Approver", action: "Approved (Finance verified)", reference: "PR-3001", result: "Recorded", before: "Pending Approval", after: "Approved", type: "Approval" },
-  { at: "2026-10-21T10:41:00", user: "M. Santos", role: "Approver", action: "Returned (Missing attachment)", reference: "PR-3002", result: "Recorded", before: "Pending Approval", after: "Returned for Correction", type: "Approval" },
-  { at: "2026-10-22T08:30:00", user: "A. Reyes", role: "Finance Preparer", action: "Self-approval attempt blocked", reference: "PR-3003", result: "Blocked", before: "Pending Approval", after: "Pending Approval", type: "Access Control" },
-  { at: "2026-10-22T17:10:00", user: "A. Reyes", role: "Finance Preparer", action: "Corrected and resubmitted", reference: "PR-3002", result: "Recorded", before: "Returned for Correction", after: "Pending Approval", type: "Payment Request" },
-  { at: "2026-10-23T11:06:00", user: "R. Tan", role: "Finance Preparer", action: "Marked paid after external payment (Oct 23, 2026, ref BANK-REF-88213)", reference: "EXP-2001", result: "Recorded", before: "Payable: Open", after: "Paid", type: "External Payment" },
-  { at: "2026-10-23T11:19:00", user: "A. Reyes", role: "Finance Preparer", action: "Updated invoice details", reference: "INV-1004", result: "Recorded", before: "Invoiced", after: "Invoiced", type: "Income" },
-  { at: "2026-10-23T11:34:00", user: "R. Tan", role: "Finance Preparer", action: "Saved expense", reference: "EXP-2002", result: "Recorded", before: "", after: "Saved", type: "Expense" },
-  { at: "2026-10-23T11:48:00", user: "M. Santos", role: "Approver", action: "Viewed payment request", reference: "PR-3003", result: "Viewed", before: "Pending Approval", after: "Pending Approval", type: "Approval" },
-  { at: "2026-10-23T12:05:00", user: "A. Reyes", role: "Finance Preparer", action: "Recorded customer collection", reference: "INV-1001", result: "Recorded", before: "Partially Paid", after: "Partially Paid", type: "Income" },
-  { at: "2026-10-23T12:22:00", user: "M. Santos", role: "Approver", action: "Viewed approval history", reference: "PR-3002", result: "Viewed", before: "Pending Approval", after: "Pending Approval", type: "Approval" },
-  { at: "2026-10-23T12:40:00", user: "A. Reyes", role: "Finance Preparer", action: "Attached supporting document", reference: "EXP-2002", result: "Recorded", before: "Missing attachment", after: "Attached", type: "Expense" },
-  { at: "2026-10-23T13:02:00", user: "M. Santos", role: "Management / Read-only", action: "Reviewed budget variance", reference: "Raw Materials", result: "Viewed", before: "Over Budget", after: "Over Budget", type: "Budget" },
-  { at: "2026-10-23T13:18:00", user: "A. Reyes", role: "Finance Preparer", action: "Submitted payment request", reference: "PR-3004", result: "Recorded", before: "Saved", after: "Pending Approval", type: "Payment Request" },
-  { at: "2026-10-23T13:35:00", user: "M. Santos", role: "Approver", action: "Reviewed supporting documents", reference: "PR-3004", result: "Viewed", before: "Pending Approval", after: "Pending Approval", type: "Approval" },
-  { at: "2026-10-23T13:52:00", user: "A. Reyes", role: "Finance Preparer", action: "Updated expense due date", reference: "EXP-2006", result: "Recorded", before: "Nov 6, 2026", after: "Nov 8, 2026", type: "Expense" },
-  { at: "2026-10-23T14:10:00", user: "M. Santos", role: "Management / Read-only", action: "Generated financial summary", reference: "2026-10", result: "Generated", before: "", after: "Summary", type: "Report" },
-  { at: "2026-10-23T14:26:00", user: "A. Reyes", role: "Finance Preparer", action: "Updated invoice status", reference: "INV-1007", result: "Recorded", before: "Invoiced", after: "Overdue", type: "Income" },
-  { at: "2026-10-23T14:43:00", user: "M. Santos", role: "Approver", action: "Reviewed request comments", reference: "PR-3002", result: "Viewed", before: "Pending Approval", after: "Pending Approval", type: "Approval" },
-  { at: "2026-10-23T15:01:00", user: "A. Reyes", role: "Finance Preparer", action: "Saved expense", reference: "EXP-2007", result: "Recorded", before: "", after: "Saved", type: "Expense" },
-  { at: "2026-10-23T15:18:00", user: "R. Tan", role: "Finance Preparer", action: "Confirmed external payment reference", reference: "BANK-REF-88213", result: "Recorded", before: "Unverified", after: "Manually recorded", type: "External Payment" },
-  { at: "2026-10-23T15:36:00", user: "M. Santos", role: "Management / Read-only", action: "Reviewed low cash alert", reference: "Week 10", result: "Alert", before: "₱3,000,000 threshold", after: "₱2,950,000 closing", type: "Cash Alert" },
-  { at: "2026-10-23T15:54:00", user: "A. Reyes", role: "Finance Preparer", action: "Submitted supporting document", reference: "EXP-2007", result: "Recorded", before: "Pending", after: "Attached", type: "Expense" },
-];
-
 function initializeAuditPage() {
   let session;
   try {
@@ -45,15 +18,8 @@ function initializeAuditPage() {
   }
 
   const permissions = new Set(session.permissions);
-  const email = session.email.toLowerCase();
-  const name = session.fullName || (email.startsWith("management@")
-    ? "Maria G. Santos"
-    : email.startsWith("approver@")
-      ? "David L. Cruz"
-      : email.startsWith("preparer@")
-        ? "Maria G. Santos"
-        : email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()));
-  const initials = name.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+  const name = window.FMIS.getDisplayName(session);
+  const initials = window.FMIS.getInitials(name);
   document.querySelector("#profile-name").textContent = name;
   document.querySelector("#profile-role").textContent = session.role;
   document.querySelector("#sidebar-user-name").textContent = session.role;
@@ -101,7 +67,7 @@ function initializeAuditPage() {
   const previousButton = document.querySelector("#audit-prev");
   const nextButton = document.querySelector("#audit-next");
   const pageSize = 7;
-  let allEvents = [...sampleAuditEvents];
+  let allEvents = [];
   let currentPage = 1;
   let filteredEvents = [];
 
@@ -126,12 +92,28 @@ function initializeAuditPage() {
     return allEvents.some((event) =>
       event.reference === reference &&
       event.action === action &&
+      typeof event.at === "string" &&
+      typeof at === "string" &&
       event.at.slice(0, 16) === at.slice(0, 16)
     );
   }
 
   function loadSavedActivity() {
     try {
+      const sampleEvents = [
+        { at: "2026-10-20T08:14:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Finance Preparer", action: "Saved expense", module: "Expense", description: "Saved expense", reference: "EXP-2001", result: "Recorded", before: "", after: "Saved", type: "Expense", source: "sample" },
+        { at: "2026-10-20T09:32:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Finance Preparer", action: "Submitted payment request", module: "Payment Request", description: "Submitted payment request", reference: "PR-3001", result: "Recorded", before: "Saved", after: "Pending Approval", type: "Payment Request", source: "sample" },
+        { at: "2026-10-20T10:00:00", user: "M. Santos", account: "m.santos@swiftfoods.ph", role: "Approver", action: "Approved", module: "Approval", description: "Finance verified", reference: "PR-3001", result: "Recorded", before: "Pending Approval", after: "Approved", type: "Approval", source: "sample" },
+        { at: "2026-10-21T10:41:00", user: "M. Santos", account: "m.santos@swiftfoods.ph", role: "Approver", action: "Returned", module: "Approval", description: "Missing attachment", reference: "PR-3002", result: "Recorded", before: "Pending Approval", after: "Returned for Correction", type: "Approval", source: "sample" },
+        { at: "2026-10-22T08:30:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Finance Preparer", action: "Self-approval attempt blocked", module: "Payment Request", description: "Self-approval attempt blocked", reference: "PR-3003", result: "Blocked", before: "Pending Approval", after: "Pending Approval", type: "Payment Request", source: "sample" },
+        { at: "2026-10-22T17:10:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Finance Preparer", action: "Corrected and resubmitted", module: "Payment Request", description: "Corrected and resubmitted", reference: "PR-3002", result: "Recorded", before: "Returned for Correction", after: "Pending Approval", type: "Payment Request", source: "sample" },
+        { at: "2026-10-23T11:06:00", user: "R. Tan", account: "r.tan@swiftfoods.ph", role: "Finance Preparer", action: "Marked paid after external payment", module: "Expense", description: "Marked paid after external payment (Oct 23, 2026); ref: BANK-REF-982131", reference: "EXP-2001", result: "Recorded", before: "Payable: Open", after: "Paid", type: "Expense", source: "sample" },
+      ];
+      sampleEvents.forEach((event) => {
+        if (!eventExists(event.reference, event.action, event.at)) {
+          allEvents.push(event);
+        }
+      });
       if (window.FMIS) {
         const liveEvents = window.FMIS.read(window.FMIS.keys.audit, []);
         liveEvents.forEach((event) => {
@@ -155,9 +137,12 @@ function initializeAuditPage() {
         if (!eventExists(expense.reference, "Saved expense", at)) {
           allEvents.push({
             at,
-            user: expense.createdBy || "Finance Preparer",
-            role: "Finance Preparer",
+            user: expense.createdBy || "Unknown user",
+            account: expense.createdByEmail || "",
+            role: expense.createdByRole || "Unknown role",
             action: "Saved expense",
+            module: "Expense",
+            description: `Saved expense for ${expense.vendor}`,
             reference: expense.reference,
             result: "Recorded",
             before: "",
@@ -186,9 +171,12 @@ function initializeAuditPage() {
           if (!eventExists(request.requestId, action, entry.at)) {
             allEvents.push({
               at: entry.at,
-              user: entry.user || "Finance Preparer",
-              role: entry.role || "Finance Preparer",
+              user: entry.user || "Unknown user",
+              account: entry.account || request.preparedByEmail || "",
+              role: entry.role || "Unknown role",
               action,
+              module: entry.role === "Approver" ? "Approval" : "Payment Request",
+              description: entry.comments || `${action} · ${entry.status || request.status || "Pending Approval"}`,
               reference: request.requestId,
               result: "Recorded",
               before: entry.previousStatus || "",
@@ -204,6 +192,100 @@ function initializeAuditPage() {
     }
   }
 
+  function renderNotifications() {
+    const alertGrid = document.querySelector("#audit-alerts");
+    const emptyAlert = document.querySelector("#audit-alert-empty");
+    const notificationCount = document.querySelector(".notification-count");
+    const alerts = [];
+
+    try {
+      const requests = readLocalRecords("fmisPaymentRequests", "Saved payment requests");
+      const pendingRequests = requests.length
+        ? requests.filter((request) =>
+        String(request.status || "").toLowerCase().includes("pending")
+          )
+        : [{ requestId: "PR-3001" }, { requestId: "PR-3002" }];
+      if (pendingRequests.length) {
+        const request = pendingRequests[0];
+        alerts.push({
+          tone: "is-warning",
+          audience: "For: Approver",
+          message: `${pendingRequests.length} payment request${pendingRequests.length === 1 ? "" : "s"} awaiting approval. Latest: ${request.requestId}.`,
+          search: request.requestId,
+        });
+      }
+
+      const today = new Date();
+      const todayValue = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+      const expenses = readLocalRecords("fmisExpenseRecords", "Saved expense records");
+      const overdueExpenses = expenses.length
+        ? expenses.filter((expense) =>
+          expense.payableStatus !== "Paid" &&
+          typeof expense.dueDate === "string" &&
+          expense.dueDate < todayValue
+        )
+        : [{ reference: "EXP-2003" }];
+      if (overdueExpenses.length) {
+        const expense = overdueExpenses[0];
+        alerts.push({
+          tone: "is-danger",
+          audience: "For: Finance",
+          message: `${overdueExpenses.length} unpaid expense${overdueExpenses.length === 1 ? "" : "s"} past due. Latest: ${expense.reference}.`,
+          search: expense.reference,
+        });
+      }
+
+      const lowWeeks = window.FMIS.getCashForecast().filter((week) => week.low);
+      if (lowWeeks.length) {
+        const week = lowWeeks[0];
+        alerts.push({
+          tone: "is-danger",
+          audience: "For: Management",
+          message: `Projected cash falls below ₱3,000,000 in Week ${week.week} (${window.FMIS.money(week.closing)}).`,
+          destination: "cashforecast.html",
+        });
+      }
+    } catch (error) {
+      showAuditError(`Notifications could not be loaded: ${error.message}`);
+    }
+
+    const cards = alerts.map((alert) => {
+      const card = document.createElement("article");
+      card.className = `audit-alert-card ${alert.tone}`;
+      const icon = document.createElement("span");
+      icon.className = "audit-alert-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = alert.tone === "is-warning" ? "⚠" : "!";
+      const copy = document.createElement("div");
+      copy.className = "audit-alert-copy";
+      const audience = document.createElement("span");
+      audience.className = "audit-alert-audience";
+      audience.textContent = alert.audience;
+      const message = document.createElement("p");
+      message.textContent = alert.message;
+      copy.append(audience, message);
+      const view = document.createElement("button");
+      view.type = "button";
+      view.className = "audit-alert-view";
+      if (alert.search) {
+        view.dataset.auditSearch = alert.search;
+      }
+      if (alert.destination) {
+        view.dataset.auditDestination = alert.destination;
+      }
+      view.textContent = "View";
+      card.append(icon, copy, view);
+      return card;
+    });
+
+    alertGrid.replaceChildren(...cards);
+    if (!cards.length) {
+      alertGrid.append(emptyAlert);
+    }
+    notificationCount.textContent = String(alerts.length);
+    notificationCount.hidden = alerts.length === 0;
+  }
+
   function populateSelect(select, values, placeholder) {
     const currentValue = select.value;
     select.replaceChildren(new Option(placeholder, ""));
@@ -216,7 +298,22 @@ function initializeAuditPage() {
   }
 
   function populateFilters() {
-    populateSelect(userSelect, allEvents.map((event) => event.user), "All users");
+    const currentUser = userSelect.value;
+    const users = new Map();
+    allEvents.forEach((event) => {
+      const value = event.account || event.user || "Unknown user";
+      const label = event.account
+        ? `${event.user || "Unknown user"} (${event.account})`
+        : value;
+      users.set(value, label);
+    });
+    userSelect.replaceChildren(new Option("All users", ""));
+    [...users.entries()]
+      .sort((left, right) => left[1].localeCompare(right[1]))
+      .forEach(([value, label]) => userSelect.add(new Option(label, value)));
+    if ([...userSelect.options].some((option) => option.value === currentUser)) {
+      userSelect.value = currentUser;
+    }
     populateSelect(actionSelect, allEvents.map((event) => event.type), "All actions");
   }
 
@@ -234,6 +331,7 @@ function initializeAuditPage() {
       time: new Intl.DateTimeFormat("en", {
         hour: "2-digit",
         minute: "2-digit",
+        second: "2-digit",
         hour12: false,
       }).format(date),
     };
@@ -272,7 +370,7 @@ function initializeAuditPage() {
   }
 
   function statusClass(status) {
-    const normalized = status.toLowerCase();
+    const normalized = String(status || "").toLowerCase();
     if (normalized.includes("pending")) return "is-pending";
     if (normalized.includes("approved") || normalized.includes("paid")) return "is-positive";
     if (normalized.includes("returned")) return "is-returned";
@@ -283,7 +381,7 @@ function initializeAuditPage() {
 
   function createTextCell(value, className = "") {
     const cell = document.createElement("td");
-    cell.textContent = value;
+    cell.textContent = value || "—";
     if (className) {
       cell.className = className;
     }
@@ -303,11 +401,24 @@ function initializeAuditPage() {
     const timeText = document.createElement("small");
     timeText.textContent = timestamp.time;
     timeCell.append(dateText, timeText);
+    const userCell = document.createElement("td");
+    userCell.className = "audit-user-cell";
+    const userText = document.createElement("span");
+    userText.textContent = event.user || "Unknown user";
+    const accountText = document.createElement("small");
+    accountText.textContent = event.account || "Account unavailable";
+    userCell.append(userText, accountText);
+    const description = event.description ||
+      [event.action, event.reference && `Reference: ${event.reference}`, event.before && `From: ${event.before}`, event.after && `To: ${event.after}`]
+        .filter(Boolean)
+        .join(" · ");
     row.append(
       timeCell,
-      createTextCell(event.user),
-      createTextCell(event.role),
+      userCell,
+      createTextCell(event.role || "Unknown role"),
+      createTextCell(event.module || event.type || "System"),
       createTextCell(event.action, "audit-action-cell"),
+      createTextCell(description, "audit-description-cell"),
       createTextCell(event.reference, "audit-reference-cell"),
     );
     const resultCell = createTextCell("", "audit-result-cell");
@@ -331,17 +442,20 @@ function initializeAuditPage() {
     feedback.hidden = true;
     filteredEvents = allEvents
       .filter((event) => {
-        const date = event.at.slice(0, 10);
+        const date = typeof event.at === "string" ? event.at.slice(0, 10) : "";
         const matchesDate = (!from || date >= from) && (!to || date <= to);
-        const matchesUser = !userSelect.value || event.user === userSelect.value;
+        const matchesUser = !userSelect.value ||
+          (event.account || event.user || "Unknown user") === userSelect.value;
         const matchesAction = !actionSelect.value || event.type === actionSelect.value;
         const query = referenceInput.value.trim().toLowerCase();
         const matchesReference = !query ||
-          event.reference.toLowerCase().includes(query) ||
-          event.action.toLowerCase().includes(query);
+          String(event.reference || "").toLowerCase().includes(query) ||
+          String(event.action || "").toLowerCase().includes(query) ||
+          String(event.description || "").toLowerCase().includes(query) ||
+          String(event.account || "").toLowerCase().includes(query);
         return matchesDate && matchesUser && matchesAction && matchesReference;
       })
-      .sort((left, right) => left.at.localeCompare(right.at) || left.reference.localeCompare(right.reference));
+      .sort((left, right) => String(right.at).localeCompare(String(left.at)));
     currentPage = 1;
     renderEvents();
   }
@@ -387,8 +501,15 @@ function initializeAuditPage() {
       renderEvents();
     }
   });
-  document.querySelectorAll("[data-audit-search]").forEach((button) => {
-    button.addEventListener("click", () => {
+  document.querySelector("#audit-alerts").addEventListener("click", (event) => {
+    const button = event.target instanceof Element
+      ? event.target.closest("[data-audit-search], [data-audit-destination]")
+      : null;
+    if (button) {
+      if (button.dataset.auditDestination) {
+        window.location.assign(button.dataset.auditDestination);
+        return;
+      }
       fromInput.value = "";
       toInput.value = "";
       userSelect.value = "";
@@ -396,10 +517,11 @@ function initializeAuditPage() {
       referenceInput.value = button.dataset.auditSearch;
       applyFilters();
       document.querySelector("#audit-log").scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    }
   });
 
   loadSavedActivity();
+  renderNotifications();
   populateFilters();
   applyFilters();
 }

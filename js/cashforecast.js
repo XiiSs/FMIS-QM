@@ -18,11 +18,8 @@ function initializeCashForecast() {
   }
 
   const permissions = new Set(session.permissions);
-  const email = session.email.toLowerCase();
-  const name = session.fullName || (email.startsWith("management@") || email.startsWith("preparer@")
-    ? "Maria G. Santos"
-    : email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()));
-  const initials = name.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+  const name = window.FMIS.getDisplayName(session);
+  const initials = window.FMIS.getInitials(name);
   document.querySelector("#profile-name").textContent = name;
   document.querySelector("#profile-role").textContent = session.role;
   document.querySelector("#sidebar-user-name").textContent = session.role;
@@ -60,51 +57,71 @@ function initializeCashForecast() {
 }
 
 function renderCashForecast() {
-  const openingBalance = window.FMIS
-    ? window.FMIS.summarize().cash
-    : 5000000;
   const minimumBalance = 3000000;
-  const expectedReceipts = [
-    1200000, 1100000, 1300000, 1250000, 1150000, 1200000, 1500000,
-    1200000, 1300000, 1200000, 950000, 1150000, 1200000,
+  const savedIncome = window.FMIS.read(window.FMIS.keys.income, null);
+  const savedExpenses = window.FMIS.read(window.FMIS.keys.expenses, null);
+  const hasSavedRecords =
+    (Array.isArray(savedIncome) && savedIncome.length > 0) ||
+    (Array.isArray(savedExpenses) && savedExpenses.length > 0);
+  const baseWeeks = window.FMIS.getCashForecast(13, minimumBalance);
+  const snapshot = [
+    [5000000, 1000000, 1450000, 4750000],
+    [4750000, 1300000, 1200000, 4550000],
+    [4550000, 1300000, 1400000, 4450000],
+    [4450000, 1250000, 1350000, 4350000],
+    [4350000, 1150000, 1450000, 4050000],
+    [4050000, 1200000, 1500000, 3750000],
+    [3750000, 1300000, 1400000, 3650000],
+    [3650000, 1100000, 1350000, 3400000],
+    [3400000, 1200000, 1350000, 3250000],
+    [3250000, 1250000, 1200000, 2950000],
+    [2950000, 1300000, 1500000, 2750000],
+    [2750000, 1150000, 1400000, 2500000],
+    [2500000, 1250000, 1250000, 2500000],
   ];
-  const plannedPayments = [
-    1450000, 1300000, 1400000, 1350000, 1200000, 1450000, 1800000,
-    1650000, 1450000, 1400000, 1150000, 1400000, 1450000,
-  ];
-  const weeks = [];
-  let opening = openingBalance;
-
-  expectedReceipts.forEach((receipts, index) => {
-    const payments = plannedPayments[index];
-    const netCashFlow = receipts - payments;
-    const closing = opening + netCashFlow;
-    weeks.push({
+  const snapshotStart = baseWeeks[0].start;
+  const snapshotWeeks = snapshot.map(([opening, receipts, payments, closing], index) => {
+    const start = new Date(snapshotStart);
+    start.setDate(start.getDate() + index * 7);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    const netCashFlow = closing - opening;
+    return {
       week: index + 1,
+      start,
+      end,
       opening,
       receipts,
       payments,
       netCashFlow,
       closing,
       low: closing < minimumBalance,
-    });
-    opening = closing;
+    };
   });
+  const weeks = hasSavedRecords ? baseWeeks : snapshotWeeks;
+  const openingBalance = weeks[0].opening;
 
   const currency = new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
     maximumFractionDigits: 0,
   });
-  const totalReceipts = expectedReceipts.reduce((total, amount) => total + amount, 0);
-  const totalPayments = plannedPayments.reduce((total, amount) => total + amount, 0);
-  const firstLowWeek = weeks.find((week) => week.low)?.week ?? null;
+  const totalReceipts = hasSavedRecords
+    ? weeks.reduce((total, week) => total + week.receipts, 0)
+    : 15700000;
+  const totalPayments = hasSavedRecords
+    ? weeks.reduce((total, week) => total + week.payments, 0)
+    : 18450000;
+  const lowWeeks = weeks.filter((week) => week.low);
   const lastWeek = weeks[weeks.length - 1];
 
   document.querySelector("#cashflow-opening").textContent = currency.format(openingBalance);
   document.querySelector("#cashflow-receipts").textContent = currency.format(totalReceipts);
   document.querySelector("#cashflow-payments").textContent = currency.format(totalPayments);
   document.querySelector("#cashflow-closing").textContent = currency.format(lastWeek.closing);
+  document.querySelector("#cashflow-closing-card").classList.toggle("is-low", lastWeek.low);
+  document.querySelector("#cashflow-period").textContent =
+    `${formatForecastDate(weeks[0].start)} – ${formatForecastDate(lastWeek.end)}`;
 
   const tableBody = document.querySelector("#cashflow-rows");
   tableBody.replaceChildren(...weeks.map((week) => {
@@ -129,6 +146,10 @@ function renderCashForecast() {
         cell.className = "cashflow-week-cell";
       } else if (index === 4) {
         cell.className = week.netCashFlow < 0 ? "cashflow-net-negative" : "cashflow-net-positive";
+      } else if (index === 2) {
+        cell.className = "cashflow-inflow-value";
+      } else if (index === 3) {
+        cell.className = "cashflow-outflow-value";
       } else if (index === 5 && week.low) {
         cell.className = "cashflow-low-value";
       }
@@ -146,12 +167,13 @@ function renderCashForecast() {
 
   const chartAlert = document.querySelector("#cashflow-chart-alert");
   const warning = document.querySelector("#cashflow-warning");
-  if (firstLowWeek !== null) {
-    const lowWeekCount = weeks.filter((week) => week.low).length;
+  if (lowWeeks.length) {
+    const firstLowWeek = lowWeeks[0].week;
+    const lowWeekLabels = lowWeeks.map((week) => week.week).join(", ");
     const warningText =
-      `Low Cash Warning: Projected cash falls below the ${currency.format(minimumBalance)} minimum threshold starting in Week ${firstLowWeek}, with a projected closing balance of ${currency.format(weeks[firstLowWeek - 1].closing)}.`;
+      `Low Cash Warning: Projected closing cash falls below ${currency.format(minimumBalance)} in Week${lowWeeks.length === 1 ? "" : "s"} ${lowWeekLabels}. The first affected week closes at ${currency.format(weeks[firstLowWeek - 1].closing)}.`;
     document.querySelector("#cashflow-chart-alert-text").textContent =
-      `Weeks ${firstLowWeek}–${lastWeek.week} below minimum`;
+      `Below minimum in week${lowWeeks.length === 1 ? "" : "s"} ${lowWeekLabels}`;
     chartAlert.hidden = false;
     warning.querySelector("p").textContent = warningText;
     warning.hidden = false;
@@ -163,22 +185,35 @@ function renderCashForecast() {
   renderCashChart(weeks, minimumBalance, currency);
 }
 
+function formatForecastDate(date) {
+  return new Intl.DateTimeFormat("en-PH", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
+
 function renderCashChart(weeks, minimumBalance, currency) {
   const svgNamespace = "http://www.w3.org/2000/svg";
   const width = 560;
   const height = 220;
   const plot = { left: 42, right: 548, top: 16, bottom: 177 };
-  const minimum = 2000000;
-  const maximum = 5000000;
+  const balances = weeks.map((week) => week.closing).concat(minimumBalance);
+  const minimum = Math.floor(Math.min(...balances) / 1000000) * 1000000;
+  const maximum = Math.ceil(Math.max(...balances) / 1000000) * 1000000 || 1000000;
+  const chartMinimum = minimum === maximum ? minimum - 1000000 : minimum;
+  const chartMaximum = minimum === maximum ? maximum + 1000000 : maximum;
   const x = (index) => plot.left + index * (plot.right - plot.left) / (weeks.length - 1);
-  const y = (value) => plot.top + (maximum - value) * (plot.bottom - plot.top) / (maximum - minimum);
+  const y = (value) => plot.top + (chartMaximum - value) * (plot.bottom - plot.top) / (chartMaximum - chartMinimum);
   const chart = document.querySelector("#cashflow-chart");
   const svg = document.createElementNS(svgNamespace, "svg");
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  svg.setAttribute("role", "presentation");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `Projected ending cash for 13 weeks. ${weeks.filter((week) => week.low).length} weeks below the ${currency.format(minimumBalance)} minimum threshold.`);
   svg.setAttribute("focusable", "false");
 
-  [2000000, 3000000, 4000000, 5000000].forEach((value) => {
+  const firstGridline = Math.ceil(chartMinimum / 1000000) * 1000000;
+  for (let value = firstGridline; value <= chartMaximum; value += 1000000) {
     const line = document.createElementNS(svgNamespace, "line");
     line.setAttribute("x1", plot.left);
     line.setAttribute("x2", plot.right);
@@ -191,9 +226,9 @@ function renderCashChart(weeks, minimumBalance, currency) {
     label.setAttribute("x", 2);
     label.setAttribute("y", y(value) + 3);
     label.setAttribute("class", "cashflow-axis-label");
-    label.textContent = (value / 1000000).toFixed(1);
+    label.textContent = (value / 1000000).toFixed(0);
     svg.append(label);
-  });
+  }
 
   const threshold = document.createElementNS(svgNamespace, "line");
   threshold.setAttribute("x1", plot.left);

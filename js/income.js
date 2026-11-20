@@ -88,20 +88,8 @@ function readIncomeSession() {
 
 function initializeIncomePage(session) {
   const permissions = new Set(session.permissions);
-  const email = session.email.toLowerCase();
-  const firstName = email.startsWith("management@")
-    ? "Maria"
-    : email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-  const fullName = session.fullName || (email.startsWith("management@") || email.startsWith("preparer@")
-    ? "Maria G. Santos"
-    : firstName);
-  const initials = fullName
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
+  const fullName = window.FMIS.getDisplayName(session);
+  const initials = window.FMIS.getInitials(fullName);
   const canEdit = session.role !== "Management / Read-only";
 
   document.querySelector("#profile-name").textContent = fullName;
@@ -498,6 +486,10 @@ function initializeIncomePage(session) {
       received,
       status: getInvoiceStatus(amount, received, String(formData.get("dueDate"))),
       dueDate: String(formData.get("dueDate")),
+      createdAt: new Date().toISOString(),
+      createdBy: fullName,
+      createdByEmail: session.email,
+      createdByRole: session.role,
     };
     records.unshift(newRecord);
     summaryTotals.invoiced += amount;
@@ -520,6 +512,7 @@ function initializeIncomePage(session) {
       before: "",
       after: `${newRecord.status}; ₱${amount.toFixed(2)}`,
       type: "Income",
+      description: `Saved invoice ${invoice} for ${newRecord.customer}; amount ₱${amount.toFixed(2)}.`,
     });
     renderRows();
     form.reset();
@@ -588,6 +581,7 @@ function initializeIncomePage(session) {
         before: previousStatus,
         after: record.status,
         type: "Income",
+        description: `Recorded collection of ₱${payment.toFixed(2)} for ${invoice}.`,
       });
       renderRows();
       showFeedback(`Collection of ${formatMoney(payment)} recorded for ${invoice}.`);

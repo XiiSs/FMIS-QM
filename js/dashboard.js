@@ -19,20 +19,9 @@ function initializeDashboard() {
   }
 
   const permissions = new Set(session.permissions);
-  const email = session.email.toLowerCase();
-  const firstName = session.fullName
-    ? session.fullName.trim().split(/\s+/)[0]
-    : email.startsWith("management@") ? "Maria" : email.split("@")[0];
-  const fullName = session.fullName || (email.startsWith("management@")
-    ? "Maria G. Santos"
-    : firstName.replace(/[._-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()));
-  const initials = fullName
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
+  const fullName = window.FMIS.getDisplayName(session);
+  const firstName = fullName.split(/\s+/)[0];
+  const initials = window.FMIS.getInitials(fullName);
 
   document.querySelector("#profile-name").textContent = fullName;
   document.querySelector("#profile-role").textContent = session.role;

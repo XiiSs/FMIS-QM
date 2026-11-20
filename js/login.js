@@ -94,10 +94,24 @@ loginForm.addEventListener("submit", (event) => {
     "fmisSession",
     JSON.stringify({
       email: account.email,
+      username: account.username || "",
       fullName: account.fullName,
       role: account.role,
       permissions: account.permissions,
     }),
   );
+  try {
+    window.FMIS.logActivity({
+      action: "Signed in",
+      module: "Authentication",
+      type: "Authentication",
+      description: "User signed in successfully.",
+    });
+  } catch (error) {
+    sessionStorage.removeItem("fmisSession");
+    errorMessage.textContent = `Sign-in succeeded, but the activity could not be recorded: ${error.message}`;
+    errorMessage.hidden = false;
+    return;
+  }
   window.location.assign("dashboard.html");
 });
