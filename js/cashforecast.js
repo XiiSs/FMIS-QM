@@ -65,19 +65,19 @@ function renderCashForecast() {
     (Array.isArray(savedExpenses) && savedExpenses.length > 0);
   const baseWeeks = window.FMIS.getCashForecast(13, minimumBalance);
   const snapshot = [
-    [5000000, 1000000, 1450000, 4750000],
-    [4750000, 1300000, 1200000, 4550000],
-    [4550000, 1300000, 1400000, 4450000],
-    [4450000, 1250000, 1350000, 4350000],
-    [4350000, 1150000, 1450000, 4050000],
-    [4050000, 1200000, 1500000, 3750000],
-    [3750000, 1300000, 1400000, 3650000],
-    [3650000, 1100000, 1350000, 3400000],
-    [3400000, 1200000, 1350000, 3250000],
-    [3250000, 1250000, 1200000, 2950000],
-    [2950000, 1300000, 1500000, 2750000],
-    [2750000, 1150000, 1400000, 2500000],
-    [2500000, 1250000, 1250000, 2500000],
+    [5000000, 1000000, 1450000, 4550000],
+    [4550000, 1300000, 1200000, 4650000],
+    [4650000, 1300000, 1400000, 4550000],
+    [4550000, 1250000, 1350000, 4450000],
+    [4450000, 1150000, 1450000, 4150000],
+    [4150000, 1200000, 1500000, 3850000],
+    [3850000, 1300000, 1400000, 3750000],
+    [3750000, 1100000, 1350000, 3500000],
+    [3500000, 1200000, 1350000, 3350000],
+    [3350000, 1250000, 1200000, 3400000],
+    [3400000, 1300000, 1500000, 3200000],
+    [3200000, 1150000, 1400000, 2950000],
+    [2950000, 1250000, 1250000, 2950000],
   ];
   const snapshotStart = baseWeeks[0].start;
   const snapshotWeeks = snapshot.map(([opening, receipts, payments, closing], index) => {
@@ -85,7 +85,7 @@ function renderCashForecast() {
     start.setDate(start.getDate() + index * 7);
     const end = new Date(start);
     end.setDate(end.getDate() + 6);
-    const netCashFlow = closing - opening;
+    const netCashFlow = receipts - payments;
     return {
       week: index + 1,
       start,
@@ -108,10 +108,10 @@ function renderCashForecast() {
   });
   const totalReceipts = hasSavedRecords
     ? weeks.reduce((total, week) => total + week.receipts, 0)
-    : 15700000;
+    : 15750000;
   const totalPayments = hasSavedRecords
     ? weeks.reduce((total, week) => total + week.payments, 0)
-    : 18450000;
+    : 17800000;
   const lowWeeks = weeks.filter((week) => week.low);
   const lastWeek = weeks[weeks.length - 1];
 

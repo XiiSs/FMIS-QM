@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#0e3556">
   <title>Financial Reports | FMIS Portal</title>
   <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/modules-th-exp.css">
 </head>
 <body class="dashboard-page transaction-page reports-page">
   <div class="dashboard-app">
@@ -19,7 +20,7 @@
         <a class="nav-link" href="dashboard.html" data-permission="dashboard"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span>Dashboard</span></a>
         <a class="nav-link" href="income.html" data-permission="income"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17 10 11l4 4 6-8"/><path d="M14 7h6v6"/></svg><span>Income</span></a>
         <a class="nav-link" href="transaction-history.html" data-permission="transactions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5"/><path d="M4 4v4.5h4.5M12 7v5l3 2"/></svg><span>Transaction History</span></a>
-        <a class="nav-link" href="expenses.html" data-permission="expenses"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M9 8h6m-6 4h6m-6 4h3"/></svg><span>Expenses</span></a>
+        <a class="nav-link" href="expenses.html" data-permission="expenses"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 17 7-7 4 4 5-7"/><path d="M14 7h6v6"/></svg><span>Expenses</span></a>
         <a class="nav-link" href="approvals.html" data-permission="approvals"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><span>Approvals</span></a>
         <a class="nav-link" href="budgets.html" data-permission="budgets"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9m7 10V5m7 14v-7"/><path d="M3 19h18"/></svg><span>Budgets</span></a>
         <a class="nav-link" href="cashforecast.html" data-permission="cashforecast"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h13l-3-3m3 3-3 3M21 17H8l3 3m-3-3 3-3"/></svg><span>Cash Forecast</span></a>
@@ -38,91 +39,115 @@
         <button class="mobile-menu-toggle" id="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
         <h1 class="topbar-title">Financial Reports</h1>
         <div class="topbar-spacer"></div>
-        <a class="notification-button" href="#report-summary" aria-label="View financial report summary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4"/></svg><span class="notification-count" aria-hidden="true">5</span></a>
         <span class="user-avatar" aria-hidden="true"></span>
         <div class="topbar-user"><strong id="profile-name"></strong><span id="profile-role"></span></div>
         <span class="profile-toggle" aria-hidden="true">⌄</span>
       </header>
 
       <main class="report-content">
+        <!-- 1. Reports Toolbar -->
         <form id="report-form" class="report-toolbar">
-          <label class="report-control report-period-control" for="report-period">
-            <span>Reporting Period</span>
-            <select id="report-period" name="period">
-              <option value="2026-10" selected>October 2026</option>
-              <option value="2026-11">November 2026</option>
-              <option value="2026-09">September 2026</option>
-            </select>
-          </label>
-          <label class="report-control report-asof-control" for="report-as-of">
-            <span>As of</span>
-            <input id="report-as-of" type="text" value="Oct 31, 2026" readonly>
-          </label>
-          <label class="report-control report-type-control" for="report-type">
-            <span>Report Type</span>
-            <select id="report-type" name="type">
-              <option value="summary" selected>Summary</option>
-              <option value="income">Income</option>
-              <option value="expenses">Expenses</option>
-              <option value="receivables-payables">Receivables &amp; Payables</option>
-              <option value="budget">Budget Variance</option>
-            </select>
-          </label>
-          <button class="report-generate-button" type="submit">Generate Report</button>
-          <button class="report-print-button" id="report-print" type="button">Print</button>
-          <button class="report-export-button" id="report-export" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 17v4h14v-4"/></svg>Export PDF</button>
+          <div class="report-toolbar-controls">
+            <label class="report-control report-period-control" for="report-period">
+              <span>Reporting Period</span>
+              <select id="report-period" name="period">
+                <option value="month" selected>This Month (October 2026)</option>
+                <option value="quarter">This Quarter (Q4 2026)</option>
+                <option value="year">This Year (FY 2026)</option>
+                <option value="2026-09">September 2026</option>
+                <option value="2026-11">November 2026</option>
+                <option value="custom">Custom Date Range</option>
+              </select>
+            </label>
+
+            <label class="report-control report-asof-control" for="report-as-of">
+              <span>As of Date</span>
+              <input id="report-as-of" type="text" value="Oct 31, 2026" readonly>
+            </label>
+
+            <label class="report-control report-type-control" for="report-type">
+              <span>Report Category</span>
+              <select id="report-type" name="type">
+                <option value="summary" selected>Consolidated Summary</option>
+                <option value="income">Income Report</option>
+                <option value="expenses">Expense Report</option>
+                <option value="budget">Budget &amp; Variance</option>
+                <option value="cashflow">Cash Flow Report</option>
+                <option value="ar-aging">AR Aging Report</option>
+                <option value="ap-aging">AP Aging Report</option>
+                <option value="approvals">Payment Approvals</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="report-toolbar-actions">
+            <button class="report-generate-button" type="submit">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"/></svg>
+              <span>Generate Report</span>
+            </button>
+            <button class="report-print-button" id="report-print" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2m-12 0v4h12v-4M8 13h8"/></svg>
+              <span>Print Report</span>
+            </button>
+            <button class="report-export-button" id="report-export" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 17v4h14v-4"/></svg>
+              <span>Export PDF</span>
+            </button>
+          </div>
         </form>
+
+        <!-- Custom Date Range Bar for Reports (Hidden by default) -->
+        <div id="reports-custom-range-bar" class="custom-date-range-bar" hidden>
+          <label for="reports-start-date">From:
+            <input type="date" id="reports-start-date" value="2026-10-01">
+          </label>
+          <label for="reports-end-date">To:
+            <input type="date" id="reports-end-date" value="2026-10-31">
+          </label>
+        </div>
 
         <p class="report-feedback" id="report-feedback" role="status" hidden></p>
 
-        <section class="report-summary-grid" id="report-summary" aria-label="Financial summary">
-          <article class="dashboard-panel report-summary-card" data-report-section="income"><span>Total Income</span><strong id="report-income-total">₱2,100,000</strong><a href="income.html" data-permission="income">View supporting records</a></article>
-          <article class="dashboard-panel report-summary-card" data-report-section="expenses"><span>Total Expenses</span><strong id="report-expenses-total">₱1,850,000</strong><a href="expenses.html" data-permission="expenses">View expense breakdown</a></article>
-          <article class="dashboard-panel report-summary-card" data-report-section="cash"><span>Cash Position (as of <span id="report-card-date">Oct 31, 2026</span>)</span><strong id="report-cash-position">₱5,000,000</strong><small>Recorded balance</small></article>
-          <article class="dashboard-panel report-summary-card" data-report-section="receivables"><span>Outstanding Receivables</span><strong id="report-receivables-total">₱110,000</strong><a href="income.html" data-permission="income">View outstanding invoices</a></article>
-          <article class="dashboard-panel report-summary-card" data-report-section="payables"><span>Outstanding Payables</span><strong id="report-payables-total">₱50,000</strong><a href="expenses.html" data-permission="expenses">View outstanding payables</a></article>
-        </section>
+        <!-- 2. Report Category Navigation Tabs -->
+        <div class="reports-category-bar" role="tablist" aria-label="Report Categories">
+          <button type="button" class="report-cat-btn is-active" data-report-cat="summary" role="tab" aria-selected="true">Consolidated Summary</button>
+          <button type="button" class="report-cat-btn" data-report-cat="income" role="tab" aria-selected="false">Income Report</button>
+          <button type="button" class="report-cat-btn" data-report-cat="expenses" role="tab" aria-selected="false">Expense Report</button>
+          <button type="button" class="report-cat-btn" data-report-cat="budget" role="tab" aria-selected="false">Budget &amp; Variance</button>
+          <button type="button" class="report-cat-btn" data-report-cat="cashflow" role="tab" aria-selected="false">Cash Flow Report</button>
+          <button type="button" class="report-cat-btn" data-report-cat="ar-aging" role="tab" aria-selected="false">AR Aging Report</button>
+          <button type="button" class="report-cat-btn" data-report-cat="ap-aging" role="tab" aria-selected="false">AP Aging Report</button>
+          <button type="button" class="report-cat-btn" data-report-cat="approvals" role="tab" aria-selected="false">Payment Approvals</button>
+        </div>
 
-        <section class="report-detail-grid">
-          <article class="dashboard-panel report-table-panel" data-report-section="receivables" aria-labelledby="report-receivables-heading">
-            <h2 id="report-receivables-heading">Outstanding Receivables</h2>
-            <div class="report-table-wrap">
-              <table class="report-table">
-                <thead><tr><th>Invoice / Customer</th><th>Status</th><th>Outstanding Balance</th><th>Due date</th></tr></thead>
-                <tbody id="report-receivables-rows"></tbody>
-                <tfoot><tr><th colspan="2">Total</th><th id="report-receivables-foot">₱110,000</th><td></td></tr></tfoot>
-              </table>
-              <p class="report-empty" id="report-receivables-empty" hidden>No outstanding invoices for this reporting period.</p>
+        <!-- 3. Report Preview Container (Print-Ready) -->
+        <div id="report-preview-container" class="report-preview-sheet">
+          <!-- Official Report Header Banner -->
+          <div class="report-header-banner">
+            <p class="report-org-title">SWIFT FOODS, INC. &bull; FINANCIAL MANAGEMENT INFORMATION SYSTEM</p>
+            <h2 class="report-doc-title" id="report-preview-title">Consolidated Financial Summary Report</h2>
+            <div class="report-meta-grid">
+              <span><strong>Reporting Period:</strong> <span id="report-preview-period">October 2026</span></span>
+              <span><strong>Generation Date:</strong> <span id="report-preview-gentime">Loading...</span></span>
+              <span><strong>Prepared By:</strong> <span id="report-preview-author">System</span></span>
+              <span><strong>Denomination:</strong> Philippine Peso (PHP, ₱)</span>
+              <span class="report-badge-confidential">Confidential &bull; Internal Use Only</span>
             </div>
-          </article>
-          <article class="dashboard-panel report-table-panel" data-report-section="payables" aria-labelledby="report-payables-heading">
-            <h2 id="report-payables-heading">Outstanding Payables</h2>
-            <div class="report-table-wrap">
-              <table class="report-table">
-                <thead><tr><th>Expense / Supplier</th><th>Outstanding Balance</th><th>Due date</th></tr></thead>
-                <tbody id="report-payables-rows"></tbody>
-                <tfoot><tr><th>Total</th><th id="report-payables-foot">₱50,000</th><td></td></tr></tfoot>
-              </table>
-              <p class="report-empty" id="report-payables-empty" hidden>No outstanding payables for this reporting period.</p>
-            </div>
-          </article>
-        </section>
-
-        <section class="dashboard-panel report-table-panel report-budget-panel" data-report-section="budget" aria-labelledby="report-budget-heading">
-          <h2 id="report-budget-heading">Budget Variance</h2>
-          <div class="report-table-wrap">
-            <table class="report-table report-budget-table">
-              <thead><tr><th>Category</th><th>Planned</th><th>Actual</th><th>Variance</th><th>Status</th></tr></thead>
-              <tbody id="report-budget-rows"></tbody>
-              <tfoot><tr><th>Total</th><th id="report-budget-planned">₱2,000,000</th><th id="report-budget-actual">₱1,850,000</th><th id="report-budget-variance">+₱150,000</th><td></td></tr></tfoot>
-            </table>
-            <p class="report-empty" id="report-budget-empty" hidden>No budget data for this reporting period.</p>
           </div>
-        </section>
-        <p class="report-note">Cash Position is a recorded balance, not the Week 13 forecast. Variance = Planned − Actual. Sample report data is illustrative.</p>
+
+          <!-- Dynamic Report Body Views (Rendered via reports.js) -->
+          <div id="report-preview-body">
+            <!-- Injected via reports.js -->
+          </div>
+        </div>
+
+        <p class="report-note">
+          FMIS-QM Consolidated Reporting System. Reconciled directly with underlying transaction records. Prototype values for demonstration.
+        </p>
       </main>
     </div>
   </div>
+
   <script src="../js/fmis-core.js" defer></script>
   <script src="../js/reports.js" defer></script>
 </body>
