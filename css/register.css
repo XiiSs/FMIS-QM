@@ -1,0 +1,195 @@
+/* Registration page extension for the FMIS Portal login layout. */
+.register-page .login-shell {
+  min-height: min(100svh, 780px);
+}
+
+.register-page .login-content {
+  align-items: center;
+  padding-top: 25px;
+  padding-bottom: 26px;
+}
+
+.register-page .login-form-wrap {
+  max-width: 410px;
+}
+
+.register-page #register-form {
+  margin-top: 22px;
+}
+
+.register-page .form-field + .form-field {
+  margin-top: 13px;
+}
+
+.register-page .form-field label {
+  margin-bottom: 7px;
+}
+
+.register-page .form-field input {
+  height: 46px;
+}
+
+.register-hint {
+  margin: 9px 1px 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #71839d;
+}
+
+.register-password-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #455d74;
+  cursor: pointer;
+}
+
+.register-page .register-password-toggle input {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  margin: 0;
+  accent-color: #117d74;
+  cursor: pointer;
+}
+
+.register-feedback {
+  margin: 15px 0 0;
+  border-radius: 7px;
+  border: 1px solid #bde0d7;
+  background: #ebf8f3;
+  padding: 10px 12px;
+  color: #126d56;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.register-feedback[hidden] {
+  display: none;
+}
+
+.register-feedback[data-state="error"] {
+  background: #fff1f0;
+  color: #ab2b29;
+  border-color: #f0c9c6;
+}
+
+.register-page .sign-in-button {
+  margin-top: 17px;
+  min-height: 49px;
+}
+
+.register-switch {
+  text-align: center;
+  font-size: 13px;
+  color: #596e85;
+  margin: 17px 0 0;
+}
+
+.register-switch a {
+  color: #117d74;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.register-switch a:hover,
+.register-switch a:focus-visible {
+  text-decoration: underline;
+}
+
+.register-page .register-prototype-note {
+  max-width: 370px;
+  margin: 17px auto 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #7c8ba0;
+  text-align: center;
+}
+
+/* Fallback styles make register.html previewable even without the main CSS. */
+.register-page {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f8fc;
+  color: #172a43;
+  margin: 0;
+  min-height: 100vh;
+}
+.register-page *, .register-page *::before, .register-page *::after {box-sizing: border-box;}
+.register-page .login-shell {display:grid;grid-template-columns:minmax(280px,.84fr) minmax(300px,1fr);gap:40px;width:min(100%,1120px);margin:auto;padding:11px 11px 16px;background:#fff;border:1px solid #dce5ef;border-top:0;border-radius:0 0 30px 30px;}
+.register-page .login-intro {display:flex;flex-direction:column;padding:25px 30px 36px;border-radius:38px;background:#122f50;color:#fff;}
+.register-page .brand {display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;}
+.register-page .brand-mark {display:block;width:44px;height:44px;flex:0 0 44px;border-radius:6px;background:#107f75;}
+.register-page .intro-copy {margin-top:36px;}
+.register-page .intro-copy h1 {margin:0;font-size:28px;line-height:1.3;letter-spacing:-.5px;}
+.register-page .intro-copy p {max-width:250px;margin:23px 0 0;color:#d3deea;font-size:15px;font-weight:600;line-height:1.35;}
+.register-page .system-badge {display:flex;align-items:center;min-height:44px;gap:6px;margin-top:auto;padding:0 15px;border-radius:5px;background:#1d4e6b;color:#f4f8fc;font-size:11px;font-weight:700;}
+.register-page .login-content {display:flex;justify-content:center;padding-left:0;padding-right:16px;}
+.register-page .login-form-wrap {width:100%;}
+.register-page .login-header h2 {margin:0;color:#142f50;font-size:29px;line-height:1.25;}
+.register-page .login-header p {margin:10px 0 0;color:#71839d;font-size:14px;line-height:1.45;}
+.register-page .form-field label {display:block;color:#172a43;font-size:13px;font-weight:700;}
+.register-page .form-field input {display:block;width:100%;border:1px solid #d7e1ed;border-radius:6px;outline:none;background:#fff;color:#172a43;font-family:inherit;font-size:14px;padding:0 15px;}
+.register-page .form-field input:focus {border-color:#117d74;box-shadow:0 0 0 2px rgba(17,125,116,.15);}
+.register-page .sign-in-button {display:flex;width:100%;align-items:center;justify-content:center;gap:8px;border:0;border-radius:7px;background:#117d74;color:white;cursor:pointer;font:inherit;font-size:15px;font-weight:700;}
+.register-page .sign-in-button:hover {background:#0e6f67;}
+@media (max-width: 730px) {
+  .register-page .login-shell {display:flex;flex-direction:column;gap:0;border-radius:0;padding:10px;}
+  .register-page .login-intro {padding:20px 23px;border-radius:18px;}
+  .register-page .intro-copy {margin-top:16px;}
+  .register-page .intro-copy h1 {font-size:21px;}
+  .register-page .intro-copy p {font-size:12px;max-width:100%;margin-top:7px;}
+  .register-page .system-badge {display:none;}
+  .register-page .login-content {padding:24px 14px;}
+  .register-page .login-header h2 {font-size:26px;}
+}
+
+/* Secondary actions on the login page */
+.login-page #login-panel > p,
+.login-page #register-panel > p {
+  margin: 18px 0 0;
+  color: #526781;
+  font-size: 14px;
+  text-align: center;
+}
+
+.login-page #show-register,
+.login-page #back-to-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 15px;
+  border: 1px solid #b4d8d4;
+  border-radius: 7px;
+  background: #f0f8f7;
+  color: #0b655e;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.login-page #show-register {
+  margin: 4px 0 0 6px;
+}
+
+.login-page #show-register:hover:not(:disabled),
+.login-page #back-to-login:hover:not(:disabled) {
+  background: #def1ef;
+  border-color: #117d74;
+}
+
+.login-page #show-register:focus-visible,
+.login-page #back-to-login:focus-visible {
+  outline: 3px solid #117d74;
+  outline-offset: 3px;
+}
+
+.login-page #show-register:disabled,
+.login-page #back-to-login:disabled {
+  opacity: 0.55;
+  cursor: default;
+}

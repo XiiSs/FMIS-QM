@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e3556">
+  <title>Payment Request &amp; Approval | FMIS Portal</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="dashboard-page transaction-page approvals-page">
+  <div class="dashboard-app">
+    <aside class="dashboard-sidebar">
+      <a class="sidebar-brand" href="dashboard.html" aria-label="Swift Foods Financial Management Workspace">
+        <svg class="sidebar-brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9 12 4l9 5M5 10v8m5-8v8m4-8v8m5-8v8M3 20h18M2 9h20"/></svg>
+        <span class="sidebar-brand-copy"><strong>SWIFT FOODS</strong><small>Financial management<br>workspace</small></span>
+      </a>
+      <span class="sidebar-section-label">WORKSPACE</span>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a class="nav-link" href="dashboard.html" data-permission="dashboard"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span>Dashboard</span></a>
+        <a class="nav-link" href="income.html" data-permission="income"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17 10 11l4 4 6-8"/><path d="M14 7h6v6"/></svg><span>Income</span></a>
+        <a class="nav-link" href="transaction-history.html" data-permission="transactions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5"/><path d="M4 4v4.5h4.5M12 7v5l3 2"/></svg><span>Transaction History</span></a>
+        <a class="nav-link" href="expenses.html" data-permission="expenses"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M9 8h6m-6 4h6m-6 4h3"/></svg><span>Expenses</span></a>
+        <a class="nav-link is-active" href="approvals.html" data-permission="approvals" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><span>Approvals</span></a>
+        <a class="nav-link" href="budgets.html" data-permission="budgets"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9m7 10V5m7 14v-7"/><path d="M3 19h18"/></svg><span>Budgets</span></a>
+        <a class="nav-link" href="cashforecast.html" data-permission="cashforecast"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h13l-3-3m3 3-3 3M21 17H8l3 3m-3-3 3-3"/></svg><span>Cash Forecast</span></a>
+        <a class="nav-link" href="reports.html" data-permission="reports"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6m-6 4h6"/></svg><span>Reports</span></a>
+        <a class="nav-link" href="audit.html" data-permission="audit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8m-8 4h8m-8 4h5"/></svg><span>Audit Trail</span></a>
+      </nav>
+      <div class="sidebar-user">
+        <span class="user-avatar user-avatar-small" aria-hidden="true"></span>
+        <span class="sidebar-user-name" id="sidebar-user-name"></span>
+        <a class="sidebar-logout" href="login.html" aria-label="Sign out" title="Sign out"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5m5-3 4-4-4-4m4 4H9"/></svg></a>
+      </div>
+    </aside>
+
+    <div class="dashboard-main">
+      <header class="dashboard-topbar">
+        <button class="mobile-menu-toggle" id="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <h1 class="topbar-title">Approvals</h1>
+        <div class="topbar-spacer"></div>
+        <a class="notification-button" href="#approval-feedback" aria-label="View approval messages"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4"/></svg><span class="notification-count" aria-hidden="true">5</span></a>
+        <span class="user-avatar" aria-hidden="true"></span>
+        <div class="topbar-user"><strong id="profile-name"></strong><span id="profile-role"></span></div>
+        <span class="profile-toggle" aria-hidden="true">⌄</span>
+      </header>
+
+      <main class="approval-content">
+        <nav class="transaction-breadcrumb" aria-label="Breadcrumb"><a href="approvals.html">Approvals</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><span>Payment Request</span></nav>
+        <section class="revenue-heading approval-heading">
+          <span class="revenue-heading-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5m-9 4h5m-5 4h3"/><circle cx="18" cy="18" r="4"/><path d="m16.5 18 1 1 2-2"/></svg></span>
+          <div><h2>Payment Request &amp; Approval</h2><p>Review the payment request details and approve, reject, or return for correction.</p></div>
+        </section>
+
+        <div class="approval-open-row">
+          <label for="approval-request-select">Open payment request</label>
+          <select id="approval-request-select" aria-label="Open payment request"></select>
+        </div>
+
+        <div class="approval-layout">
+          <div class="approval-main-column">
+            <section class="dashboard-panel approval-details-panel" aria-labelledby="payment-details-title">
+              <h3 id="payment-details-title">Payment Request Details</h3>
+              <div class="approval-detail-grid">
+                <div class="approval-detail">
+                  <span class="approval-detail-label">Payment Request ID</span>
+                  <span class="approval-detail-value"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5m-9 4h5m-5 4h4"/></svg><span id="detail-request-id">—</span></span>
+                </div>
+                <div class="approval-detail">
+                  <span class="approval-detail-label">Linked Expense ID</span>
+                  <span class="approval-detail-value"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 15 6-6m-8 9-2 2a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m4-2 2-2a4 4 0 1 1 6 6l-4 4a4 4 0 0 1-6 0" transform="translate(2 -2)"/></svg><span id="detail-expense-id">—</span></span>
+                </div>
+                <div class="approval-detail">
+                  <span class="approval-detail-label">Vendor</span>
+                  <span class="approval-detail-value"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20v-1a7 7 0 0 1 14 0v1z"/></svg><span id="detail-vendor">—</span></span>
+                </div>
+                <div class="approval-detail">
+                  <span class="approval-detail-label">Expense Category</span>
+                  <span class="approval-detail-value"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 8-8 8-8-8z"/><circle cx="9" cy="9" r="1"/></svg><span id="detail-category">—</span></span>
+                </div>
+                <div class="approval-detail">
+                  <span class="approval-detail-label">Amount</span>
+                  <span class="approval-detail-value"><b class="approval-currency">₱</b><span id="detail-amount">—</span></span>
+                </div>
+                <div class="approval-detail">
+                  <span class="approval-detail-label">Due Date</span>
+                  <span class="approval-detail-value"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><span id="detail-due-date">—</span></span>
+                </div>
+                <div class="approval-detail">
+                  <span class="approval-detail-label">Supporting Document</span>
+                  <span class="approval-detail-value approval-document-value"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 12.5 14.5 6a4 4 0 0 1 5.7 5.7l-8.5 8.5a6 6 0 0 1-8.5-8.5l8-8"/></svg><span id="detail-document">—</span><button type="button" id="open-evidence" hidden>Open attachment</button><span class="approval-document-note" id="document-availability"></span></span>
+                </div>
+                <div class="approval-detail">
+                  <span class="approval-detail-label">Requested Payment Date</span>
+                  <span class="approval-detail-value"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><span id="detail-requested-date">—</span></span>
+                </div>
+                <div class="approval-detail approval-detail-comments">
+                  <span class="approval-detail-label">Comments / Notes</span>
+                  <span class="approval-detail-value"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v12H9l-5 4z"/><path d="M8 9h8m-8 4h6"/></svg><span id="detail-comments">—</span></span>
+                </div>
+              </div>
+              <h3 class="approval-subheading">Request Information</h3>
+              <div class="approval-request-meta">
+                <div><span class="approval-detail-label">Prepared By</span><span class="approval-meta-person"><span class="approval-meta-icon">●</span><span><strong id="detail-prepared-by">—</strong><small id="detail-prepared-role">Finance Preparer</small></span></span></div>
+                <div><span class="approval-detail-label">Date Submitted</span><span class="approval-meta-value"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><span id="detail-submitted-date">—</span></span></div>
+                <div><span class="approval-detail-label">Current Status</span><span class="approval-status-chip" id="detail-status">Pending Approval</span></div>
+              </div>
+              <div class="approval-caution"><span aria-hidden="true">!</span><p id="approval-caution-text">This request is pending approval. Approve only after reviewing the linked expense and supporting evidence. Approval does not transfer money.</p></div>
+            </section>
+
+            <section class="dashboard-panel approval-history-panel" aria-labelledby="approval-history-title">
+              <h3 id="approval-history-title">Approval History</h3>
+              <div class="approval-history-table-wrap">
+                <table class="approval-history-table">
+                  <thead><tr><th>#</th><th>Date &amp; Time</th><th>User</th><th>Role</th><th>Action</th><th>Status</th><th>Comments</th></tr></thead>
+                  <tbody id="approval-history-rows"></tbody>
+                </table>
+              </div>
+              <p class="approval-history-empty" id="approval-history-empty" hidden>No history is available for this request.</p>
+            </section>
+          </div>
+
+          <aside class="approval-side-column">
+            <section class="dashboard-panel approval-actions-panel" aria-labelledby="approval-actions-title">
+              <h3 id="approval-actions-title">Actions</h3>
+              <p class="approval-actor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 3v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><span>Your Role: <strong id="approval-role-label">Approver</strong></span></p>
+              <div class="approval-role-notice" id="approval-role-notice"><span aria-hidden="true">i</span><p>You are signed in as <strong id="approval-actor-name">David L. Cruz</strong>. Decisions are recorded under this account.</p></div>
+              <div class="approval-action-buttons">
+                <button class="approval-action-button approve" id="approve-request" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg>Approve</button>
+                <button class="approval-action-button reject" id="reject-request" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>Reject</button>
+                <button class="approval-action-button return" id="return-request" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0 1 4"/><path d="M20 4v7h-7"/></svg>Return for Correction</button>
+              </div>
+              <button class="approval-submit-button" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-8-8 18-2-8z"/><path d="m11 13 5-5"/></svg>Submit Request</button>
+              <p class="approval-action-note" id="approval-action-note">Payment requests are submitted by the Finance Preparer. No money is transferred by an approval decision.</p>
+              <label class="approval-comment-label" for="approval-comment">Decision comments <span>(required for reject or return)</span></label>
+              <textarea id="approval-comment" rows="2" maxlength="500" placeholder="Add a note for the request history..."></textarea>
+              <p class="approval-feedback" id="approval-feedback" role="status" aria-live="polite" hidden></p>
+            </section>
+
+            <section class="dashboard-panel approval-status-panel" aria-labelledby="payment-status-title">
+              <h3 id="payment-status-title">Payment Request Status</h3>
+              <div class="approval-status-summary"><span class="approval-status-clock" aria-hidden="true">◷</span><div><span class="approval-status-chip" id="side-status">Pending Approval</span><p id="side-status-description">Waiting for approver decision.</p></div></div>
+              <p class="approval-no-transfer">No funds are transferred by this prototype.</p>
+            </section>
+          </aside>
+        </div>
+        <p class="transaction-prototype-note">Prototype approval actions update request status and history only. They do not execute or record a payment.</p>
+      </main>
+    </div>
+  </div>
+  <script src="../js/fmis-core.js" defer></script>
+<script src="../js/fmis-qs.js" defer></script>
+<script src="../js/approvals.js" defer></script>
+</body>
+</html>

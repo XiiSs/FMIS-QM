@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e3556">
+  <title>Financial Dashboard | FMIS Portal</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/modules-th-exp.css">
+</head>
+<body class="dashboard-page">
+  <div class="dashboard-app">
+    <aside class="dashboard-sidebar">
+      <a class="sidebar-brand" href="dashboard.html" aria-label="Swift Foods Financial Management Workspace">
+        <svg class="sidebar-brand-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 9 12 4l9 5M5 10v8m5-8v8m4-8v8m5-8v8M3 20h18M2 9h20" />
+        </svg>
+        <span class="sidebar-brand-copy"><strong>SWIFT FOODS</strong><small>Financial Management<br>Workspace</small></span>
+      </a>
+
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a class="nav-link is-active" href="dashboard.html" aria-current="page" data-permission="dashboard">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link" href="income.html" data-permission="income">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17 10 11l4 4 6-8"/><path d="M14 7h6v6"/></svg>
+          <span>Income</span>
+        </a>
+        <a class="nav-link" href="transaction-history.html" data-permission="transactions">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5"/><path d="M4 4v4.5h4.5M12 7v5l3 2"/></svg>
+          <span>Transaction History</span>
+        </a>
+        <a class="nav-link" href="expenses.html" data-permission="expenses">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 17 7-7 4 4 5-7"/><path d="M14 7h6v6"/></svg>
+          <span>Expenses</span>
+        </a>
+        <a class="nav-link" href="approvals.html" data-permission="approvals">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg>
+          <span>Approvals</span>
+        </a>
+        <a class="nav-link" href="budgets.html" data-permission="budgets">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9m7 10V5m7 14v-7"/><path d="M3 19h18"/></svg>
+          <span>Budgets</span>
+        </a>
+        <a class="nav-link" href="cashforecast.html" data-permission="cashforecast">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h13l-3-3m3 3-3 3M21 17H8l3 3m-3-3 3-3"/></svg>
+          <span>Cash Forecast</span>
+        </a>
+        <a class="nav-link" href="reports.html" data-permission="reports">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6m-6 4h6"/></svg>
+          <span>Reports</span>
+        </a>
+        <a class="nav-link" href="audit.html" data-permission="audit">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8m-8 4h8m-8 4h5"/></svg>
+          <span>Audit Trail</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-user">
+        <span class="user-avatar user-avatar-small" aria-hidden="true"></span>
+        <span class="sidebar-user-name" id="sidebar-user-name"></span>
+        <a class="sidebar-logout" href="login.html" aria-label="Sign out" title="Sign out">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5m5-3 4-4-4-4m4 4H9"/></svg>
+        </a>
+      </div>
+    </aside>
+
+    <div class="dashboard-main">
+      <header class="dashboard-topbar">
+        <button class="mobile-menu-toggle" id="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <h1 class="topbar-title">Financial Dashboard</h1>
+        <div class="topbar-spacer"></div>
+        <a class="notification-button" id="topbar-alerts-link" href="#alerts-section" aria-label="View financial alerts">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4"/></svg>
+          <span class="notification-count" id="topbar-alert-count" aria-hidden="true">0</span>
+        </a>
+        <span class="user-avatar" aria-hidden="true"></span>
+        <div class="topbar-user">
+          <strong id="profile-name"></strong>
+          <span id="profile-role"></span>
+        </div>
+        <span class="profile-toggle" aria-hidden="true">⌄</span>
+      </header>
+
+      <main class="dashboard-content">
+        <!-- 1. Dashboard Header Section -->
+        <section class="dashboard-heading" aria-labelledby="dashboard-title">
+          <div>
+            <h2 id="dashboard-title">Financial Dashboard</h2>
+            <p>Overview of financial performance and current financial position.</p>
+            <div class="dashboard-header-meta">
+              <span class="dashboard-period-badge" id="dashboard-period-badge">October 2026</span>
+              <span class="dashboard-timestamp" id="dashboard-last-updated">Last updated: Loading...</span>
+            </div>
+          </div>
+          <label class="period-select-wrap" for="report-period">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg>
+            <select id="report-period" aria-label="Reporting period">
+              <option value="month" selected>This Month (October 2026)</option>
+              <option value="quarter">This Quarter (Q4 2026)</option>
+              <option value="year">This Year (FY 2026)</option>
+              <option value="2026-09">September 2026</option>
+              <option value="2026-11">November 2026</option>
+              <option value="2026-12">December 2026</option>
+              <option value="custom">Custom Date Range</option>
+            </select>
+            <span class="period-caret" aria-hidden="true">⌄</span>
+          </label>
+        </section>
+
+        <!-- Custom Date Range Toolbar (Hidden by default) -->
+        <form id="custom-range-bar" class="custom-date-range-bar" hidden>
+          <label for="custom-start-date">From:
+            <input type="date" id="custom-start-date" required>
+          </label>
+          <label for="custom-end-date">To:
+            <input type="date" id="custom-end-date" required>
+          </label>
+          <button type="submit" class="custom-range-apply-btn">Apply Period</button>
+        </form>
+
+        <p id="period-empty" class="period-empty" role="status" hidden>
+          No transaction records found for the selected reporting period. Showing empty baseline state.
+        </p>
+
+        <!-- 2. Financial Summary Cards -->
+        <div id="report-data">
+          <section class="summary-grid" aria-label="Financial summary cards">
+            <!-- Card A: Total Revenue -->
+            <a class="summary-card" href="income.html" data-permission="income" aria-label="Total Revenue. Click to view income workspace.">
+              <span class="summary-icon icon-blue">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V4m-6 6 6-6 6 6"/></svg>
+              </span>
+              <span class="summary-copy">
+                <span class="summary-label">Total Revenue</span>
+                <strong id="card-revenue">₱0.00</strong>
+                <span class="summary-change" id="card-revenue-change"><b>—</b><span>vs. previous period</span></span>
+              </span>
+            </a>
+
+            <!-- Card B: Total Expenses -->
+            <a class="summary-card" href="expenses.html" data-permission="expenses" aria-label="Total Expenses. Click to view expenses workspace.">
+              <span class="summary-icon icon-red">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16m6-6-6 6-6-6"/></svg>
+              </span>
+              <span class="summary-copy">
+                <span class="summary-label">Total Expenses</span>
+                <strong id="card-expenses">₱0.00</strong>
+                <span class="summary-change" id="card-expenses-change"><b>—</b><span>vs. previous period</span></span>
+              </span>
+            </a>
+
+            <!-- Card C: Accounts Receivable -->
+            <a class="summary-card" href="income.html" data-permission="income" aria-label="Accounts Receivable. Click to view open invoices.">
+              <span class="summary-icon icon-navy">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6m-6 3h4"/></svg>
+              </span>
+              <span class="summary-copy">
+                <span class="summary-label">Accounts Receivable</span>
+                <strong id="card-ar">₱0.00</strong>
+                <span class="summary-detail" id="card-ar-detail">0 invoices outstanding</span>
+              </span>
+            </a>
+
+            <!-- Card D: Accounts Payable -->
+            <a class="summary-card" href="expenses.html" data-permission="expenses" aria-label="Accounts Payable. Click to view open payables.">
+              <span class="summary-icon icon-orange">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6m-6 3h4"/></svg>
+              </span>
+              <span class="summary-copy">
+                <span class="summary-label">Accounts Payable</span>
+                <strong id="card-ap">₱0.00</strong>
+                <span class="summary-detail" id="card-ap-detail">0 payables outstanding</span>
+              </span>
+            </a>
+
+            <!-- Card E: Available Cash -->
+            <a class="summary-card" href="cashforecast.html" data-permission="cashforecast" aria-label="Available Cash Position. Click to view 13-week forecast.">
+              <span class="summary-icon icon-teal">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 9.5c0-1-1.3-1.5-3-1.5s-3 .7-3 2 1.4 1.7 3 2 3 .7 3 2-1.2 2-3 2-3-.6-3-1.5M12.5 6v12"/></svg>
+              </span>
+              <span class="summary-copy">
+                <span class="summary-label">Available Cash</span>
+                <strong id="card-cash">₱5,000,000.00</strong>
+                <span class="summary-detail" id="card-cash-detail">Recorded cash balance</span>
+              </span>
+            </a>
+
+            <!-- Card F: Net Operating Result -->
+            <a class="summary-card summary-net-income" href="reports.html" data-permission="reports" aria-label="Net Operating Result. Click to view consolidated report.">
+              <span class="summary-icon icon-pink">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8m-4-4h8"/></svg>
+              </span>
+              <span class="summary-copy">
+                <span class="summary-label">Operating Result</span>
+                <strong id="card-operating-result">₱0.00</strong>
+                <span class="summary-detail" id="card-operating-detail">Revenue − Expenses</span>
+              </span>
+            </a>
+          </section>
+
+          <!-- 3. Financial Performance Indicators Section -->
+          <section class="indicators-section" aria-labelledby="indicators-title">
+            <div class="indicators-section-head">
+              <h3 id="indicators-title">Financial Performance Indicators</h3>
+              <p>Evaluating operational metrics and statutory ratio computability based on available data.</p>
+            </div>
+            <div class="indicators-grid" id="indicators-container">
+              <!-- Dynamically populated via dashboard.js -->
+            </div>
+          </section>
+
+          <!-- 4. Financial Trends & Charts -->
+          <section class="charts-grid" aria-label="Financial charts">
+            <!-- Chart 1: Revenue vs. Expenses -->
+            <article class="dashboard-panel chart-panel">
+              <div class="panel-heading">
+                <h3>Revenue vs. Expenses</h3>
+                <span class="chart-subcaption" id="chart-rev-exp-subcaption">Comparative overview</span>
+              </div>
+              <div class="chart-plot" id="chart-rev-exp-plot">
+                <!-- Injected via dashboard.js -->
+              </div>
+              <div class="chart-legend">
+                <span><i class="legend-dot legend-income"></i>Revenue</span>
+                <span><i class="legend-dot legend-expense"></i>Expenses</span>
+              </div>
+            </article>
+
+            <!-- Chart 2: Cash Flow Movements -->
+            <article class="dashboard-panel chart-panel" data-permission="cashforecast">
+              <div class="panel-heading">
+                <h3>Cash Position Movements</h3>
+                <span class="chart-subcaption">Inflows, Outflows, and Closing Position</span>
+              </div>
+              <div class="chart-plot" id="chart-cash-plot">
+                <!-- Injected via dashboard.js -->
+              </div>
+              <div class="chart-legend">
+                <span><i class="legend-dot legend-income"></i>Inflows</span>
+                <span><i class="legend-dot legend-expense"></i>Outflows</span>
+                <span><i class="legend-dot legend-blue"></i>Closing Cash</span>
+              </div>
+            </article>
+
+            <!-- Chart 3: Expense Breakdown by Category -->
+            <article class="dashboard-panel chart-panel budget-panel" data-permission="budgets">
+              <div class="panel-heading">
+                <h3>Expense Breakdown by Cost Center</h3>
+                <span class="chart-subcaption">Distribution across categories</span>
+              </div>
+              <div class="chart-plot" id="chart-expense-plot">
+                <!-- Injected via dashboard.js -->
+              </div>
+              <div class="chart-legend" id="chart-expense-legend">
+                <!-- Legend items injected dynamically -->
+              </div>
+            </article>
+          </section>
+
+          <!-- 5. Bottom Grid: Recent Transactions & Financial Alerts -->
+          <section class="bottom-grid">
+            <!-- Recent Transactions Table -->
+            <article class="dashboard-panel transactions-panel">
+              <div class="panel-heading">
+                <h3>Recent Financial Transactions</h3>
+                <a href="transaction-history.html" class="panel-link" data-permission="transactions">View All</a>
+              </div>
+              <div class="table-wrap">
+                <table class="transactions-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Reference No.</th>
+                      <th>Type</th>
+                      <th>Customer / Vendor</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboard-recent-transactions">
+                    <!-- Populated via dashboard.js -->
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <!-- Financial Alerts & Notifications -->
+            <article class="dashboard-panel alerts-panel" id="alerts-section">
+              <div class="panel-heading">
+                <h3 id="alerts-title">Financial Alerts &amp; Risks</h3>
+                <a href="reports.html" class="panel-link" data-permission="reports">Full Reports</a>
+              </div>
+              <div class="alerts-list-full" id="dashboard-alerts-list">
+                <!-- Populated via dashboard.js -->
+              </div>
+            </article>
+          </section>
+        </div>
+
+        <footer class="dashboard-footer">
+          FMIS-QM Core Architecture · All values derived from unified browser storage records. Non-audited prototype system.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/fmis-core.js" defer></script>
+  <script src="../js/dashboard.js" defer></script>
+</body>
+</html>

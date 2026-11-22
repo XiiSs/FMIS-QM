@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e3556">
+  <title>Record Expenses | FMIS Portal</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/modules-th-exp.css">
+</head>
+<body class="dashboard-page transaction-page expense-page">
+  <div class="dashboard-app">
+    <aside class="dashboard-sidebar">
+      <a class="sidebar-brand" href="dashboard.html" aria-label="Swift Foods Financial Management Workspace">
+        <svg class="sidebar-brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9 12 4l9 5M5 10v8m5-8v8m4-8v8m5-8v8M3 20h18M2 9h20"/></svg>
+        <span class="sidebar-brand-copy"><strong>SWIFT FOODS</strong><small>Financial Management<br>Workspace</small></span>
+      </a>
+      <span class="sidebar-section-label">WORKSPACE</span>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a class="nav-link" href="dashboard.html" data-permission="dashboard"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span>Dashboard</span></a>
+        <a class="nav-link" href="income.html" data-permission="income"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17 10 11l4 4 6-8"/><path d="M14 7h6v6"/></svg><span>Income</span></a>
+        <a class="nav-link" href="transaction-history.html" data-permission="transactions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5"/><path d="M4 4v4.5h4.5M12 7v5l3 2"/></svg><span>Transaction History</span></a>
+        <a class="nav-link is-active" href="expenses.html" data-permission="expenses" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M9 8h6m-6 4h6m-6 4h3"/></svg><span>Expenses</span></a>
+        <a class="nav-link" href="approvals.html" data-permission="approvals"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><span>Approvals</span></a>
+        <a class="nav-link" href="budgets.html" data-permission="budgets"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9m7 10V5m7 14v-7"/><path d="M3 19h18"/></svg><span>Budgets</span></a>
+        <a class="nav-link" href="cashforecast.html" data-permission="cashforecast"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h13l-3-3m3 3-3 3M21 17H8l3 3m-3-3 3-3"/></svg><span>Cash Forecast</span></a>
+        <a class="nav-link" href="reports.html" data-permission="reports"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6m-6 4h6"/></svg><span>Reports</span></a>
+        <a class="nav-link" href="audit.html" data-permission="audit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8m-8 4h8m-8 4h5"/></svg><span>Audit Trail</span></a>
+      </nav>
+      <div class="sidebar-user">
+        <span class="user-avatar user-avatar-small" aria-hidden="true"></span>
+        <span class="sidebar-user-name" id="sidebar-user-name"></span>
+        <a class="sidebar-logout" href="login.html" aria-label="Sign out" title="Sign out"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5m5-3 4-4-4-4m4 4H9"/></svg></a>
+      </div>
+    </aside>
+
+    <div class="dashboard-main">
+      <header class="dashboard-topbar">
+        <button class="mobile-menu-toggle" id="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <h1 class="topbar-title">Expenses</h1>
+        <div class="topbar-spacer"></div>
+        <a class="notification-button" href="#expense-feedback" aria-label="View notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4"/></svg><span class="notification-count" aria-hidden="true">5</span></a>
+        <span class="user-avatar" aria-hidden="true"></span>
+        <div class="topbar-user"><strong id="profile-name"></strong><span id="profile-role"></span></div>
+        <span class="profile-toggle" aria-hidden="true">⌄</span>
+      </header>
+
+      <main class="expense-content">
+        <nav class="transaction-breadcrumb" aria-label="Breadcrumb"><a href="expenses.html">Expenses</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><span>Record Expenses</span></nav>
+
+        <section class="revenue-heading expense-heading">
+          <span class="revenue-heading-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 3h12l4 4v14H4z"/><path d="M8 3v6h8V3m-8 18v-6h8v6"/><circle cx="18" cy="17" r="5"/><path d="M18 14.5v5m1.7-3.5c0-1.3-3.4-1.3-3.4 0s3.4.8 3.4 2-3.4 1.3-3.4 0"/></svg></span>
+          <div><h2>Record Expenses and Payables</h2><p>Record a new expense and track the related expense/payable record.</p></div>
+          <span class="expense-role-badge">Role: <strong id="expense-role-badge">Finance Preparer</strong></span>
+        </section>
+
+        <section class="dashboard-panel revenue-entry-panel expense-entry-panel" aria-labelledby="expense-information-title">
+          <h3 id="expense-information-title">Expense Information</h3>
+          <form id="expense-form" novalidate>
+            <div class="revenue-form-grid expense-form-grid">
+              <div class="revenue-field">
+                <label for="expense-date">Date <span>*</span></label>
+                <div class="revenue-input-with-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><input id="expense-date" name="date" type="date" required></div>
+                <p class="revenue-field-error" data-error-for="date" hidden></p>
+              </div>
+              <div class="revenue-field">
+                <label for="expense-vendor">Vendor <span>*</span></label>
+                <div class="revenue-input-with-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20v-1a7 7 0 0 1 14 0v1z"/></svg><input id="expense-vendor" name="vendor" type="text" list="expense-vendor-options" placeholder="Select vendor" required maxlength="100"><datalist id="expense-vendor-options"><option value="FreshFarm Supplies"><option value="Local Store"><option value="Office Depot"><option value="Utilities Provider"></datalist></div>
+                <p class="revenue-field-error" data-error-for="vendor" hidden></p>
+              </div>
+              <div class="revenue-field">
+                <label for="expense-amount">Amount <span>*</span></label>
+                <div class="revenue-input-with-icon"><span class="revenue-currency">₱</span><input id="expense-amount" name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required></div>
+                <p class="revenue-field-error" data-error-for="amount" hidden></p>
+              </div>
+              <div class="revenue-field">
+                <label for="expense-category">Expense Category <span>*</span></label>
+                <div class="revenue-input-with-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 8-8 8-8-8z"/><circle cx="9" cy="9" r="1"/></svg><select id="expense-category" name="category" required><option value="">Select category</option><option>Raw Materials</option><option>Operations</option><option>Maintenance</option><option>Utilities</option><option>Rent</option><option>Transportation</option><option>Salaries</option><option>Office Supplies</option><option>Other Expense</option></select></div>
+                <p class="revenue-field-error" data-error-for="category" hidden></p>
+              </div>
+              <div class="revenue-field">
+                <label for="expense-due-date">Due Date <span>*</span></label>
+                <div class="revenue-input-with-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><input id="expense-due-date" name="dueDate" type="date" required></div>
+                <p class="revenue-field-error" data-error-for="dueDate" hidden></p>
+              </div>
+              <div class="revenue-field">
+                <label for="expense-reference">Reference / Invoice No. <span>*</span></label>
+                <div class="revenue-input-with-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5m-9 4h5m-5 4h5"/></svg><input id="expense-reference" name="reference" type="text" placeholder="INV-88214" maxlength="40" required></div>
+                <p class="revenue-field-error" data-error-for="reference" hidden></p>
+              </div>
+              <div class="revenue-field expense-document-field">
+                <label for="expense-document">Supporting Document <span>*</span></label>
+                <div class="expense-document-control">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 12.5 14.5 6a4 4 0 0 1 5.7 5.7l-8.5 8.5a6 6 0 0 1-8.5-8.5l8-8"/></svg>
+                  <label class="expense-document-pick" for="expense-document">Choose supporting file</label>
+                  <span id="expense-document-name">No file selected</span>
+                  <button type="button" id="remove-expense-document" aria-label="Remove supporting document" hidden>×</button>
+                  <input id="expense-document" name="document" type="file" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" required hidden>
+                </div>
+                <p class="expense-document-help">Supporting document required before approval.<br>Missing evidence will return the request for correction.</p>
+                <p class="revenue-field-error" data-error-for="document" hidden></p>
+              </div>
+              <div class="expense-form-actions">
+                <button class="revenue-reset-button" type="reset">Reset</button>
+                <button class="revenue-save-button" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h12l3 3v13H5z"/><path d="M8 4v6h8V4m-8 16v-6h8v6"/></svg>Save Expense</button>
+                <button class="expense-request-button" id="create-payment-request" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg>Create Payment Request</button>
+              </div>
+              <p class="expense-request-hint">Available after the expense is saved.</p>
+            </div>
+          </form>
+        </section>
+
+        <div class="expense-info-banner" role="note"><span aria-hidden="true">i</span><p>Saving creates the expense/payable record only. A payment request must be created separately.</p></div>
+        <div id="expense-duplicate-warning" class="expense-message expense-message-warning" role="alert" hidden>
+          <span class="expense-message-icon" aria-hidden="true">!</span>
+          <div><strong>Possible duplicate detected before save.</strong><p>A similar vendor, amount, and category were recorded recently. Review the entry before continuing.</p></div>
+          <div class="expense-warning-actions"><button type="button" id="review-expense">Review Entry</button><button type="button" id="confirm-expense-save">Save Anyway</button></div>
+        </div>
+        <div id="expense-feedback" class="expense-message" role="status" aria-live="polite" hidden>
+          <span class="expense-message-icon" aria-hidden="true"></span>
+          <div><strong id="expense-feedback-title"></strong><p id="expense-feedback-message"></p></div>
+          <button type="button" id="dismiss-expense-feedback" aria-label="Dismiss message">×</button>
+        </div>
+        <section class="dashboard-panel qm-panel" aria-labelledby="payables-title">
+  <div class="qm-panel-head"><h3 id="payables-title">Payables Register</h3><p>Expense/payable records with aging. Payment requests are created per record, never automatically.</p></div>
+  <div class="qm-kpis" id="payables-kpis"></div>
+  <div class="qm-aging" id="payables-aging" aria-label="Payables aging"></div>
+  <div class="qm-table-wrap">
+    <table class="qm-table">
+      <thead><tr><th>Expense ID</th><th>Vendor</th><th>Category</th><th>Reference</th><th class="qm-num">Amount</th><th>Due Date</th><th>Payable Status</th><th>Document</th><th>Action</th></tr></thead>
+      <tbody id="payables-body"></tbody>
+    </table>
+    <p id="payables-empty" class="qm-empty" role="status">No expenses recorded yet. Saved expenses appear here as payables.</p>
+  </div>
+</section>
+        <p class="transaction-prototype-note">Expense and payment request records are stored in this browser prototype. Uploaded document contents are not transferred to a server.</p>
+      </main>
+    </div>
+  </div>
+  <dialog id="payable-action-dialog" aria-labelledby="payable-action-title">
+    <form id="payable-action-form">
+      <h2 id="payable-action-title"></h2>
+      <p id="payable-action-note"></p>
+      <label id="payment-date-label">Payment date <input type="date" name="paymentDate"></label>
+      <label id="payment-reference-label">Bank reference <input name="bankReference" maxlength="80"></label>
+      <p id="payable-action-error" role="alert"></p>
+      <button type="submit">Save</button>
+      <button id="cancel-payable-action" type="button">Cancel</button>
+    </form>
+  </dialog>
+  <script src="../js/fmis-core.js" defer></script>
+  <script src="../js/fmis-qs.js" defer></script>
+  <script src="../js/expenses.js" defer></script>
+</body>
+</html>

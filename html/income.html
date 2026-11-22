@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e3556">
+  <title>Income Management | FMIS Portal</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="dashboard-page income-page">
+  <div class="dashboard-app">
+    <aside class="dashboard-sidebar">
+      <a class="sidebar-brand" href="dashboard.html" aria-label="Swift Foods Financial Management Workspace">
+        <svg class="sidebar-brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9 12 4l9 5M5 10v8m5-8v8m4-8v8m5-8v8M3 20h18M2 9h20"/></svg>
+        <span class="sidebar-brand-copy"><strong>SWIFT FOODS</strong><small>Financial Management<br>Workspace</small></span>
+      </a>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a class="nav-link" href="dashboard.html" data-permission="dashboard"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span>Dashboard</span></a>
+        <a class="nav-link is-active" href="income.html" aria-current="page" data-permission="income"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17 10 11l4 4 6-8"/><path d="M14 7h6v6"/></svg><span>Income</span></a>
+        <a class="nav-link" href="transaction-history.html" data-permission="transactions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5"/><path d="M4 4v4.5h4.5M12 7v5l3 2"/></svg><span>Transaction History</span></a>
+        <a class="nav-link" href="expenses.html" data-permission="expenses"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 17 7-7 4 4 5-7"/><path d="M14 7h6v6"/></svg><span>Expenses</span></a>
+        <a class="nav-link" href="approvals.html" data-permission="approvals"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><span>Approvals</span></a>
+        <a class="nav-link" href="budgets.html" data-permission="budgets"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9m7 10V5m7 14v-7"/><path d="M3 19h18"/></svg><span>Budgets</span></a>
+        <a class="nav-link" href="cashforecast.html" data-permission="cashforecast"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h13l-3-3m3 3-3 3M21 17H8l3 3m-3-3 3-3"/></svg><span>Cash Forecast</span></a>
+        <a class="nav-link" href="reports.html" data-permission="reports"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6m-6 4h6"/></svg><span>Reports</span></a>
+        <a class="nav-link" href="audit.html" data-permission="audit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8m-8 4h8m-8 4h5"/></svg><span>Audit Trail</span></a>
+      </nav>
+      <div class="sidebar-user">
+        <span class="user-avatar user-avatar-small" aria-hidden="true"></span>
+        <span class="sidebar-user-name" id="sidebar-user-name"></span>
+        <a class="sidebar-logout" href="login.html" aria-label="Sign out" title="Sign out"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5m5-3 4-4-4-4m4 4H9"/></svg></a>
+      </div>
+    </aside>
+
+    <div class="dashboard-main">
+      <header class="dashboard-topbar">
+        <button class="mobile-menu-toggle" id="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <h1 class="topbar-title">Income Management</h1>
+        <div class="topbar-spacer"></div>
+        <a class="notification-button" href="#income-summary" aria-label="View income summary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4"/></svg><span class="notification-count" aria-hidden="true">5</span></a>
+        <span class="user-avatar" aria-hidden="true"></span>
+        <div class="topbar-user"><strong id="profile-name"></strong><span id="profile-role"></span></div>
+        <span class="profile-toggle" aria-hidden="true">⌄</span>
+      </header>
+
+      <main class="income-content">
+        <nav class="income-tabs" aria-label="Income sections" role="tablist">
+          <button id="tab-record" class="income-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="record-view" data-income-tab="record">Record Income</button>
+          <button id="tab-invoices" class="income-tab" type="button" role="tab" aria-selected="false" aria-controls="invoices-view" data-income-tab="invoices" tabindex="-1">Invoice List</button>
+          <button id="tab-collections" class="income-tab" type="button" role="tab" aria-selected="false" aria-controls="collections-view" data-income-tab="collections" tabindex="-1">Collections</button>
+          <button id="tab-reports" class="income-tab" type="button" role="tab" aria-selected="false" aria-controls="reports-view" data-income-tab="reports" tabindex="-1">Income Reports</button>
+        </nav>
+
+        <div id="income-feedback" class="income-feedback" role="status" aria-live="polite" hidden></div>
+
+        <section id="record-view" class="income-view" role="tabpanel" aria-labelledby="tab-record" data-income-view="record">
+          <div class="income-top-grid">
+            <section class="dashboard-panel invoice-form-panel" aria-labelledby="invoice-form-title">
+              <h2 id="invoice-form-title">Record Income / Create Invoice</h2>
+              <form id="invoice-form" class="invoice-form">
+                <div class="income-field">
+                  <label for="customer">Customer / Source <span class="required-mark">*</span></label>
+                  <select id="customer" name="customer" required>
+                    <option value="">Select customer</option>
+                    <option>ABC Retail</option>
+                    <option>DEF Mart</option>
+                    <option>GHI Supermarket</option>
+                    <option>JKL Traders</option>
+                    <option>MNO Wholesaler</option>
+                    <option>Other customer</option>
+                  </select>
+                </div>
+                <div class="income-field">
+                  <label for="category">Category <span class="required-mark">*</span></label>
+                  <select id="category" name="category" required>
+                    <option value="">Select category</option>
+                    <option>Product Sales</option>
+                    <option>Service Income</option>
+                    <option>Other Income</option>
+                  </select>
+                </div>
+                <div class="income-field">
+                  <label for="invoice-reference">Invoice Reference <span class="required-mark">*</span></label>
+                  <div class="reference-input"><span id="invoice-prefix">INV-year-</span><input id="invoice-reference" name="invoiceReference" type="text" inputmode="numeric" placeholder="e.g. 1046" required maxlength="20"></div>
+                </div>
+                <div class="income-field">
+                  <label for="description">Description <span class="required-mark">*</span></label>
+                  <div class="description-input"><textarea id="description" name="description" rows="2" maxlength="255" placeholder="Enter description of the income" required></textarea><span id="description-count">0/255</span></div>
+                </div>
+                <div class="income-field">
+                  <label for="invoice-date">Invoice Date <span class="required-mark">*</span></label>
+                  <input id="invoice-date" name="invoiceDate" type="date" required>
+                </div>
+                <div class="income-field">
+                  <label for="amount-received">Amount Received (₱)</label>
+                  <input id="amount-received" name="amountReceived" type="number" min="0" step="0.01" value="0.00">
+                </div>
+                <div class="income-field">
+                  <label for="due-date">Due Date <span class="required-mark">*</span></label>
+                  <input id="due-date" name="dueDate" type="date" required>
+                </div>
+                <div class="income-field">
+                  <label for="invoice-status">Invoice Status <span class="required-mark">*</span></label>
+                  <select id="invoice-status" name="invoiceStatus" required>
+                    <option value="Invoiced">Invoiced</option>
+                    <option value="Partially Paid">Partially Paid</option>
+                    <option value="Received">Received</option>
+                  </select>
+                </div>
+                <div class="income-field">
+                  <label for="invoice-amount">Invoice Amount (₱) <span class="required-mark">*</span></label>
+                  <input id="invoice-amount" name="invoiceAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+                </div>
+                <div class="income-field balance-field">
+                  <label for="outstanding-balance">Outstanding Balance (₱)</label>
+                  <input id="outstanding-balance" name="outstandingBalance" type="text" value="0.00" readonly aria-live="polite">
+                </div>
+                <div class="form-actions">
+                  <button class="income-button income-button-secondary" id="reset-invoice" type="reset">Reset</button>
+                  <button class="income-button income-button-primary" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h12l3 3v13H5z"/><path d="M8 4v6h8V4m-8 16v-6h8v6"/></svg>Save Invoice</button>
+                </div>
+              </form>
+            </section>
+
+            <aside id="income-summary" class="dashboard-panel income-summary-panel" aria-labelledby="income-summary-title">
+              <div class="income-summary-heading">
+                <h2 id="income-summary-title">Income Summary (<span id="summary-period">October 2026</span>)</h2>
+                <label class="period-select-wrap income-period-select" for="income-period">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg>
+                  <select id="income-period" aria-label="Income reporting month"><option value="2026-12">December 2026</option><option value="2026-11">November 2026</option><option value="2026-10" selected>October 2026</option><option value="2026-09">September 2026</option><option value="2026-08">August 2026</option><option value="2026-07">July 2026</option><option value="2026-06">June 2026</option></select>
+                  <span class="period-caret" aria-hidden="true">⌄</span>
+                </label>
+              </div>
+              <div class="income-summary-list">
+                <article class="income-metric">
+                  <span class="income-metric-icon metric-teal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V6m0 12h16M7 15l4-5 3 3 5-7"/><path d="M15 6h4v4"/></svg></span>
+                  <span><span class="income-metric-label">Total Invoiced Amount</span><strong id="total-invoiced">₱ 1,200,000</strong><span class="metric-change positive">▲ 12% <small>vs. previous month</small></span></span>
+                </article>
+                <article class="income-metric">
+                  <span class="income-metric-icon metric-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18m-14 5h4"/></svg></span>
+                  <span><span class="income-metric-label">Total Received Amount</span><strong id="total-received">₱ 950,000</strong><span class="metric-change positive">▲ 8% <small>vs. previous month</small></span></span>
+                </article>
+                <article class="income-metric">
+                  <span class="income-metric-icon metric-orange"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6m-6 4h4"/></svg></span>
+                  <span><span class="income-metric-label">Outstanding Balance</span><strong id="total-outstanding">₱ 250,000</strong><span class="metric-change negative">▼ 5% <small>vs. previous month</small></span></span>
+                </article>
+                <article class="income-metric">
+                  <span class="income-metric-icon metric-red"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2"/><path d="M3 20v-1a6 6 0 0 1 12 0v1m1-5a4 4 0 0 1 5 4v1"/></svg></span>
+                  <span><span class="income-metric-label">Overdue Invoices</span><strong id="overdue-invoices">5 invoices</strong><span class="metric-change negative">▼ 2 <small>vs. previous month</small></span></span>
+                </article>
+              </div>
+              <p id="income-summary-empty" class="income-report-empty" role="status" hidden>No illustrative summary data is available for this period. Select October 2026 to view the sample summary.</p>
+            </aside>
+          </div>
+
+          <section class="dashboard-panel income-records-panel" aria-labelledby="recent-income-title">
+            <div class="income-records-heading">
+              <h2 id="recent-income-title">Recent Income Records</h2>
+              <div class="income-record-tools">
+                <button id="filter-toggle" class="income-tool-button" type="button" aria-expanded="false" aria-controls="income-filters"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg>Filters</button>
+                <button id="export-income" class="income-tool-button" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg>Export</button>
+              </div>
+              <label class="income-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4 4"/></svg><input id="income-search" type="search" placeholder="Search by reference, customer or description..." aria-label="Search income records"></label>
+              <div id="income-filters" class="income-filters" hidden>
+                <label>Status
+                  <select id="status-filter">
+                    <option value="">All statuses</option>
+                    <option>Invoiced</option><option>Partially Paid</option><option>Received</option><option>Overdue</option>
+                  </select>
+                </label>
+                <label>Category
+                  <select id="category-filter">
+                    <option value="">All categories</option>
+                    <option>Product Sales</option><option>Service Income</option><option>Other Income</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="income-table-wrap">
+              <table class="transactions-table income-table">
+                <thead><tr><th>Date</th><th>Invoice No.</th><th>Customer / Source</th><th>Category</th><th>Invoice Amount (₱)</th><th>Amount Received (₱)</th><th>Outstanding Balance (₱)</th><th>Status</th><th><span class="visually-hidden">Actions</span></th></tr></thead>
+                <tbody id="income-record-rows"></tbody>
+              </table>
+              <p id="income-no-results" class="income-no-results" hidden>No income records match your search.</p>
+            </div>
+            <div class="income-table-footer"><span id="record-count">Showing 5 records</span><div class="income-pagination"><button type="button" disabled aria-label="Previous page">‹</button><span>1</span><button type="button" disabled aria-label="Next page">›</button></div></div>
+          </section>
+          <p class="income-prototype-note">Illustrative summary values · Income records are stored in this browser prototype only.</p>
+        </section>
+
+        <section id="invoices-view" class="income-view" role="tabpanel" aria-labelledby="tab-invoices" data-income-view="invoices" hidden>
+          <section class="dashboard-panel income-secondary-panel">
+            <div class="income-secondary-heading"><div><h2>Invoice List</h2><p>Search and review customer invoices and their payment status.</p></div><button class="income-button income-button-primary" type="button" data-open-tab="record">＋ Create Invoice</button></div>
+            <label class="income-search invoice-list-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4 4"/></svg><input type="search" data-shared-search placeholder="Search by invoice, customer or description..." aria-label="Search invoices"></label>
+            <div class="income-table-wrap"><table class="transactions-table income-table"><thead><tr><th>Date</th><th>Invoice No.</th><th>Customer / Source</th><th>Category</th><th>Invoice Amount (₱)</th><th>Amount Received (₱)</th><th>Outstanding Balance (₱)</th><th>Status</th></tr></thead><tbody data-shared-rows></tbody></table></div>
+          </section>
+        </section>
+
+        <section id="collections-view" class="income-view" role="tabpanel" aria-labelledby="tab-collections" data-income-view="collections" hidden>
+          <section class="dashboard-panel income-secondary-panel">
+            <div class="income-secondary-heading"><div><h2>Collections</h2><p>Review balances still to be collected and record customer payments.</p></div></div>
+            <label class="income-search invoice-list-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4 4"/></svg><input type="search" data-shared-search placeholder="Search outstanding invoices..." aria-label="Search collections"></label>
+            <div class="income-table-wrap"><table class="transactions-table income-table collection-table"><thead><tr><th>Date</th><th>Invoice No.</th><th>Customer / Source</th><th>Invoice Amount (₱)</th><th>Amount Received (₱)</th><th>Outstanding Balance (₱)</th><th>Status</th><th>Record Collection</th></tr></thead><tbody data-shared-rows></tbody></table></div>
+          </section>
+        </section>
+
+        <section id="reports-view" class="income-view" role="tabpanel" aria-labelledby="tab-reports" data-income-view="reports" hidden>
+          <section class="dashboard-panel income-secondary-panel">
+            <div class="income-secondary-heading"><div><h2>Income Reports</h2><p>Illustrative income summary for <span data-income-report-month>October 2026</span>.</p></div><label class="period-select-wrap income-period-select" for="report-period"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg><select id="report-period" aria-label="Report period"><option value="2026-12">December 2026</option><option value="2026-11">November 2026</option><option value="2026-10" selected>October 2026</option><option value="2026-09">September 2026</option><option value="2026-08">August 2026</option><option value="2026-07">July 2026</option><option value="2026-06">June 2026</option></select><span class="period-caret" aria-hidden="true">⌄</span></label></div>
+            <div class="income-report-cards"><article><span>Total invoiced</span><strong id="report-invoiced">₱ 1,200,000</strong></article><article><span>Total received</span><strong id="report-received">₱ 950,000</strong></article><article><span>Outstanding balance</span><strong id="report-outstanding">₱ 250,000</strong></article><article><span>Invoices issued</span><strong id="report-invoice-count">5</strong></article></div>
+            <h3 class="report-breakdown-title income-category-title">Income by Category</h3>
+            <div class="income-table-wrap"><table class="transactions-table income-table"><thead><tr><th>Category</th><th>Invoices</th><th>Total Invoiced (₱)</th><th>Total Received (₱)</th><th>Outstanding (₱)</th></tr></thead><tbody id="category-report-rows"></tbody></table></div>
+            <h3 class="report-breakdown-title income-status-title">Collection Status</h3>
+            <div class="income-table-wrap"><table class="transactions-table income-table"><thead><tr><th>Status</th><th>Invoices</th><th>Total Invoiced (₱)</th><th>Total Received (₱)</th><th>Outstanding (₱)</th></tr></thead><tbody id="income-status-rows"></tbody></table></div>
+            <p class="income-report-empty" id="income-report-empty" role="status" hidden>No illustrative report data is available for this period. Select October 2026 to view the sample report.</p>
+          </section>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="../js/fmis-core.js" defer></script>
+  <script src="../js/income.js" defer></script>
+</body>
+</html>
