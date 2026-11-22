@@ -33,8 +33,8 @@ if (approvalSession) {
 function initializeApprovals(session) {
   const permissions = new Set(session.permissions);
   const email = session.email.toLowerCase();
-  const isApprover = session.permissions.includes("approvals");
-  const isAdministrator = session.role === "Administrator";
+  const isApprover = session.role === "Approver";
+  const evidenceButton = document.querySelector("#open-evidence");
   const actorName = window.FMIS.getDisplayName(session);
   const initials = window.FMIS.getInitials(actorName);
 
@@ -132,61 +132,9 @@ function initializeApprovals(session) {
       typeof expense.amount === "number";
   }
 
-  function seedIllustrativeRequest() {
-    const request = {
-      requestId: "PR-2026-00012",
-      expenseId: "EXP-2026-00031",
-      status: "Pending Approval",
-      vendor: "FreshFarm Supplies",
-      amount: 12450,
-      category: "Raw Materials",
-      dueDate: "2026-11-28",
-      reference: "INV-2026-88214",
-      documentName: "invoice_oct20.pdf",
-      requestedDate: "2026-11-14",
-      comments: "Urgent supplier payment for October raw-material deliveries.",
-      preparedBy: "Maria G. Santos",
-      preparedByEmail: "preparer@fmis.example",
-      preparedRole: "Finance Preparer",
-      submittedAt: "2026-11-14T06:32:00.000Z",
-      history: [
-        {
-          at: "2026-11-14T06:32:00.000Z",
-          user: "Maria G. Santos",
-          role: "Finance Preparer",
-          action: "Submitted",
-          status: "Pending Approval",
-          comments: "Request created and submitted for approval.",
-        },
-      ],
-      illustrative: true,
-    };
-    const expense = {
-      expenseId: request.expenseId,
-      transactionId: request.expenseId,
-      date: "2026-11-14",
-      vendor: request.vendor,
-      amount: request.amount,
-      category: request.category,
-      dueDate: request.dueDate,
-      reference: request.reference,
-      documentName: request.documentName,
-      payableStatus: "Payment Requested",
-      paymentRequestId: request.requestId,
-      illustrative: true,
-    };
-    requests = [request];
-    expenses = [expense];
-    document.querySelector("#approval-action-note").textContent =
-      "Illustrative request for demonstration. Decisions change its status and history only; no money is transferred.";
-  }
-
   try {
     requests = loadRecords(approvalRequestsKey, isValidRequest, "Saved payment requests");
     expenses = loadRecords(approvalExpensesKey, isValidExpense, "Saved expense records");
-    if (!requests.length && localStorage.getItem(approvalRequestsKey) === null) {
-      seedIllustrativeRequest();
-    }
   } catch (error) {
     storageReady = false;
     showFeedback(`Approval data could not be loaded: ${error.message}`, true);
@@ -267,6 +215,7 @@ function initializeApprovals(session) {
   }
 
   function renderRequest() {
+    evidenceButton.hidden = true;
     if (!currentRequest) {
       [
         "detail-request-id",
@@ -302,10 +251,8 @@ function initializeApprovals(session) {
     displayValue("detail-prepared-by", currentRequest.preparedBy || currentRequest.createdBy || "Finance Preparer");
     displayValue("detail-submitted-date", formatDateTime(currentRequest.submittedAt || currentRequest.createdAt));
     document.querySelector("#detail-prepared-role").textContent = currentRequest.preparedRole || "Finance Preparer";
-    document.querySelector("#document-availability").textContent =
-      currentRequest.documentName || expense?.documentName
-        ? "(metadata only; file is not stored)"
-        : "";
+    evidenceButton.hidden = !expense;
+    document.querySelector("#document-availability").textContent = "";
     displayStatusChips(status);
     const requestHistory = Array.isArray(currentRequest.history) && currentRequest.history.length
       ? currentRequest.history
@@ -339,7 +286,9 @@ function initializeApprovals(session) {
       status === "Pending Approval"
         ? "Waiting for approver decision."
         : status === "Approved"
-          ? "Approved. No payment has been made."
+          ? (currentRequest && relatedExpense(currentRequest)?.payableStatus === "Paid"
+              ? "Approved. External payment recorded."
+              : "Approved. External payment is still outstanding.")
           : status === "Rejected"
             ? "Rejected. No payment has been made."
             : status === "Returned for Correction"
@@ -385,7 +334,18 @@ function initializeApprovals(session) {
     document.querySelector("#approval-role-notice").classList.toggle("is-read-only", !isApprover);
   }
 
-  function persistDecision(action, nextStatus) {
+  async function persistDecision(action, nextStatus) {
+    const selectedId = currentRequest?.requestId;
+    if (selectedId) {
+      try {
+        requests = loadRecords(approvalRequestsKey, isValidRequest, "payment requests");
+        expenses = loadRecords(approvalExpensesKey, isValidExpense, "expenses");
+        currentRequest = requests.find((request) => request.requestId === selectedId);
+      } catch (error) {
+        showFeedback(error.message, true);
+        return;
+      }
+    }
     if (!isApprover) {
       showFeedback("Only an authorized Approver may record a decision.", true);
       return;
@@ -394,9 +354,13 @@ function initializeApprovals(session) {
       showFeedback("Approval data is unavailable. No decision was recorded.", true);
       return;
     }
-    if (!isAdministrator &&
-      currentRequest.preparedByEmail &&
-      currentRequest.preparedByEmail.toLowerCase() === email) {
+    const expense = relatedExpense(currentRequest);
+    const preparer = currentRequest.preparedByEmail || expense?.createdByEmail;
+    if (!preparer) {
+      showFeedback("The preparer account is missing. Submit a new request with a demo account.", true);
+      return;
+    }
+    if (preparer.toLowerCase() === email) {
       try {
         window.FMIS.logActivity({
           action: "Blocked self-approval attempt",
@@ -419,6 +383,27 @@ function initializeApprovals(session) {
       return;
     }
 
+    const pendingRequest = currentRequest;
+    if (action === "Approved") {
+      try {
+        const document = expense && await window.FMISQM.getDoc(expense.documentKey || expense.expenseId);
+        if (!document?.blob) {
+          showFeedback("Approval requires a stored supporting attachment. Return this request for correction.", true);
+          return;
+        }
+        const latest = loadRecords(approvalRequestsKey, isValidRequest, "payment requests")
+          .find((request) => request.requestId === pendingRequest.requestId);
+        if (currentRequest !== pendingRequest || latest?.status !== pendingRequest.status ||
+            latest?.submittedAt !== pendingRequest.submittedAt) {
+          showFeedback("The request changed during review. Reload it before making a decision.", true);
+          return;
+        }
+        requests = loadRecords(approvalRequestsKey, isValidRequest, "payment requests");
+      } catch (error) {
+        showFeedback(error.message, true);
+        return;
+      }
+    }
     const comments = decisionComment.value.trim();
     if ((action === "Rejected" || action === "Returned for Correction") && !comments) {
       decisionComment.setCustomValidity("Add a comment explaining this decision.");
@@ -517,6 +502,18 @@ function initializeApprovals(session) {
     renderRequest();
     showFeedback(`${action} recorded for ${updatedRequest.requestId}. No money was transferred.`);
   }
+
+  evidenceButton.addEventListener("click", async () => {
+    const expense = currentRequest && relatedExpense(currentRequest);
+    if (!expense) return;
+    try {
+      if (!await window.FMISQM.openDoc(expense.documentKey || expense.expenseId)) {
+        showFeedback("No attachment is available. Return the request for correction.", true);
+      }
+    } catch (error) {
+      showFeedback(error.message, true);
+    }
+  });
 
   requestSelect.addEventListener("change", () => {
     currentRequest = requests.find((request) => request.requestId === requestSelect.value) || null;

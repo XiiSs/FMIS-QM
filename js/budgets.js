@@ -1,13 +1,3 @@
-const budgetData = {
-  "2026-10": [
-    { category: "Raw Materials", planned: 800000, actual: 850000 },
-    { category: "Operations", planned: 500000, actual: 450000 },
-    { category: "Transportation", planned: 300000, actual: 280000 },
-    { category: "Utilities", planned: 200000, actual: 170000 },
-    { category: "Maintenance", planned: 200000, actual: 100000 },
-  ],
-};
-
 function getBudgetSession() {
   let session;
 
@@ -81,7 +71,26 @@ function initializeBudgetPage(session) {
     }
   });
 
-  const periodSelect = document.querySelector("#budget-period");
+    const periodSelect = document.querySelector("#budget-period");
+  const { keys, read, parsePeriod, todayDate } = window.FMIS;
+  const currentMonth = todayDate().slice(0, 7);
+
+  const months = new Set([
+    currentMonth,
+    ...Object.keys(read(keys.budgets, {})),
+    ...read(keys.expenses, []).map(({ date }) => date?.slice(0, 7)),
+    ...Array.from(periodSelect.options, ({ value }) => value),
+  ]);
+
+  periodSelect.replaceChildren(
+    ...Array.from(months)
+      .filter((month) => /^\d{4}-(0[1-9]|1[0-2])$/.test(month))
+      .sort()
+      .reverse()
+      .map((month) => new Option(parsePeriod(month).label, month)),
+  );
+
+  periodSelect.value = currentMonth;
   const currency = new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
@@ -89,30 +98,17 @@ function initializeBudgetPage(session) {
   });
 
   function renderBudget(period) {
-    const categories = (budgetData[period] || []).map((item) => ({ ...item }));
-    if (window.FMIS) {
-      const expenseRecords = window.FMIS.read(window.FMIS.keys.expenses, []);
-      expenseRecords
-        .filter((expense) => String(expense.date || "").startsWith(period))
-        .forEach((expense) => {
-          const category = categories.find((item) =>
-            item.category.toLowerCase() === String(expense.category || "").toLowerCase(),
-          );
-          if (category) category.actual += Number(expense.amount || 0);
-        });
-    }
+    const { categories, totalPlanned, totalActual, totalVariance: remaining } = window.FMIS.getBudgetMetrics(window.FMIS.parsePeriod(period));
     const rows = document.querySelector("#budget-rows");
     const chart = document.querySelector("#budget-chart");
     const empty = document.querySelector("#budget-empty");
-    const totalPlanned = categories.reduce((total, item) => total + item.planned, 0);
-    const totalActual = categories.reduce((total, item) => total + item.actual, 0);
-    const remaining = totalPlanned - totalActual;
+    const maximum = Math.max(1, ...categories.flatMap(({ planned, actual }) => [planned, actual]));
     const overBudget = categories.filter((item) => item.actual > item.planned);
     const monthName = periodSelect.selectedOptions[0].textContent.split(" ")[0];
 
     rows.replaceChildren(...categories.map((item) => createBudgetRow(item)));
     empty.hidden = categories.length > 0;
-    chart.replaceChildren(...categories.map((item) => createBudgetBar(item)));
+    chart.replaceChildren(...categories.map((item) => createBudgetBar(item, maximum)));
 
     document.querySelector("#budget-total").textContent = currency.format(totalPlanned);
     document.querySelector("#actual-total").textContent = currency.format(totalActual);
@@ -175,8 +171,7 @@ function initializeBudgetPage(session) {
     return row;
   }
 
-  function createBudgetBar(item) {
-    const maximum = Math.max(...budgetData["2026-10"].flatMap((record) => [record.planned, record.actual]));
+  function createBudgetBar(item, maximum) {
     const category = document.createElement("div");
     category.className = "budget-chart-category";
     const bars = document.createElement("div");

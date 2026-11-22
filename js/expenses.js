@@ -100,6 +100,8 @@ function initializeExpensePage(session) {
   });
   let records = [];
   let pendingExpense = null;
+  let editingExpenseId = null;
+  let savingExpense = false;
   let lastSavedExpenseId = null;
   let keepFeedbackAfterReset = false;
   let storageReady = true;
@@ -240,6 +242,7 @@ function initializeExpensePage(session) {
       documentName.textContent = "No file selected";
       removeDocumentButton.hidden = true;
       setDateDefaults();
+      editingExpenseId = null;
       if (keepFeedbackAfterReset) {
         keepFeedbackAfterReset = false;
       } else {
@@ -288,7 +291,7 @@ function initializeExpensePage(session) {
     )) {
       errors.push(["reference", "This reference / invoice number already exists."]);
     }
-    if (!data.document) {
+    if (!data.document || data.document.size === 0) {
       errors.push(["document", "Attach a supporting document before saving."]);
     } else if (data.document.size > 5 * 1024 * 1024) {
       errors.push(["document", "The supporting document must be 5 MB or smaller."]);
@@ -317,6 +320,7 @@ function initializeExpensePage(session) {
     dismissFeedback();
     clearDuplicateWarning();
 
+    if (!canEdit || savingExpense) return;
     if (!storageReady) {
       showFeedback("error", "Expense storage is unavailable", "Resolve the saved expense data error before continuing.");
       return;
@@ -330,7 +334,7 @@ function initializeExpensePage(session) {
       return;
     }
 
-    if (findPossibleDuplicate(data)) {
+    if (!editingExpenseId && findPossibleDuplicate(data)) {
       pendingExpense = data;
       warning.hidden = false;
       return;
@@ -338,9 +342,29 @@ function initializeExpensePage(session) {
     saveExpense(data);
   }
 
-  function saveExpense(data) {
+  async function saveExpense(data) {
+    if (!canEdit || savingExpense) return;
+    savingExpense = true;
+    try {
+      await storeExpense(data);
+    } catch (error) {
+      showFeedback("error", "Expense could not be saved", error.message);
+    } finally {
+      savingExpense = false;
+    }
+  }
+
+  async function storeExpense(data) {
+    records = readRecords();
+    const previous = records.find((record) => record.expenseId === editingExpenseId);
+    const returned = previous && readPaymentRequests().find((request) =>
+      request.requestId === previous.paymentRequestId && request.status === "Returned for Correction");
+    if (editingExpenseId && (!previous || (previous.paymentRequestId && !returned) || previous.payableStatus === "Paid")) {
+      throw new Error("This payable is no longer available for correction.");
+    }
+    const expenseId = previous?.expenseId || createExpenseId(data.date.slice(0, 4), records);
     const currentReference = data.reference.toLowerCase();
-    if (records.some((record) => record.reference.trim().toLowerCase() === currentReference)) {
+    if (records.some((record) => record.expenseId !== expenseId && record.reference.trim().toLowerCase() === currentReference)) {
       clearDuplicateWarning();
       setFieldError("reference", "This reference / invoice number already exists.");
       showFeedback("error", "Duplicate invoice reference", "Use a unique reference / invoice number for each expense.");
@@ -348,7 +372,17 @@ function initializeExpensePage(session) {
       return;
     }
 
-    const expenseId = createExpenseId(data.date.slice(0, 4), records);
+    const documentKey = crypto.randomUUID();
+    await window.FMISQM.saveDoc(documentKey, data.document);
+    records = readRecords();
+    if (records.some((record) => record.expenseId !== expenseId && record.reference.trim().toLowerCase() === currentReference) ||
+        (!previous && records.some((record) => record.expenseId === expenseId)) ||
+        (previous && ((returned && !readPaymentRequests().some((request) => request.requestId === returned.requestId &&
+          request.status === returned.status && request.decidedAt === returned.decidedAt)) ||
+          !records.some((record) => record.expenseId === expenseId && record.documentKey === previous.documentKey &&
+            record.paymentRequestId === previous.paymentRequestId && record.payableStatus === previous.payableStatus)))) {
+      throw new Error("The payable changed while its attachment was saved. Review the latest entry and try again.");
+    }
     const newRecord = {
       expenseId,
       transactionId: expenseId,
@@ -358,23 +392,24 @@ function initializeExpensePage(session) {
       category: data.category,
       dueDate: data.dueDate,
       reference: data.reference,
+      documentKey,
       documentName: data.document.name,
       documentSize: data.document.size,
       createdAt: new Date().toISOString(),
       createdBy: window.FMIS.getDisplayName(session),
       createdByEmail: session.email,
       createdByRole: session.role,
-      payableStatus: "Open",
-      paymentRequestId: null,
+      payableStatus: returned ? "Payment Requested" : "Open",
+      paymentRequestId: previous?.paymentRequestId || null,
     };
 
     let previousRecords;
     try {
       previousRecords = localStorage.getItem(expenseRecordsKey);
-      records.unshift(newRecord);
+      records = [newRecord, ...records.filter((record) => record.expenseId !== expenseId)];
       localStorage.setItem(expenseRecordsKey, JSON.stringify(records));
       if (window.FMIS) window.FMIS.logActivity({
-        action: "Saved expense",
+        action: previous ? "Corrected returned expense" : "Saved expense",
         reference: data.reference,
         before: "",
         after: `Saved; ₱${data.amount.toFixed(2)}`,
@@ -382,7 +417,7 @@ function initializeExpensePage(session) {
         description: `Saved expense ${data.reference} for ${data.vendor}; amount ₱${data.amount.toFixed(2)}.`,
       });
     } catch (error) {
-      records = records.filter((record) => record.expenseId !== expenseId);
+      records = previousRecords ? JSON.parse(previousRecords) : [];
       let rollbackMessage = "";
       try {
         if (previousRecords === null) {
@@ -398,15 +433,8 @@ function initializeExpensePage(session) {
       return;
     }
 
-    // Keep the real attached file so it can be viewed again from the register / history.
-    if (window.FMISQM) {
-      window.FMISQM.saveDoc(expenseId, data.document).catch((error) => {
-        showFeedback("warning", "Expense saved, but the document copy could not be stored", `${error.message} The file name is still recorded on the expense.`);
-      });
-    }
-
     lastSavedExpenseId = expenseId;
-    paymentRequestButton.disabled = false;
+    paymentRequestButton.disabled = Boolean(returned);
     paymentRequestButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg>Create Payment Request';
     keepFeedbackAfterReset = true;
     form.reset();
@@ -419,15 +447,25 @@ function initializeExpensePage(session) {
     );
   }
 
-  function createPaymentRequest(targetExpenseId) {
+  async function createPaymentRequest(targetExpenseId) {
+    try {
+      await submitPaymentRequest(targetExpenseId);
+    } catch (error) {
+      showFeedback("error", "Payment request could not be created", error.message);
+    }
+  }
+
+  async function submitPaymentRequest(targetExpenseId) {
+    if (!canEdit) return;
     const expenseKey = targetExpenseId || lastSavedExpenseId;
     if (!expenseKey) {
       showFeedback("error", "Payment request unavailable", "Save an expense first. Payment requests are a separate step.");
       return;
     }
-    const expense = records.find((record) => record.expenseId === expenseKey);
-    if (!expense) {
-      showFeedback("error", "Payable record not found", "The saved expense could not be located. Refresh the Expenses page and try again.");
+    records = readRecords();
+    let expense = records.find((record) => record.expenseId === expenseKey);
+    if (!expense || expense.payableStatus === "Paid") {
+      showFeedback("error", "Open payable record not found", "The saved expense could not be located. Refresh the Expenses page and try again.");
       return;
     }
     if (expense.paymentRequestId) {
@@ -435,6 +473,15 @@ function initializeExpensePage(session) {
       return;
     }
 
+    if (!(await window.FMISQM.getDoc(expense.documentKey || expense.expenseId))?.blob) {
+      throw new Error("Attach supporting evidence to an expense before submitting a payment request.");
+    }
+    const documentKey = expense.documentKey;
+    records = readRecords();
+    expense = records.find((record) => record.expenseId === expenseKey);
+    if (!expense || expense.documentKey !== documentKey || expense.paymentRequestId || expense.payableStatus === "Paid") {
+      throw new Error("The payable changed. Reload the page before submitting.");
+    }
     let requests;
     try {
       requests = readPaymentRequests();
@@ -548,11 +595,135 @@ function initializeExpensePage(session) {
     return window.FMISQM.daysUntil(expense.dueDate) < 0 ? "status-overdue" : "status-pending";
   }
 
+  const actionDialog = document.querySelector("#payable-action-dialog");
+  const actionForm = document.querySelector("#payable-action-form");
+  const actionError = document.querySelector("#payable-action-error");
+  let activePayableAction;
+  document.querySelector("#cancel-payable-action").addEventListener("click", () => actionDialog.close());
+
+  function editExpense(expense, request) {
+    form.reset();
+    window.setTimeout(() => {
+      editingExpenseId = expense.expenseId;
+      dateInput.value = expense.date;
+      updateDueDateConstraint();
+      dueDateInput.value = expense.dueDate;
+      vendorInput.value = expense.vendor;
+      referenceInput.value = expense.reference;
+      form.elements.amount.value = expense.amount;
+      form.elements.category.value = expense.category;
+      paymentRequestButton.disabled = true;
+      const instructions = request
+        ? `${request.history?.at(-1)?.comments || request.comments || ""} Attach the corrected evidence and save.`
+        : "Update the open expense and attach its supporting evidence before submitting a request.";
+      showFeedback("info", "Edit expense", instructions);
+      vendorInput.focus();
+    }, 0);
+  }
+
+  function openPayableAction(expense, request, recordingPayment) {
+    actionForm.reset();
+    activePayableAction = { expenseId: expense.expenseId, requestId: request.requestId, recordingPayment };
+    actionError.textContent = "";
+    document.querySelector("#payable-action-title").textContent = recordingPayment
+      ? "Record External Payment" : "Resubmit Payment Request";
+    document.querySelector("#payable-action-note").textContent = recordingPayment
+      ? `Record the completed external payment of ₱${moneyFormat.format(expense.amount)}.`
+      : "The corrected expense and attachment will go back to the approver.";
+    const { paymentDate, bankReference } = actionForm.elements;
+    paymentDate.required = bankReference.required = recordingPayment;
+    paymentDate.disabled = bankReference.disabled = !recordingPayment;
+    document.querySelector("#payment-date-label").hidden = !recordingPayment;
+    document.querySelector("#payment-reference-label").hidden = !recordingPayment;
+    paymentDate.min = (request.decidedAt ? formatDateValue(new Date(request.decidedAt)) : request.requestedDate) || expense.date;
+    paymentDate.max = paymentDate.value = window.FMIS.todayDate();
+    actionDialog.showModal();
+  }
+
+  actionForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!canEdit || !activePayableAction) return;
+    const { expenseId, requestId, recordingPayment } = activePayableAction;
+    const submit = actionForm.querySelector('[type="submit"]');
+    submit.disabled = true;
+    actionError.textContent = "";
+    try {
+      let currentExpenses = readRecords();
+      let currentRequests = readPaymentRequests();
+      let expense = currentExpenses.find((item) => item.expenseId === expenseId);
+      let request = currentRequests.find((item) => item.requestId === requestId && item.expenseId === expenseId);
+      const expected = recordingPayment ? "Approved" : "Returned for Correction";
+      if (!expense || request?.status !== expected || expense.payableStatus === "Paid") {
+        throw new Error("This payable changed. Reload the page and review its current status.");
+      }
+      const timestamp = new Date().toISOString();
+      const action = recordingPayment ? "Recorded external payment" : "Resubmitted payment request";
+      let nextStatus;
+      let description;
+      if (recordingPayment) {
+        const bankReference = actionForm.elements.bankReference.value.trim();
+        const paidDate = actionForm.elements.paymentDate.value;
+        if (!bankReference || !actionForm.reportValidity()) throw new Error("Enter a valid payment date and bank reference.");
+        if (currentExpenses.some((item) => item.bankReference?.toLowerCase() === bankReference.toLowerCase())) {
+          throw new Error("This bank reference has already been recorded.");
+        }
+        Object.assign(expense, { payableStatus: "Paid", bankReference, paidDate, paidBy: session.email });
+        nextStatus = "Paid";
+        description = `Payment for ${expense.reference} recorded on ${paidDate}, bank reference ${bankReference}.`;
+      } else {
+        const correctedAt = expense.createdAt;
+        const documentKey = expense.documentKey;
+        if (!correctedAt || correctedAt <= request.decidedAt || !documentKey ||
+            !(await window.FMISQM.getDoc(documentKey))?.blob) {
+          throw new Error("Save a correction with a supporting attachment before resubmitting.");
+        }
+        currentExpenses = readRecords();
+        currentRequests = readPaymentRequests();
+        expense = currentExpenses.find((item) => item.expenseId === expenseId);
+        request = currentRequests.find((item) => item.requestId === requestId);
+        if (request?.status !== expected || expense?.documentKey !== documentKey || correctedAt <= request.decidedAt) {
+          throw new Error("The correction changed. Review the latest request.");
+        }
+        nextStatus = "Pending Approval";
+        description = `Corrected expense ${expense.reference} submitted for review.`;
+        Object.assign(request, {
+          status: nextStatus, vendor: expense.vendor, amount: expense.amount, category: expense.category,
+          dueDate: expense.dueDate, reference: expense.reference, documentName: expense.documentName,
+          submittedAt: timestamp, requestedDate: window.FMIS.todayDate(), comments: description,
+          preparedBy: window.FMIS.getDisplayName(session), preparedByEmail: session.email, preparedRole: session.role,
+          decidedAt: null, decidedBy: null, decidedByRole: null,
+          history: [...(request.history || []), {
+            at: timestamp, user: window.FMIS.getDisplayName(session), account: session.email,
+            role: session.role, action: "Resubmitted", status: nextStatus, comments: description,
+          }],
+        });
+      }
+      const key = recordingPayment ? expenseRecordsKey : paymentRequestsKey;
+      const before = localStorage.getItem(key);
+      localStorage.setItem(key, JSON.stringify(recordingPayment ? currentExpenses : currentRequests));
+      try {
+        window.FMIS.logActivity({ action, reference: requestId, before: expected, after: nextStatus, description, type: "Payment Request" });
+      } catch (error) {
+        localStorage.setItem(key, before);
+        throw error;
+      }
+      records = currentExpenses;
+      actionDialog.close();
+      renderPayables();
+      showFeedback("success", action, description);
+    } catch (error) {
+      actionError.textContent = error.message;
+    } finally {
+      submit.disabled = false;
+    }
+  });
+
   function renderPayables() {
     if (!payablesBody || !window.FMISQM) {
       return;
     }
     const Q = window.FMISQM;
+    const requests = window.FMIS.read(paymentRequestsKey, []);
     const summary = Q.payablesSummary(records);
 
     payablesKpis.replaceChildren(
@@ -623,7 +794,7 @@ function initializeExpensePage(session) {
         view.textContent = "View";
         view.title = expense.documentName;
         view.addEventListener("click", () => {
-          Q.openDoc(expense.expenseId).then((opened) => {
+          Q.openDoc(expense.documentKey || expense.expenseId).then((opened) => {
             if (!opened) {
               showFeedback("info", "Document copy not available", `${expense.documentName} is recorded on this expense, but the file itself is not stored in this browser.`);
             }
@@ -636,15 +807,40 @@ function initializeExpensePage(session) {
       row.append(docCell);
 
       const actionCell = document.createElement("td");
-      if (expense.paymentRequestId) {
-        actionCell.textContent = expense.paymentRequestId;
-      } else if (expense.payableStatus !== "Paid") {
+      const linked = requests.find((request) => request.requestId === expense.paymentRequestId);
+      if (expense.payableStatus === "Paid") {
+        actionCell.textContent = expense.bankReference ? `Paid ${expense.paidDate} · ${expense.bankReference}` : "Paid";
+      } else if (linked) {
+        actionCell.textContent = `${linked.requestId} · ${linked.status}`;
+        const addAction = (label, handler) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "qm-button qm-button-small";
+          button.textContent = label;
+          button.addEventListener("click", handler);
+          actionCell.append(button);
+        };
+        if (canEdit && linked.status === "Returned for Correction") {
+          addAction("Correct Expense", () => editExpense(expense, linked));
+          if (expense.documentKey && expense.createdAt > linked.decidedAt) {
+            addAction("Resubmit Request", () => openPayableAction(expense, linked, false));
+          }
+        }
+        if (canEdit && linked.status === "Approved") {
+          addAction("Record External Payment", () => openPayableAction(expense, linked, true));
+        }
+      } else if (canEdit && !expense.paymentRequestId) {
         const request = document.createElement("button");
         request.type = "button";
         request.className = "qm-button qm-button-small";
         request.textContent = "Create Payment Request";
         request.addEventListener("click", () => createPaymentRequest(expense.expenseId));
-        actionCell.append(request);
+        const edit = document.createElement("button");
+        edit.type = "button";
+        edit.className = "qm-button qm-button-small";
+        edit.textContent = "Edit Expense";
+        edit.addEventListener("click", () => editExpense(expense, null));
+        actionCell.append(edit, request);
       } else {
         actionCell.textContent = "-";
       }

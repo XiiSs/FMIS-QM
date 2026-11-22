@@ -1,62 +1,4 @@
 const incomeStorageKey = "fmisIncomeRecords";
-const sampleIncomeRecords = [
-  {
-    date: "2026-10-28",
-    invoice: "INV-2026-1045",
-    customer: "ABC Retail",
-    category: "Product Sales",
-    description: "Sale to ABC Retail",
-    amount: 180000,
-    received: 0,
-    status: "Invoiced",
-    dueDate: "2026-11-27",
-  },
-  {
-    date: "2026-10-25",
-    invoice: "INV-2026-1044",
-    customer: "DEF Mart",
-    category: "Product Sales",
-    description: "Sale to DEF Mart",
-    amount: 220000,
-    received: 100000,
-    status: "Partially Paid",
-    dueDate: "2026-11-24",
-  },
-  {
-    date: "2026-10-20",
-    invoice: "INV-2026-1043",
-    customer: "GHI Supermarket",
-    category: "Product Sales",
-    description: "Sale to GHI Supermarket",
-    amount: 150000,
-    received: 150000,
-    status: "Received",
-    dueDate: "2026-11-19",
-  },
-  {
-    date: "2026-10-18",
-    invoice: "INV-2026-1042",
-    customer: "JKL Traders",
-    category: "Other Income",
-    description: "Other income from JKL Traders",
-    amount: 75000,
-    received: 0,
-    status: "Invoiced",
-    dueDate: "2026-11-17",
-  },
-  {
-    date: "2026-10-16",
-    invoice: "INV-2026-1041",
-    customer: "MNO Wholesaler",
-    category: "Product Sales",
-    description: "Sale to MNO Wholesaler",
-    amount: 200000,
-    received: 50000,
-    status: "Partially Paid",
-    dueDate: "2026-11-15",
-  },
-];
-
 const incomeSession = readIncomeSession();
 
 if (incomeSession) {
@@ -90,7 +32,7 @@ function initializeIncomePage(session) {
   const permissions = new Set(session.permissions);
   const fullName = window.FMIS.getDisplayName(session);
   const initials = window.FMIS.getInitials(fullName);
-  const canEdit = session.role !== "Management / Read-only";
+  const canEdit = session.role === "Finance Preparer";
 
   document.querySelector("#profile-name").textContent = fullName;
   document.querySelector("#profile-role").textContent = session.role;
@@ -136,6 +78,7 @@ function initializeIncomePage(session) {
 
   const feedback = document.querySelector("#income-feedback");
   let records = loadIncomeRecords(feedback);
+  if (!records) return;
   const recordRows = document.querySelector("#income-record-rows");
   const searchInput = document.querySelector("#income-search");
   const statusFilter = document.querySelector("#status-filter");
@@ -146,7 +89,6 @@ function initializeIncomePage(session) {
   const summaryPeriodSelect = document.querySelector("#income-period");
   let reportViewHasData = true;
   const summaryStorageKey = "fmisIncomeSummary";
-  let summaryTotals = loadIncomeSummary();
 
   if (!canEdit) {
     document.querySelectorAll("#invoice-form input, #invoice-form select, #invoice-form textarea, #invoice-form button").forEach((control) => {
@@ -183,7 +125,7 @@ function initializeIncomePage(session) {
       const matchesSearch = [
         record.invoice,
         record.customer,
-        record.description,
+        record.description || "",
         record.category,
         record.status,
       ].some((value) => value.toLowerCase().includes(query));
@@ -273,7 +215,7 @@ function initializeIncomePage(session) {
     input.type = "number";
     input.name = "payment";
     input.min = "0.01";
-    input.max = String(record.amount - record.received);
+    input.max = String(window.FMIS.subMoney(record.amount, record.received));
     input.step = "0.01";
     input.required = true;
     input.placeholder = "₱ amount";
@@ -281,7 +223,15 @@ function initializeIncomePage(session) {
     const button = document.createElement("button");
     button.type = "submit";
     button.textContent = "Receive";
-    form.append(input, button);
+    const date = document.createElement("input");
+    date.type = "date";
+    date.name = "collectionDate";
+    date.min = record.date;
+    date.max = window.FMIS.todayDate();
+    date.value = window.FMIS.todayDate();
+    date.required = true;
+    date.setAttribute("aria-label", "Collection date");
+    form.append(input, date, button);
     return form;
   }
 
@@ -300,20 +250,13 @@ function initializeIncomePage(session) {
   }
 
   function renderSummary() {
-    const hasSummary = summaryPeriodSelect.value === "2026-10";
-    const periodRecords = records.filter((record) => record.date.startsWith(summaryPeriodSelect.value));
-    const invoiced = hasSummary
-      ? summaryTotals.invoiced
-      : periodRecords.reduce((sum, record) => sum + record.amount, 0);
-    const received = hasSummary
-      ? summaryTotals.received
-      : periodRecords.reduce((sum, record) => sum + record.received, 0);
-    const outstanding = invoiced - received;
-    const overdue = hasSummary
-      ? summaryTotals.overdue
-      : periodRecords.filter((record) => record.status === "Overdue").length;
+    const period = window.FMIS.parsePeriod(summaryPeriodSelect.value);
+    const { records: periodRecords, totalRevenue: invoiced, totalCollected: received,
+      outstandingAR: outstanding } = window.FMIS.getIncomeMetrics(period);
+    const overdue = periodRecords.filter((record) =>
+      record.dueDate < window.FMIS.todayDate() && record.received < record.amount).length;
+    const hasPeriodData = periodRecords.length > 0;
     document.querySelector("#summary-period").textContent = summaryPeriodSelect.selectedOptions[0].textContent;
-    const hasPeriodData = hasSummary || periodRecords.length > 0;
     document.querySelector(".income-summary-list").hidden = !hasPeriodData;
     document.querySelector("#income-summary-empty").hidden = hasPeriodData;
     document.querySelector("#total-invoiced").textContent = formatMoney(invoiced);
@@ -325,7 +268,7 @@ function initializeIncomePage(session) {
   function renderReport() {
     const selectedPeriod = reportPeriodSelect.value;
     const reportRecords = records.filter((record) => record.date.startsWith(selectedPeriod));
-    reportViewHasData = selectedPeriod === "2026-10" || reportRecords.length > 0;
+    reportViewHasData = reportRecords.length > 0;
     document.querySelectorAll("[data-income-report-month]").forEach((element) => {
       element.textContent = reportPeriodSelect.selectedOptions[0].textContent;
     });
@@ -341,12 +284,8 @@ function initializeIncomePage(session) {
       return;
     }
 
-    const invoiced = selectedPeriod === "2026-10"
-      ? summaryTotals.invoiced
-      : reportRecords.reduce((sum, record) => sum + record.amount, 0);
-    const received = selectedPeriod === "2026-10"
-      ? summaryTotals.received
-      : reportRecords.reduce((sum, record) => sum + record.received, 0);
+    const { totalRevenue: invoiced, totalCollected: received } =
+      window.FMIS.getIncomeMetrics(window.FMIS.parsePeriod(selectedPeriod));
     document.querySelector("#report-invoiced").textContent = formatMoney(invoiced);
     document.querySelector("#report-received").textContent = formatMoney(received);
     document.querySelector("#report-outstanding").textContent = formatMoney(invoiced - received);
@@ -459,6 +398,9 @@ function initializeIncomePage(session) {
       return;
     }
 
+    const latest = loadIncomeRecords(feedback);
+    if (!latest) return;
+    records = latest;
     const formData = new FormData(form);
     const amount = Number(formData.get("invoiceAmount"));
     const received = Number(formData.get("amountReceived")) || 0;
@@ -467,9 +409,13 @@ function initializeIncomePage(session) {
       showFeedback("Enter a valid invoice amount and a received amount no greater than the invoice total.", true);
       return;
     }
+    if (String(formData.get("dueDate")) < String(formData.get("invoiceDate"))) {
+      showFeedback("The due date must fall on or after the invoice date.", true);
+      return;
+    }
     const invoice = invoiceSuffix.startsWith("INV-")
       ? invoiceSuffix
-      : `INV-2026-${invoiceSuffix}`;
+      : `INV-${String(formData.get("invoiceDate")).slice(0, 4)}-${invoiceSuffix}`;
 
     if (records.some((record) => record.invoice.toLowerCase() === invoice.toLowerCase())) {
       showFeedback("That invoice reference already exists. Enter a unique reference.", true);
@@ -484,6 +430,7 @@ function initializeIncomePage(session) {
       description: String(formData.get("description")).trim(),
       amount,
       received,
+      collections: received > 0 ? [{ date: String(formData.get("invoiceDate")), amount: received }] : [],
       status: getInvoiceStatus(amount, received, String(formData.get("dueDate"))),
       dueDate: String(formData.get("dueDate")),
       createdAt: new Date().toISOString(),
@@ -492,18 +439,8 @@ function initializeIncomePage(session) {
       createdByRole: session.role,
     };
     records.unshift(newRecord);
-    summaryTotals.invoiced += amount;
-    summaryTotals.received += received;
-    if (newRecord.status === "Overdue") {
-      summaryTotals.overdue += 1;
-    }
-    if (!saveIncomeRecords(records, feedback) || !saveIncomeSummary(summaryTotals, feedback)) {
+    if (!saveIncomeRecords(records, feedback)) {
       records.shift();
-      summaryTotals.invoiced -= amount;
-      summaryTotals.received -= received;
-      if (newRecord.status === "Overdue") {
-        summaryTotals.overdue -= 1;
-      }
       return;
     }
     if (window.FMIS) window.FMIS.logActivity({
@@ -552,27 +489,25 @@ function initializeIncomePage(session) {
       if (!canEdit) {
         return;
       }
+      const latest = loadIncomeRecords(feedback);
+      if (!latest || !collectionForm.reportValidity()) return;
+      records = latest;
       const invoice = collectionForm.dataset.invoice;
       const record = records.find((item) => item.invoice === invoice);
       const payment = Number(new FormData(collectionForm).get("payment"));
-      if (!record || !Number.isFinite(payment) || payment <= 0 || payment > record.amount - record.received) {
+      if (!record || !Number.isFinite(payment) || payment <= 0 || payment > window.FMIS.subMoney(record.amount, record.received)) {
         showFeedback("Enter a collection amount no greater than the outstanding balance.", true);
         return;
       }
       const previousStatus = record.status;
-      record.received += payment;
+      const priorCollections = record.collections;
+      record.collections = [...window.FMIS.getCollections(record), { date: collectionForm.elements.collectionDate.value, amount: payment }];
+      record.received = window.FMIS.addMoney(record.received, payment);
       record.status = getInvoiceStatus(record.amount, record.received, record.dueDate);
-      summaryTotals.received += payment;
-      if (previousStatus === "Overdue" && record.status !== "Overdue") {
-        summaryTotals.overdue -= 1;
-      }
-      if (!saveIncomeRecords(records, feedback) || !saveIncomeSummary(summaryTotals, feedback)) {
-        record.received -= payment;
+      if (!saveIncomeRecords(records, feedback)) {
+        record.received = window.FMIS.subMoney(record.received, payment);
         record.status = previousStatus;
-        summaryTotals.received -= payment;
-        if (previousStatus === "Overdue" && record.status !== "Overdue") {
-          summaryTotals.overdue += 1;
-        }
+        record.collections = priorCollections;
         return;
       }
       if (window.FMIS) window.FMIS.logActivity({
@@ -619,7 +554,7 @@ function initializeIncomePage(session) {
 function loadIncomeRecords(feedback) {
   const storedRecords = localStorage.getItem(incomeStorageKey);
   if (storedRecords === null) {
-    return sampleIncomeRecords.map((record) => ({ ...record }));
+    return [];
   }
 
   try {
@@ -640,7 +575,7 @@ function loadIncomeRecords(feedback) {
     feedback.textContent = `Saved income data could not be read: ${error.message}`;
     feedback.hidden = false;
     feedback.classList.add("is-error");
-    return sampleIncomeRecords.map((record) => ({ ...record }));
+    return null;
   }
 }
 
@@ -656,51 +591,11 @@ function saveIncomeRecords(records, feedback) {
   }
 }
 
-function loadIncomeSummary() {
-  const storedSummary = localStorage.getItem("fmisIncomeSummary");
-  if (storedSummary === null) {
-    return { invoiced: 1200000, received: 950000, overdue: 5 };
-  }
-
-  try {
-    const summary = JSON.parse(storedSummary);
-    if (
-      typeof summary.invoiced !== "number" ||
-      typeof summary.received !== "number" ||
-      typeof summary.overdue !== "number" ||
-      summary.invoiced < summary.received ||
-      summary.received < 0 ||
-      summary.overdue < 0
-    ) {
-      throw new TypeError("Saved income summary has an invalid format.");
-    }
-    return summary;
-  } catch (error) {
-    const feedback = document.querySelector("#income-feedback");
-    feedback.textContent = `Saved income summary could not be read: ${error.message}`;
-    feedback.hidden = false;
-    feedback.classList.add("is-error");
-    return { invoiced: 1200000, received: 950000, overdue: 5 };
-  }
-}
-
-function saveIncomeSummary(summary, feedback) {
-  try {
-    localStorage.setItem("fmisIncomeSummary", JSON.stringify(summary));
-    return true;
-  } catch (error) {
-    feedback.textContent = `Income summary could not be saved in this browser: ${error.message}`;
-    feedback.hidden = false;
-    feedback.classList.add("is-error");
-    return false;
-  }
-}
-
 function getInvoiceStatus(amount, received, dueDate) {
   if (received >= amount) {
     return "Received";
   }
-  if (dueDate < new Date().toISOString().slice(0, 10)) {
+  if (dueDate < window.FMIS.todayDate()) {
     return "Overdue";
   }
   if (received > 0) {

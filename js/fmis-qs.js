@@ -1,5 +1,5 @@
 /*
- * fmis-qm.js
+ * fmis-qs.js
  * Shared helpers for the Transaction History and Expenses & Payables modules.
  *  1. Payables helpers - aging buckets and totals for the Payables Register
  *  2. Supporting-document store - keeps the real attached file in IndexedDB so it

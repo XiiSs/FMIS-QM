@@ -75,6 +75,7 @@
                 <option value="cashflow">Cash Flow Report</option>
                 <option value="ar-aging">AR Aging Report</option>
                 <option value="ap-aging">AP Aging Report</option>
+                <option value="ratios">Financial Ratio Analysis</option>
                 <option value="approvals">Payment Approvals</option>
               </select>
             </label>
@@ -117,6 +118,7 @@
           <button type="button" class="report-cat-btn" data-report-cat="cashflow" role="tab" aria-selected="false">Cash Flow Report</button>
           <button type="button" class="report-cat-btn" data-report-cat="ar-aging" role="tab" aria-selected="false">AR Aging Report</button>
           <button type="button" class="report-cat-btn" data-report-cat="ap-aging" role="tab" aria-selected="false">AP Aging Report</button>
+          <button type="button" class="report-cat-btn" data-report-cat="ratios" role="tab" aria-selected="false">Ratio Analysis</button>
           <button type="button" class="report-cat-btn" data-report-cat="approvals" role="tab" aria-selected="false">Payment Approvals</button>
         </div>
 
@@ -142,13 +144,14 @@
         </div>
 
         <p class="report-note">
-          FMIS-QM Consolidated Reporting System. Reconciled directly with underlying transaction records. Prototype values for demonstration.
+          FMIS-QM Consolidated Reporting System. Based on recorded prototype transactions. Prototype values for demonstration.
         </p>
       </main>
     </div>
   </div>
 
   <script src="../js/fmis-core.js" defer></script>
+  <script src="../js/ratio-analysis.js" defer></script>
   <script src="../js/reports.js" defer></script>
 </body>
 </html>

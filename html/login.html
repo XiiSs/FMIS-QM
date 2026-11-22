@@ -8,38 +8,49 @@
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/register.css">
 </head>
+
 <body class="login-page">
   <main class="login-shell">
     <aside class="login-intro" aria-label="FMIS Portal">
       <div class="brand">
         <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M4 21V9l8-5 8 5v12M8 21v-7h8v7M8 10h8M12 4v17"/></svg>
+          <svg viewBox="0 0 24 24">
+            <path d="M4 21V9l8-5 8 5v12M8 21v-7h8v7M8 10h8M12 4v17"/>
+          </svg>
         </span>
-        <span class="brand-copy"><strong>Swift Foods</strong><small></small></span>
+        <span class="brand-copy"><strong>Swift Foods</strong></span>
       </div>
 
       <div class="intro-copy">
         <span class="intro-eyebrow">FINANCIAL MANAGEMENT</span>
         <h1>Financial clarity,<br><span>built for better decisions.</span></h1>
-        <p>Monitor cash, manage transactions and keep every financial workflow moving with confidence.</p>
+        <p>Monitor cash, manage transactions, and review financial reports.</p>
       </div>
 
       <div class="intro-visual" aria-hidden="true">
         <div class="visual-card visual-card-main">
-          <div class="visual-card-head"><span>Cash position</span><small>LIVE</small></div>
+          <div class="visual-card-head">
+            <span>Cash position</span><small>DEMO</small>
+          </div>
           <strong>₱ 5,000,000</strong>
           <svg viewBox="0 0 260 84" preserveAspectRatio="none">
-            <defs><linearGradient id="loginChartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#54d6c5" stop-opacity=".35"/><stop offset="1" stop-color="#54d6c5" stop-opacity="0"/></linearGradient></defs>
-            <path class="visual-chart-fill" d="M0 68 C25 58 38 63 58 48 S90 55 110 38 S145 43 165 27 S200 36 260 8 L260 84 L0 84Z"/>
-            <path class="visual-chart-line" d="M0 68 C25 58 38 63 58 48 S90 55 110 38 S145 43 165 27 S200 36 260 8"/>
+            <defs>
+              <linearGradient id="loginChartFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#54d6c5" stop-opacity=".35"/>
+                <stop offset="1" stop-color="#54d6c5" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path class="visual-chart-fill"
+                  d="M0 68 C25 58 38 63 58 48 S90 55 110 38 S145 43 165 27 S200 36 260 8 L260 84 L0 84Z"/>
+            <path class="visual-chart-line"
+                  d="M0 68 C25 58 38 63 58 48 S90 55 110 38 S145 43 165 27 S200 36 260 8"/>
           </svg>
         </div>
-        <div class="visual-card visual-card-status"><span></span><div><small>System status</small><strong>All modules ready</strong></div></div>
       </div>
 
       <div class="intro-footer">
         <span>SWIFT FOODS, INC.</span>
-        <span>SECURE WORKSPACE <i></i> 2026</span>
+        <span>FMIS <i></i> 2026</span>
       </div>
     </aside>
 
@@ -47,36 +58,77 @@
       <div class="login-form-wrap">
         <header class="login-header">
           <h2 id="welcome-heading">Welcome back</h2>
-          <p>Sign in to access your authorized FMIS workspace.</p>
+          <p id="auth-description">Sign in to access your FMIS workspace.</p>
         </header>
 
-        <form id="login-form" novalidate>
-          <div class="form-field">
-            <label for="email">Email or username</label>
-            <input id="email" name="email" type="text" placeholder="name@swiftfoods.example" autocomplete="username" required>
-          </div>
+        <div id="login-panel">
+          <form id="login-form">
+            <div class="form-field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email"
+                     autocomplete="username" required>
+            </div>
 
-          <div class="form-field">
-            <label for="password">Password</label>
-            <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
-          </div>
+            <div class="form-field">
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password"
+                     autocomplete="current-password" required>
+            </div>
 
-          <p class="form-hint">Credentials are verified before access.</p>
-          <p id="login-status" class="login-status" role="status" aria-live="polite" hidden></p>
-          <p id="login-error" class="login-error" role="alert" aria-live="polite" hidden></p>
+            <p id="login-error" class="login-error" role="alert" hidden></p>
 
-          <button class="sign-in-button" type="submit">
-            <span>Sign in</span>
-            <span aria-hidden="true">→</span>
-          </button>
-        </form>
+            <button class="sign-in-button" type="submit">
+              <span>Sign in</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </form>
 
-        <p class="login-switch">Don't have an account? <a href="signup.html">Create an account</a></p>
-        <p class="prototype-note">Prototype only — no live authentication</p>
+          <p>
+            Don't have an account?
+            <button id="show-register" type="button" aria-controls="register-panel">
+              Create account
+            </button>
+          </p>
+        </div>
+
+        <div id="register-panel" hidden>
+          <form id="register-form">
+            <div class="form-field">
+              <label for="register-name">Full name</label>
+              <input id="register-name" name="fullName" autocomplete="name" required>
+            </div>
+
+            <div class="form-field">
+              <label for="register-email">Email</label>
+              <input id="register-email" name="email" type="email"
+                     autocomplete="email" required>
+            </div>
+
+            <div class="form-field">
+              <label for="register-password">Password</label>
+              <input id="register-password" name="password" type="password"
+                     minlength="8" autocomplete="new-password" required>
+            </div>
+
+            <div class="form-field">
+              <label for="register-confirm">Confirm password</label>
+              <input id="register-confirm" name="confirmPassword" type="password"
+                     minlength="8" autocomplete="new-password" required>
+            </div>
+
+            <button class="sign-in-button" type="submit">Register</button>
+          </form>
+
+          <p><button id="back-to-login" type="button">Back to sign in</button></p>
+        </div>
+
+        <p id="registration-message" role="status"></p>
       </div>
     </section>
   </main>
+
   <script src="../js/fmis-core.js" defer></script>
+  <script src="../js/accounts.js" defer></script>
   <script src="../js/login.js" defer></script>
 </body>
 </html>

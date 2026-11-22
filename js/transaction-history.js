@@ -1,102 +1,3 @@
-const historyExpenseRecords = [
-  {
-    transactionId: "TRX-2026-000042",
-    date: "2026-11-13",
-    customer: "Supplier Co.",
-    invoice: "EXP-2026-0318",
-    type: "Expense",
-    category: "Other Expense",
-    amount: 1200,
-    status: "Pending",
-    description: "Office supplies",
-  },
-  {
-    transactionId: "TRX-2026-000039",
-    date: "2026-11-12",
-    customer: "Local Store",
-    invoice: "EXP-2026-0317",
-    type: "Expense",
-    category: "Utilities",
-    amount: 2450,
-    status: "Overdue",
-    description: "Utilities Expense",
-  },
-  {
-    transactionId: "TRX-2026-000040",
-    date: "2026-11-11",
-    customer: "Online Customer",
-    invoice: "INC-2026-1040",
-    type: "Income",
-    category: "Sales Revenue",
-    amount: 3800,
-    status: "Collected",
-    description: "Online order payment",
-  },
-];
-
-const historyIncomeSamples = [
-  {
-    transactionId: "TRX-2026-000045",
-    date: "2026-10-28",
-    customer: "ABC Corporation",
-    invoice: "INV-2026-1045",
-    type: "Income",
-    category: "Sales Revenue",
-    amount: 15000,
-    received: 15000,
-    status: "Collected",
-    description: "Sales Revenue — ABC Corporation",
-  },
-  {
-    transactionId: "TRX-2026-000044",
-    date: "2026-10-25",
-    customer: "Walk-in Customer",
-    invoice: "INV-2026-1044",
-    type: "Income",
-    category: "Service Income",
-    amount: 2500,
-    received: 2500,
-    status: "Collected",
-    description: "Walk-in service payment",
-  },
-  {
-    transactionId: "TRX-2026-000043",
-    date: "2026-10-20",
-    customer: "XYZ Retailers",
-    invoice: "INV-2026-1043",
-    type: "Income",
-    category: "Product Sales",
-    amount: 8750,
-    received: 8750,
-    status: "Collected",
-    description: "Product sales",
-  },
-  {
-    transactionId: "TRX-2026-000041",
-    date: "2026-10-18",
-    customer: "Local Store",
-    invoice: "INV-2026-1042",
-    type: "Income",
-    category: "Sales Revenue",
-    amount: 5000,
-    received: 2500,
-    status: "Partially Collected",
-    description: "Sales Revenue — Local Store",
-  },
-  {
-    transactionId: "TRX-2026-000038",
-    date: "2026-10-16",
-    customer: "Walk-in Customer",
-    invoice: "INV-2026-1041",
-    type: "Income",
-    category: "Service Income",
-    amount: 1750,
-    received: 0,
-    status: "Pending",
-    description: "Service income",
-  },
-];
-
 function getHistorySession() {
   let session;
 
@@ -251,7 +152,6 @@ function initializeTransactionHistory(session) {
         };
       });
 
-    const income = importedIncome.length ? importedIncome : historyIncomeSamples;
     let savedExpenses;
     try {
       const saved = localStorage.getItem("fmisExpenseRecords");
@@ -282,7 +182,10 @@ function initializeTransactionHistory(session) {
       category: record.category || "Other Expense",
       amount: record.amount,
       dueDate: record.dueDate,
+      documentKey: record.documentKey,
       documentName: record.documentName,
+      paidDate: record.paidDate,
+      bankReference: record.bankReference,
       paymentRequestId: record.paymentRequestId,
       hasStoredRecord: true,
       status: record.payableStatus === "Paid"
@@ -295,7 +198,7 @@ function initializeTransactionHistory(session) {
       description: `${record.payableStatus || "Open"} payable${record.paymentRequestId ? ` · Payment request ${record.paymentRequestId}` : ""}${record.documentName ? ` · Supporting document ${record.documentName}` : ""}`,
     }));
 
-    const allRecords = [...income, ...historyExpenseRecords, ...importedExpenses];
+    const allRecords = [...importedIncome, ...importedExpenses];
     return allRecords.sort((left, right) => right.date.localeCompare(left.date));
   }
 
@@ -475,6 +378,8 @@ function initializeTransactionHistory(session) {
     } else {
       if (record.dueDate) rows.push(["Due date", formatHistoryDate(record.dueDate)]);
       if (record.paymentRequestId) rows.push(["Payment request", record.paymentRequestId]);
+      if (record.paidDate) rows.push(["Payment date", formatHistoryDate(record.paidDate)]);
+      if (record.bankReference) rows.push(["Bank reference", record.bankReference]);
       if (record.documentName) rows.push(["Supporting document", record.documentName]);
     }
     if (record.description) rows.push(["Description", record.description]);
@@ -496,7 +401,7 @@ function initializeTransactionHistory(session) {
       view.className = "qm-button";
       view.textContent = "View supporting document";
       view.addEventListener("click", () => {
-        Q.openDoc(record.transactionId).then((opened) => {
+        Q.openDoc(record.documentKey || record.transactionId).then((opened) => {
           if (!opened) showHistoryError(`${record.documentName} is recorded, but the file itself is not stored in this browser.`);
         }).catch((error) => showHistoryError(error.message));
       });

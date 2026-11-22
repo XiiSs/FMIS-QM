@@ -178,7 +178,7 @@
       const cashDetailEl = document.querySelector("#card-cash-detail");
       if (cashEl) cashEl.textContent = window.FMIS.money(cashMetrics.closingCash);
       if (cashDetailEl) {
-        cashDetailEl.textContent = `Recorded cash (Opening: ${window.FMIS.money(cashMetrics.openingCash, { maximumFractionDigits: 0 })})`;
+        cashDetailEl.textContent = `Demo cash (Opening: ${window.FMIS.money(cashMetrics.openingCash, { maximumFractionDigits: 0 })})`;
       }
 
       // F. Net Operating Result

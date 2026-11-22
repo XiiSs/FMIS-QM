@@ -1,117 +1,120 @@
-const demoAccounts = [
-  // Each demo account is an administrator-level account in this single-admin system.
-  {
-    email: "preparer@fmis.example",
-    password: "Prepare2026!",
-    fullName: "Maria G. Santos",
-    role: "Administrator",
-    permissions: ["dashboard", "income", "transactions", "expenses", "approvals", "budgets", "cashforecast", "reports", "audit"],
-  },
-  {
-    email: "approver@fmis.example",
-    password: "Approve2026!",
-    fullName: "David L. Cruz",
-    role: "Administrator",
-    permissions: ["dashboard", "income", "transactions", "expenses", "approvals", "budgets", "cashforecast", "reports", "audit"],
-  },
-  {
-    email: "management@fmis.example",
-    password: "Manage2026!",
-    fullName: "Maria G. Santos",
-    role: "Administrator",
-    permissions: [
-      "dashboard",
-      "income",
-      "transactions",
-      "expenses",
-      "approvals",
-      "budgets",
-      "cashforecast",
-      "reports",
-      "audit",
-    ],
-  },
-];
-
+const loginPanel = document.querySelector("#login-panel");
 const loginForm = document.querySelector("#login-form");
-const errorMessage = document.querySelector("#login-error");
-const statusMessage = document.querySelector("#login-status");
-const registeredUsersKey = "fmisRegisteredUsers";
+const loginError = document.querySelector("#login-error");
+const loginSubmit = loginForm.querySelector('button[type="submit"]');
 
-const params = new URLSearchParams(window.location.search);
-if (params.get("registered") === "1") {
-  statusMessage.textContent = "Account created. Sign in with your email or username.";
-  statusMessage.hidden = false;
-  document.querySelector("#email").value = params.get("email") || "";
+const registerPanel = document.querySelector("#register-panel");
+const registerForm = document.querySelector("#register-form");
+const registerSubmit = registerForm.querySelector('button[type="submit"]');
+const registerMessage = document.querySelector("#registration-message");
+const showRegisterButton = document.querySelector("#show-register");
+const backToLoginButton = document.querySelector("#back-to-login");
+
+const heading = document.querySelector("#welcome-heading");
+const description = document.querySelector("#auth-description");
+
+function showLoginError(message) {
+  loginError.textContent = message;
+  loginError.hidden = !message;
 }
 
-loginForm.addEventListener("submit", (event) => {
+function showRegistration(show) {
+  loginPanel.hidden = show;
+  registerPanel.hidden = !show;
+  registerMessage.textContent = "";
+  showLoginError("");
+
+  heading.textContent = show ? "Create an account" : "Welcome back";
+  description.textContent = show
+    ? "New registrations receive Administrator access."
+    : "Sign in to access your FMIS workspace.";
+
+  if (show) {
+    registerForm.elements.fullName.focus();
+  } else {
+    loginForm.elements.email.focus();
+  }
+}
+
+showRegisterButton.addEventListener("click", () => showRegistration(true));
+
+backToLoginButton.addEventListener("click", () => {
+  registerForm.reset();
+  showRegistration(false);
+});
+
+loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  sessionStorage.removeItem("fmisSession");
-  errorMessage.hidden = true;
-  errorMessage.textContent = "";
-  statusMessage.hidden = true;
-  statusMessage.textContent = "";
+  if (loginSubmit.disabled) return;
 
-  if (!loginForm.reportValidity()) {
-    return;
-  }
+  showLoginError("");
+  registerMessage.textContent = "";
+  loginSubmit.disabled = true;
+  showRegisterButton.disabled = true;
 
-  const formData = new FormData(loginForm);
-  const identifier = String(formData.get("email")).trim().toLowerCase();
-  const password = String(formData.get("password"));
-  let registeredUsers = [];
   try {
-    const savedUsers = localStorage.getItem(registeredUsersKey);
-    registeredUsers = savedUsers ? JSON.parse(savedUsers) : [];
-    if (!Array.isArray(registeredUsers)) {
-      throw new Error("Stored accounts are not a list.");
+    const { email, password } = Object.fromEntries(new FormData(loginForm));
+    const account = await window.FMISAccounts.authenticate(email, password);
+
+    if (!account) {
+      showLoginError("Email address or password is incorrect.");
+      return;
     }
+
+    sessionStorage.setItem("fmisSession", JSON.stringify(account));
+
+    try {
+      window.FMIS.logActivity({
+        action: "Signed in",
+        module: "Authentication",
+        type: "Authentication",
+        description: "User signed in successfully.",
+      });
+    } catch (error) {
+      sessionStorage.removeItem("fmisSession");
+      throw error;
+    }
+
+    window.location.assign("dashboard.html");
   } catch {
-    errorMessage.textContent =
-      "Saved account data could not be read. Clear this browser's prototype account data and try again.";
-    errorMessage.hidden = false;
+    showLoginError("Unable to sign in. Open FMIS on localhost and try again.");
+  } finally {
+    loginSubmit.disabled = false;
+    showRegisterButton.disabled = false;
+  }
+});
+
+registerForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (registerSubmit.disabled) return;
+
+  const { fullName, email, password, confirmPassword } =
+    Object.fromEntries(new FormData(registerForm));
+
+  if (password !== confirmPassword) {
+    registerMessage.textContent = "Passwords do not match.";
+    registerForm.elements.confirmPassword.focus();
     return;
   }
 
-  const account = demoAccounts.find(
-    (candidate) =>
-      candidate.email === identifier && candidate.password === password,
-  ) || registeredUsers.find(
-    (candidate) =>
-      (candidate.email === identifier || candidate.username === identifier) &&
-      candidate.password === password,
-  );
+  registerSubmit.disabled = true;
+  backToLoginButton.disabled = true;
+  registerMessage.textContent = "";
 
-  if (!account) {
-    errorMessage.textContent =
-      "Email address or password is incorrect. No financial records were opened.";
-    errorMessage.hidden = false;
-    return;
-  }
-
-  sessionStorage.setItem(
-    "fmisSession",
-    JSON.stringify({
-      email: account.email,
-      username: account.username || "",
-      fullName: account.fullName,
-      role: account.role,
-      permissions: account.permissions,
-    }),
-  );
   try {
-    window.FMIS.logActivity({
-      action: "Signed in",
-      module: "Authentication",
-      type: "Authentication",
-      description: "User signed in successfully.",
-    });
+    await window.FMISAccounts.registerAccount({ fullName, email, password });
+
+    registerForm.reset();
+    loginForm.elements.email.value = email.trim().toLowerCase();
+    loginForm.elements.password.value = "";
+
+    showRegistration(false);
+    registerMessage.textContent = "Administrator account created. Enter your password to sign in.";
+    loginForm.elements.password.focus();
   } catch (error) {
-    sessionStorage.removeItem("fmisSession");
-    errorMessage.textContent = `Sign-in succeeded, but the activity could not be recorded: ${error.message}`;
-    errorMessage.hidden = false;
-    return;
+    registerMessage.textContent = error.message;
+  } finally {
+    registerSubmit.disabled = false;
+    backToLoginButton.disabled = false;
   }
-  window.location.assign("dashboard.html");
 });

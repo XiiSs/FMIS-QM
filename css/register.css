@@ -145,3 +145,51 @@
   .register-page .login-content {padding:24px 14px;}
   .register-page .login-header h2 {font-size:26px;}
 }
+
+/* Secondary actions on the login page */
+.login-page #login-panel > p,
+.login-page #register-panel > p {
+  margin: 18px 0 0;
+  color: #526781;
+  font-size: 14px;
+  text-align: center;
+}
+
+.login-page #show-register,
+.login-page #back-to-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 15px;
+  border: 1px solid #b4d8d4;
+  border-radius: 7px;
+  background: #f0f8f7;
+  color: #0b655e;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.login-page #show-register {
+  margin: 4px 0 0 6px;
+}
+
+.login-page #show-register:hover:not(:disabled),
+.login-page #back-to-login:hover:not(:disabled) {
+  background: #def1ef;
+  border-color: #117d74;
+}
+
+.login-page #show-register:focus-visible,
+.login-page #back-to-login:focus-visible {
+  outline: 3px solid #117d74;
+  outline-offset: 3px;
+}
+
+.login-page #show-register:disabled,
+.login-page #back-to-login:disabled {
+  opacity: 0.55;
+  cursor: default;
+}

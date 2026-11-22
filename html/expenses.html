@@ -75,7 +75,7 @@
               </div>
               <div class="revenue-field">
                 <label for="expense-category">Expense Category <span>*</span></label>
-                <div class="revenue-input-with-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 8-8 8-8-8z"/><circle cx="9" cy="9" r="1"/></svg><select id="expense-category" name="category" required><option value="">Select category</option><option>Raw Materials</option><option>Utilities</option><option>Rent</option><option>Transportation</option><option>Salaries</option><option>Office Supplies</option><option>Other Expense</option></select></div>
+                <div class="revenue-input-with-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 8-8 8-8-8z"/><circle cx="9" cy="9" r="1"/></svg><select id="expense-category" name="category" required><option value="">Select category</option><option>Raw Materials</option><option>Operations</option><option>Maintenance</option><option>Utilities</option><option>Rent</option><option>Transportation</option><option>Salaries</option><option>Office Supplies</option><option>Other Expense</option></select></div>
                 <p class="revenue-field-error" data-error-for="category" hidden></p>
               </div>
               <div class="revenue-field">
@@ -137,8 +137,19 @@
       </main>
     </div>
   </div>
+  <dialog id="payable-action-dialog" aria-labelledby="payable-action-title">
+    <form id="payable-action-form">
+      <h2 id="payable-action-title"></h2>
+      <p id="payable-action-note"></p>
+      <label id="payment-date-label">Payment date <input type="date" name="paymentDate"></label>
+      <label id="payment-reference-label">Bank reference <input name="bankReference" maxlength="80"></label>
+      <p id="payable-action-error" role="alert"></p>
+      <button type="submit">Save</button>
+      <button id="cancel-payable-action" type="button">Cancel</button>
+    </form>
+  </dialog>
   <script src="../js/fmis-core.js" defer></script>
-  <script src="../js/fmis-qm.js" defer></script>
+  <script src="../js/fmis-qs.js" defer></script>
   <script src="../js/expenses.js" defer></script>
 </body>
 </html>

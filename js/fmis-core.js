@@ -472,6 +472,7 @@
   }
 
   function money(amount, options = {}) {
+    if (amount === null) return "Unavailable";
     const val = Number(amount) || 0;
     const isNegative = val < 0;
     const minDigits = options.minimumFractionDigits !== undefined
@@ -779,14 +780,66 @@
 
   // Budget & Variance Metrics
   function getBudgetMetrics(periodObj) {
-    const rawBudgets = read(keys.budgets, seedBudgets);
-    const ym = periodObj.ym || (periodObj.start ? periodObj.start.slice(0, 7) : "2026-10");
-    const configured = rawBudgets[ym] || rawBudgets["2026-10"] || [];
-
+        const rawBudgets = read(keys.budgets, seedBudgets);
     const expenseMetrics = getExpenseMetrics(periodObj);
+    const plannedByCategory = new Map();
+    const plannedCategoriesByMonth = new Map();
+    const categoriesByMonth = new Map();
+
+    expenseMetrics.records.forEach(({ date, category }) => {
+      const month = date.slice(0, 7);
+
+      if (!categoriesByMonth.has(month)) {
+        categoriesByMonth.set(month, new Map());
+      }
+
+      const name = category?.trim() || "Other";
+      categoriesByMonth.get(month).set(name.toLowerCase(), name);
+    });
+
+    const months = new Set([
+      ...Object.keys(rawBudgets),
+      ...categoriesByMonth.keys(),
+    ]);
+
+    months.forEach((month) => {
+      const period = parsePeriod(month);
+      if (period.start < periodObj.start || period.end > periodObj.end) return;
+
+      const allocations = rawBudgets[month] || Array.from(
+        categoriesByMonth.get(month)?.values() || [],
+        (category) => ({ category, planned: 10000 }),
+      );
+
+      plannedCategoriesByMonth.set(
+        month,
+        new Set(allocations.map(({ category }) => category.trim().toLowerCase())),
+      );
+
+      allocations.forEach(({ category, planned }) => {
+        plannedByCategory.set(
+          category,
+          addMoney(plannedByCategory.get(category) || 0, planned),
+        );
+      });
+    });
+
+    const configured = Array.from(
+      plannedByCategory,
+      ([category, planned]) => ({ category, planned }),
+    );
+
     const actualsByCat = {};
-    expenseMetrics.byCategory.forEach((item) => {
-      actualsByCat[item.category.toLowerCase()] = item.amount;
+    expenseMetrics.records.forEach((expense) => {
+      const category = expense.category?.trim().toLowerCase() || "other";
+      const month = expense.date.slice(0, 7);
+
+      if (!plannedCategoriesByMonth.get(month)?.has(category)) return;
+
+      actualsByCat[category] = addMoney(
+        actualsByCat[category] || 0,
+        expense.amount,
+      );
     });
 
     let totalPlannedCents = 0;
@@ -828,28 +881,55 @@
   }
 
   // Cash Position & Cash Flow Metrics
+  function todayDate(date = new Date()) {
+    return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0")].join("-");
+  }
+
+  function getCollections(record) {
+    // Existing demo and saved records only tracked a cumulative amount.
+    return record.collections || (record.received > 0 ? [{ date: record.date, amount: record.received }] : []);
+  }
+
+  function paidDate(record) {
+    return record.payableStatus === "Paid" ? record.paidDate || record.date : null;
+  }
+
+  function cashMovement(start, end) {
+    let receipts = 0;
+    let payments = 0;
+    read(keys.income, []).forEach((record) => {
+      getCollections(record).forEach(({ date, amount }) => {
+        if (inDateRange(date, start, end)) receipts += toCents(amount);
+      });
+    });
+    read(keys.expenses, []).forEach((record) => {
+      if (inDateRange(paidDate(record), start, end)) payments += toCents(record.amount);
+    });
+    return { inflows: fromCents(receipts), outflows: fromCents(payments) };
+  }
+
   function getCashFlowMetrics(periodObj) {
-    const openingBalance = 5000000; // Base baseline cash position
-    const incomeMetrics = getIncomeMetrics(periodObj);
-    const expenseMetrics = getExpenseMetrics(periodObj);
-
-    const inflows = incomeMetrics.totalCollected;
-    const outflows = expenseMetrics.paidExpenses;
+    const baseline = { date: "2026-09-01", amount: 5000000 };
+    const start = periodObj.start || baseline.date;
+    const prior = new Date(`${start}T00:00:00`);
+    prior.setDate(prior.getDate() - 1);
+    const before = cashMovement(baseline.date, todayDate(prior));
+    const openingBalance = start >= baseline.date
+      ? addMoney(baseline.amount, subMoney(before.inflows, before.outflows))
+      : null;
+    const { inflows, outflows } = cashMovement(start, periodObj.end);
     const netCashFlow = subMoney(inflows, outflows);
-    const closingBalance = addMoney(openingBalance, netCashFlow);
-
     return {
       openingCash: openingBalance,
-      inflows,
-      outflows,
-      netCashFlow,
-      closingCash: closingBalance,
+      inflows, outflows, netCashFlow,
+      closingCash: openingBalance === null ? null : addMoney(openingBalance, netCashFlow),
     };
   }
 
   // Receivables Aging
   function getReceivablesAging(asOfDate) {
-    const today = asOfDate || new Date().toISOString().slice(0, 10);
+    const today = asOfDate || todayDate();
     const records = read(keys.income, []);
 
     const buckets = [
@@ -862,7 +942,10 @@
     let totalARCents = 0;
 
     records.forEach((r) => {
-      const balCents = Math.max(0, toCents(r.amount) - toCents(r.received));
+      if (r.date > today) return;
+      const collected = getCollections(r).filter((item) => item.date <= today)
+        .reduce((sum, item) => sum + toCents(item.amount), 0);
+      const balCents = Math.max(0, toCents(r.amount) - collected);
       if (balCents <= 0) return;
 
       totalARCents += balCents;
@@ -899,7 +982,7 @@
 
   // Payables Aging
   function getPayablesAging(asOfDate) {
-    const today = asOfDate || new Date().toISOString().slice(0, 10);
+    const today = asOfDate || todayDate();
     const records = read(keys.expenses, []);
 
     const buckets = [
@@ -912,7 +995,7 @@
     let totalAPCents = 0;
 
     records.forEach((r) => {
-      if (r.payableStatus === "Paid") return;
+      if (r.date > today || (paidDate(r) && paidDate(r) <= today)) return;
       const amtCents = toCents(r.amount);
       totalAPCents += amtCents;
       const amt = fromCents(amtCents);
@@ -1003,7 +1086,7 @@
     return [
       {
         category: "Operational / Transactional",
-        name: "Operational Working Capital",
+        name: "Net Receivables Less Payables",
         value: money(opWorkingCapital),
         unit: "PHP (₱)",
         computable: true,
@@ -1011,7 +1094,7 @@
       },
       {
         category: "Operational / Transactional",
-        name: "Operating Revenue Margin",
+        name: "Recorded Revenue Less Expenses (%)",
         value: inc.totalRevenue > 0 ? `${((opResult / inc.totalRevenue) * 100).toFixed(1)}%` : "0.0%",
         unit: "%",
         computable: true,
@@ -1103,7 +1186,7 @@
   // Financial Alerts Engine
   function getAlerts() {
     const alerts = [];
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayDate();
 
     // 1. Low Cash Alert (Threshold ₱3,000,000)
     const forecast = getCashForecast(13, 3000000);
@@ -1193,12 +1276,10 @@
 
   // 13-Week Cash Forecast Engine
   function getCashForecast(weekCount = 13, minimumBalance = 3000000) {
-    const incomeMetrics = getIncomeMetrics(parsePeriod("2026-10"));
-    const expenseMetrics = getExpenseMetrics(parsePeriod("2026-10"));
-    const openingBalance = 5000000 + incomeMetrics.totalCollected - expenseMetrics.paidExpenses;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const openingBalance = getCashFlowMetrics({ start: todayDate(today), end: todayDate(today) }).closingCash;
 
     const weeks = Array.from({ length: weekCount }, (_, index) => {
       const start = new Date(today);
@@ -1219,17 +1300,18 @@
       const dueDate = new Date(`${dateValue}T00:00:00`);
       if (Number.isNaN(dueDate.valueOf())) return;
 
-      const diffMs = dueDate - today;
-      const index = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000));
-      const weekIndex = Math.max(0, index);
-      if (weekIndex < weeks.length) {
+      const weekIndex = weeks.findIndex((week) => dueDate <= week.end);
+      if (weekIndex >= 0) {
         weeks[weekIndex][field] = addMoney(weeks[weekIndex][field], amount);
       }
     }
 
     // Populate from unpaid/partial income receivables
     read(keys.income, []).forEach((r) => {
-      const bal = subMoney(r.amount, r.received);
+      if (r.date > todayDate(today)) return;
+      const collected = getCollections(r).filter(({ date }) => date <= todayDate(today))
+        .reduce((sum, { amount }) => addMoney(sum, amount), 0);
+      const bal = subMoney(r.amount, collected);
       if (bal > 0) {
         addToWeek(r.dueDate || r.date, bal, "receipts");
       }
@@ -1237,20 +1319,15 @@
 
     // Populate from open expense payables
     read(keys.expenses, []).forEach((r) => {
-      if (r.payableStatus !== "Paid" && r.amount > 0) {
+      if (r.date <= todayDate(today) && (!paidDate(r) || paidDate(r) > todayDate(today)) && r.amount > 0) {
         addToWeek(r.dueDate || r.date, r.amount, "payments");
       }
     });
 
-    // If live records have very sparse scheduled receipts/payments, supplement with standard operational projections
-    const baselineReceipts = [1000000, 1300000, 1300000, 1250000, 1150000, 1200000, 1300000, 1100000, 1200000, 1250000, 1300000, 1150000, 1250000];
-    const baselinePayments = [1450000, 1200000, 1400000, 1350000, 1450000, 1500000, 1400000, 1350000, 1350000, 1200000, 1500000, 1400000, 1250000];
-
     let runningCash = openingBalance;
-    return weeks.map((w, idx) => {
-      // Use baseline if schedule has no entries
-      const rec = w.receipts > 0 ? w.receipts : baselineReceipts[idx];
-      const pay = w.payments > 0 ? w.payments : baselinePayments[idx];
+    return weeks.map((w) => {
+      const rec = w.receipts;
+      const pay = w.payments;
       const net = subMoney(rec, pay);
       const close = addMoney(runningCash, net);
 
@@ -1291,6 +1368,15 @@
   }
 
   // Logout listener
+  // Force sign-in again for sessions created by the earlier single-admin prototype.
+  if (
+  typeof sessionStorage !== "undefined" &&
+  getSession()?.role === "Administrator" &&
+  !getSession()?.permissions?.includes("accounts")
+) {
+  sessionStorage.removeItem("fmisSession");
+}
+
   document.addEventListener("click", (event) => {
     const target = event.target;
     if (!(target instanceof Element) || !target.closest('a[href="login.html"]')) return;
@@ -1340,6 +1426,8 @@
     getExpenseMetrics,
     getBudgetMetrics,
     getCashFlowMetrics,
+    getCollections,
+    todayDate,
     getReceivablesAging,
     getPayablesAging,
     getPaymentApprovalMetrics,

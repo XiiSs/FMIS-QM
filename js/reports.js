@@ -87,17 +87,21 @@
     let currentCategory = "summary";
     let activePeriod = window.FMIS.parsePeriod(periodSelect.value);
 
-    // Period selector handler
-    periodSelect.addEventListener("change", () => {
-      if (periodSelect.value === "custom") {
-        customRangeBar.hidden = false;
-        activePeriod = window.FMIS.parsePeriod("custom", startDateInput.value, endDateInput.value);
-      } else {
-        customRangeBar.hidden = true;
-        activePeriod = window.FMIS.parsePeriod(periodSelect.value);
+    function selectReportPeriod() {
+      const custom = periodSelect.value === "custom";
+      customRangeBar.hidden = !custom;
+      if (custom && (!startDateInput.value || !endDateInput.value || startDateInput.value > endDateInput.value)) {
+        showFeedback("Select a valid start and end date.");
+        return false;
       }
-      if (asOfInput) asOfInput.value = activePeriod.end || "Oct 31, 2026";
-      generateCurrentReport();
+      activePeriod = window.FMIS.parsePeriod(periodSelect.value, startDateInput.value, endDateInput.value);
+      return true;
+    }
+
+    [periodSelect, startDateInput, endDateInput].forEach((input) => {
+      input.addEventListener("change", () => {
+        if (selectReportPeriod()) generateCurrentReport();
+      });
     });
 
     // Report Type / Category Dropdown Handler
@@ -131,13 +135,10 @@
     // Generate Form Submit
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      if (periodSelect.value === "custom") {
-        activePeriod = window.FMIS.parsePeriod("custom", startDateInput.value, endDateInput.value);
-      } else {
-        activePeriod = window.FMIS.parsePeriod(periodSelect.value);
-      }
+      if (!selectReportPeriod()) return;
       generateCurrentReport();
-      showFeedback(`Report successfully generated for ${activePeriod.label}.`);
+      showFeedback(currentCategory === "ratios" ? "Historical ratio analysis generated."
+        : `Report successfully generated for ${activePeriod.label}.`);
     });
 
     // Print & Export PDF buttons
@@ -167,6 +168,7 @@
         minute: "numeric",
         second: "numeric",
         hour12: true,
+        timeZone: "Asia/Manila",
       }).format(now);
       if (reportGenTimeEl) reportGenTimeEl.textContent = `${formatted} PHT`;
     }
@@ -205,7 +207,7 @@
             ${createKpiCard("Operating Result", window.FMIS.money(opResult), opResult >= 0 ? "Favorable operational flow" : "Operational deficit", opResult < 0)}
             ${createKpiCard("Accounts Receivable", window.FMIS.money(inc.outstandingAR), `${inc.unpaidCount + inc.partialCount} invoices open`)}
             ${createKpiCard("Accounts Payable", window.FMIS.money(exp.outstandingAP), `${exp.openCount} payables open`)}
-            ${createKpiCard("Cash Position", window.FMIS.money(cash.closingCash), "Recorded cash balance")}
+            ${createKpiCard("Cash Position", window.FMIS.money(cash.closingCash), "Calculated demo balance")}
           </div>
         </div>
 
@@ -414,7 +416,7 @@
                 <tr>
                   <th>Closing Cash Balance</th>
                   <th class="report-amount-cell" style="font-size:14px;color:#0e3556;">${window.FMIS.money(cash.closingCash)}</th>
-                  <th>Recorded ending liquidity</th>
+                  <th>Calculated demo balance</th>
                 </tr>
               </tfoot>
             </table>
@@ -473,7 +475,7 @@
         <div class="report-section">
           <div class="report-summary-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
             ${createKpiCard("Total Invoiced", window.FMIS.money(inc.totalRevenue), `${inc.invoiceCount} invoices`)}
-            ${createKpiCard("Total Collected", window.FMIS.money(inc.totalCollected), "Cash collections")}
+            ${createKpiCard("Collected on Selected Invoices", window.FMIS.money(inc.totalCollected), "See Cash Flow for collections by receipt date")}
             ${createKpiCard("Outstanding AR", window.FMIS.money(inc.outstandingAR), `${inc.unpaidCount + inc.partialCount} invoices pending`)}
             ${createKpiCard("Fully Paid", String(inc.paidCount), "Invoices fully settled")}
             ${createKpiCard("Partially Paid", String(inc.partialCount), "Invoices with balances")}
@@ -613,6 +615,10 @@
     function renderBudgetReport() {
       updateReportHeader("Budget Allocation vs. Actual Expenditure Report");
       const budget = window.FMIS.getBudgetMetrics(activePeriod);
+      if (!budget.categories.length) {
+        reportBodyEl.innerHTML = "<p>No budget configured for this reporting period.</p>";
+        return;
+      }
 
       reportBodyEl.innerHTML = `
         <div class="report-section">
@@ -683,7 +689,7 @@
             ${createKpiCard("Cash Inflows", window.FMIS.money(cash.inflows), "Actual collections")}
             ${createKpiCard("Cash Outflows", window.FMIS.money(cash.outflows), "Settled payments")}
             ${createKpiCard("Net Cash Flow", `${cash.netCashFlow < 0 ? "−" : "+"}${window.FMIS.money(Math.abs(cash.netCashFlow))}`, "Inflows − Outflows")}
-            ${createKpiCard("Closing Cash", window.FMIS.money(cash.closingCash), "Recorded ending balance")}
+            ${createKpiCard("Closing Cash", window.FMIS.money(cash.closingCash), "Calculated demo balance")}
           </div>
         </div>
 
@@ -730,7 +736,7 @@
     // 6. AR Aging Report
     function renderARAgingReport() {
       updateReportHeader("Accounts Receivable Aging Schedule");
-      const aging = window.FMIS.getReceivablesAging();
+      const aging = window.FMIS.getReceivablesAging(activePeriod.end);
 
       reportBodyEl.innerHTML = `
         <div class="report-section">
@@ -807,7 +813,7 @@
     // 7. AP Aging Report
     function renderAPAgingReport() {
       updateReportHeader("Accounts Payable Aging Schedule");
-      const aging = window.FMIS.getPayablesAging();
+      const aging = window.FMIS.getPayablesAging(activePeriod.end);
 
       reportBodyEl.innerHTML = `
         <div class="report-section">
@@ -979,8 +985,16 @@
       `;
     }
 
-    // Switch between the 8 report categories
+    // Render the selected report category
     function generateCurrentReport() {
+      if (asOfInput) asOfInput.value = activePeriod.end || "";
+      if (currentCategory === "ratios") {
+        updateReportHeader("Financial Ratio Analysis");
+        if (reportPeriodEl) reportPeriodEl.textContent = "2014–September 2026";
+        if (asOfInput) asOfInput.value = "Sep. 30, 2026";
+        window.renderRatioAnalysis(reportBodyEl);
+        return;
+      }
       switch (currentCategory) {
         case "summary":
           renderConsolidatedSummary();
