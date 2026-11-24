@@ -24,6 +24,7 @@
       return;
     }
 
+    document.querySelector(".dashboard-content").classList.add("role-dashboard");
     const permissions = new Set(session.permissions);
     const fullName = window.FMIS.getDisplayName(session);
     const initials = window.FMIS.getInitials(fullName);
@@ -67,6 +68,15 @@
         }
       });
     }
+
+    if (session.role !== "Management / Read-only") {
+      const render = () => renderWorkDashboard(session);
+      render();
+      window.addEventListener("storage", render);
+      return;
+    }
+
+    document.querySelector(".dashboard-content").classList.add("management-dashboard");
 
     // Period selectors
     const periodSelect = document.querySelector("#report-period");
@@ -116,6 +126,18 @@
     function renderDashboard() {
       if (!window.FMIS) return;
       updateTimestamp();
+      const forecast = window.FMIS.getCashForecast();
+      const firstLow = forecast.find((week) => week.low);
+      const weekThirteen = window.FMIS.money(forecast[forecast.length - 1].closing);
+      document.querySelector("#dashboard-forecast-value").textContent = weekThirteen;
+      const outlook = document.querySelector("#dashboard-liquidity-outlook");
+      outlook.textContent = firstLow
+        ? `Below the ₱3 million minimum in Week ${firstLow.week}`
+        : "All 13 weeks meet the ₱3 million minimum";
+      outlook.dataset.tone = firstLow ? "warning" : "success";
+      if (document.querySelector("#dashboard-liquidity-ratios").childElementCount === 0) {
+        window.renderLiquiditySummary(document.querySelector("#dashboard-liquidity-ratios"));
+      }
 
       if (periodBadge) periodBadge.textContent = activePeriod.label;
 
@@ -518,6 +540,191 @@
 
     // Listen to localStorage events from other tabs/workspaces
     window.addEventListener("storage", renderDashboard);
+  }
+
+  function renderWorkDashboard(session) {
+    const { keys, read, money, recordOwner, assignedApprover, getCollections, todayDate } = window.FMIS;
+    const email = session.email.toLowerCase();
+    const requests = read(keys.requests, []);
+    const main = document.querySelector(".dashboard-content");
+    const alerts = document.querySelector("#topbar-alerts-link");
+    if (alerts) alerts.remove();
+    const workspaces = {
+      "Finance Preparer": ["Finance workspace", "Record invoices, collections, and expenses.", "New invoice", "income.html"],
+      "Approver": ["Approval workspace", "Review assigned payment requests and track your decisions.", "Open approval queue", "approvals.html"],
+      "Administrator": ["Administration", "Manage user accounts and budget allocations.", "Open budgets", "budgets.html"],
+    };
+    const [title, description, action, actionUrl] = workspaces[session.role] || ["Dashboard", "", "", ""];
+    const header = document.createElement("header");
+    header.className = "role-hero";
+    const intro = document.createElement("div");
+    const heading = document.createElement("h2");
+    heading.textContent = title;
+    const subtitle = document.createElement("p");
+    subtitle.textContent = description;
+    intro.append(heading, subtitle);
+    const primary = document.createElement("a");
+    primary.className = "role-primary";
+    primary.href = actionUrl;
+    primary.textContent = action;
+    header.append(intro);
+    if (actionUrl) header.append(primary);
+
+    const metrics = document.createElement("div");
+    metrics.className = "role-metrics";
+    const grid = document.createElement("div");
+    grid.className = "role-activity";
+    main.dataset.workspace = session.role === "Approver" ? "approval" : session.role === "Administrator" ? "admin" : "finance";
+    main.replaceChildren(header, metrics, grid);
+
+    function addMetric(label, value, tone) {
+      const card = document.createElement("article");
+      card.className = "role-metric";
+      card.dataset.tone = tone;
+      const caption = document.createElement("span");
+      caption.textContent = label;
+      const number = document.createElement("strong");
+      number.textContent = value;
+      card.append(caption, number);
+      metrics.append(card);
+    }
+
+    function addPanel(label, entries, href, linkText, emptyText = "No activity yet.") {
+      const panel = document.createElement("section");
+      panel.className = "role-panel";
+      const panelHeader = document.createElement("header");
+      const heading = document.createElement("h3");
+      heading.textContent = label;
+      panelHeader.append(heading);
+      if (href) {
+        const link = document.createElement("a");
+        link.href = href;
+        link.textContent = linkText;
+        panelHeader.append(link);
+      }
+      panel.append(panelHeader);
+      if (entries.length) {
+        const list = document.createElement("ul");
+        list.className = "role-rows";
+        for (const [title, detail, value, tone] of entries.slice(0, 5)) {
+          const item = document.createElement("li");
+          const identity = document.createElement("div");
+          const name = document.createElement("strong");
+          name.textContent = title;
+          identity.append(name);
+          if (detail) {
+            const metadata = document.createElement("small");
+            metadata.textContent = detail;
+            identity.append(metadata);
+          }
+          item.append(identity);
+          if (value) {
+            const trailing = document.createElement("span");
+            trailing.className = tone ? "role-status" : "role-row-value";
+            if (tone) trailing.dataset.tone = tone;
+            trailing.textContent = value;
+            item.append(trailing);
+          }
+          list.append(item);
+        }
+        panel.append(list);
+      } else if (emptyText) {
+        const empty = document.createElement("p");
+        empty.className = "role-empty";
+        empty.textContent = emptyText;
+        panel.append(empty);
+      }
+      grid.append(panel);
+      return panel;
+    }
+
+    const statusTone = (status) => ({
+      Approved: "success", Paid: "success", Rejected: "danger",
+      "Returned for Correction": "warning", Overdue: "danger",
+    })[status] || "info";
+
+    if (session.role === "Finance Preparer") {
+      const income = read(keys.income, []);
+      const invoices = income.filter((record) => recordOwner(record, "income") === email);
+      const expenses = read(keys.expenses, []).filter((record) => recordOwner(record, "expense") === email);
+      const collections = income.flatMap((record) => getCollections(record)
+        .filter((entry) => (entry.createdByEmail || recordOwner(record, "income")).toLowerCase() === email)
+        .map((entry) => ({ ...entry, invoice: record.invoice })))
+        .sort((left, right) => right.date.localeCompare(left.date));
+      const ownRequests = requests.filter((request) => request.preparedByEmail?.toLowerCase() === email);
+      const returned = ownRequests.filter((request) => request.status === "Returned for Correction");
+      addMetric("My invoices", invoices.length, "info");
+      addMetric("My collections", collections.length, "success");
+      addMetric("My expenses", expenses.length, "info");
+      addMetric("Returned for correction", returned.length, returned.length ? "warning" : "success");
+
+      const invoiceRows = invoices.map((record) => [record.customer, record.invoice, money(record.amount)]);
+      const expenseRows = expenses.map((record) => [record.vendor, record.expenseId, money(record.amount)]);
+      addPanel("Recent invoices", invoiceRows, "income.html", "Open income", "Your saved invoices will appear here.");
+      addPanel("Payment requests", [...returned, ...ownRequests.filter((request) => !returned.includes(request))]
+        .map((request) => [request.vendor || request.requestId, request.requestId, request.status, statusTone(request.status)]),
+        "expenses.html", "View payables", "Your submitted payment requests will appear here.");
+      addPanel("Recent collections", collections.map((entry) => [entry.invoice, entry.date, money(entry.amount)]),
+        "income.html#collections", "Open collections", "Your recorded payments will appear here.");
+      addPanel("Recent expenses", expenseRows, "expenses.html", "Open expenses", "Your saved expenses will appear here.");
+    } else if (session.role === "Approver") {
+      const pending = requests.filter((request) => assignedApprover(request) === email &&
+        ["Pending Approval", "Submitted"].includes(request.status))
+        .sort((left, right) => (left.dueDate || "9999").localeCompare(right.dueDate || "9999"));
+      const upcoming = new Date();
+      upcoming.setDate(upcoming.getDate() + 7);
+      const dueSoon = pending.filter((request) => request.dueDate && request.dueDate <= todayDate(upcoming));
+      const decisions = requests.flatMap((request) => (request.history || [])
+        .filter((entry) => entry.account?.toLowerCase() === email &&
+          ["Approved", "Rejected", "Returned for Correction"].includes(entry.action))
+        .map((entry) => ({ ...entry, requestId: request.requestId })))
+        .sort((left, right) => String(right.at).localeCompare(String(left.at)));
+      const today = todayDate();
+      const overdue = pending.filter((request) => request.dueDate && request.dueDate < today);
+      addMetric("Assigned to me", pending.length, "info");
+      addMetric("Due in 7 days or overdue", dueSoon.length, dueSoon.length ? "warning" : "success");
+      addMetric("Overdue", overdue.length, overdue.length ? "danger" : "success");
+      addMetric("My decisions", decisions.length, "info");
+      addPanel("Requests awaiting review", pending.map((request) => [
+        request.vendor || request.requestId,
+        [request.requestId, request.dueDate && `Due ${request.dueDate}`].filter(Boolean).join(" · "),
+        money(request.amount),
+      ]), "approvals.html", "View queue", "You have no assigned requests awaiting review.");
+      addPanel("Recent decisions", decisions.map((entry) => [
+        entry.requestId, String(entry.at || entry.date || "").slice(0, 10), entry.action, statusTone(entry.action),
+      ]), "approvals.html?status=all", "View history", "Your approval decisions will appear here.");
+    } else if (session.role === "Administrator") {
+      metrics.hidden = true;
+      const accounts = addPanel("User accounts", read("fmisUserAccounts", []).map((account) =>
+        [account.fullName, account.email, account.role, "info"]), "", "", "");
+      const form = document.createElement("form");
+      form.className = "work-account-form";
+      form.innerHTML = `
+        <label>Full name <input name="fullName" required autocomplete="off"></label>
+        <label>Email <input name="email" type="email" required autocomplete="off"></label>
+        <label>Temporary password <input name="password" type="password" minlength="8" required autocomplete="new-password"></label>
+        <label>Role <select name="role"></select></label>
+        <button type="submit">Create user</button>
+        <p role="status"></p>`;
+      form.elements.role.replaceChildren(...window.FMISAccounts.roles.map((role) => new Option(role)));
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const button = form.querySelector("button");
+        const feedback = form.querySelector('[role="status"]');
+        button.disabled = true;
+        try {
+          await window.FMISAccounts.createAccount(Object.fromEntries(new FormData(form)));
+          renderWorkDashboard(session);
+          main.querySelector('[role="status"]').textContent = "Account created.";
+        } catch (error) {
+          feedback.textContent = error.message;
+        } finally {
+          button.disabled = false;
+        }
+      });
+      accounts.append(form);
+      addPanel("Budget configuration", [], "budgets.html", "Open budgets", "Configure and review budget allocations.");
+    }
   }
 
   if (document.readyState === "loading") {

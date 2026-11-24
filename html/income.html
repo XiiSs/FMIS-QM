@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="income-page">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,7 +28,7 @@
       <div class="sidebar-user">
         <span class="user-avatar user-avatar-small" aria-hidden="true"></span>
         <span class="sidebar-user-name" id="sidebar-user-name"></span>
-        <a class="sidebar-logout" href="login.html" aria-label="Sign out" title="Sign out"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5m5-3 4-4-4-4m4 4H9"/></svg></a>
+
       </div>
     </aside>
 
@@ -43,7 +43,11 @@
         <span class="profile-toggle" aria-hidden="true">⌄</span>
       </header>
 
-      <main class="income-content">
+      <main class="income-content module-workspace" data-module-tone="finance">
+        <section class="module-hero">
+          <div><h2>Income workspace</h2><p>Create invoices, review balances, and record customer collections.</p></div>
+        </section>
+
         <nav class="income-tabs" aria-label="Income sections" role="tablist">
           <button id="tab-record" class="income-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="record-view" data-income-tab="record">Record Income</button>
           <button id="tab-invoices" class="income-tab" type="button" role="tab" aria-selected="false" aria-controls="invoices-view" data-income-tab="invoices" tabindex="-1">Invoice List</button>
@@ -57,67 +61,74 @@
           <div class="income-top-grid">
             <section class="dashboard-panel invoice-form-panel" aria-labelledby="invoice-form-title">
               <h2 id="invoice-form-title">Record Income / Create Invoice</h2>
-              <form id="invoice-form" class="invoice-form">
-                <div class="income-field">
-                  <label for="customer">Customer / Source <span class="required-mark">*</span></label>
-                  <select id="customer" name="customer" required>
-                    <option value="">Select customer</option>
-                    <option>ABC Retail</option>
-                    <option>DEF Mart</option>
-                    <option>GHI Supermarket</option>
-                    <option>JKL Traders</option>
-                    <option>MNO Wholesaler</option>
-                    <option>Other customer</option>
-                  </select>
+              <form id="invoice-form" class="invoice-form checkout-form">
+                <div class="checkout-details">
+                  <h3>Invoice details</h3>
+                  <div class="income-field">
+                    <label for="customer">Customer / Source <span class="required-mark">*</span></label>
+                    <select id="customer" name="customer" required>
+                      <option value="">Select customer</option>
+                      <option>ABC Retail</option>
+                      <option>DEF Mart</option>
+                      <option>GHI Supermarket</option>
+                      <option>JKL Traders</option>
+                      <option>MNO Wholesaler</option>
+                      <option>Other customer</option>
+                    </select>
+                  </div>
+                  <div class="income-field">
+                    <label for="category">Category <span class="required-mark">*</span></label>
+                    <select id="category" name="category" required>
+                      <option value="">Select category</option>
+                      <option>Product Sales</option>
+                      <option>Service Income</option>
+                      <option>Other Income</option>
+                    </select>
+                  </div>
+                  <div class="income-field">
+                    <label for="invoice-reference">Invoice Reference</label>
+                    <input id="invoice-reference" type="text" value="Assigned on save" readonly>
+                  </div>
+                  <div class="income-field">
+                    <label for="description">Description <span class="required-mark">*</span></label>
+                    <div class="description-input"><textarea id="description" name="description" rows="2" maxlength="255" placeholder="Enter description of the income" required></textarea><span id="description-count">0/255</span></div>
+                  </div>
+                  <div class="income-field">
+                    <label for="invoice-date">Invoice Date <span class="required-mark">*</span></label>
+                    <input id="invoice-date" name="invoiceDate" type="date" required>
+                  </div>
+                  <div class="income-field">
+                    <label for="delivery-date">Delivery Date <span class="required-mark">*</span></label>
+                    <input id="delivery-date" name="deliveryDate" type="date" required>
+                  </div>
+                  <div class="income-field">
+                    <label for="expected-collection-date">Expected Collection Date</label>
+                    <input id="expected-collection-date" name="expectedCollectionDate" type="date">
+                    <small>Defaults to delivery date for the cash forecast.</small>
+                  </div>
                 </div>
-                <div class="income-field">
-                  <label for="category">Category <span class="required-mark">*</span></label>
-                  <select id="category" name="category" required>
-                    <option value="">Select category</option>
-                    <option>Product Sales</option>
-                    <option>Service Income</option>
-                    <option>Other Income</option>
-                  </select>
-                </div>
-                <div class="income-field">
-                  <label for="invoice-reference">Invoice Reference <span class="required-mark">*</span></label>
-                  <div class="reference-input"><span id="invoice-prefix">INV-year-</span><input id="invoice-reference" name="invoiceReference" type="text" inputmode="numeric" placeholder="e.g. 1046" required maxlength="20"></div>
-                </div>
-                <div class="income-field">
-                  <label for="description">Description <span class="required-mark">*</span></label>
-                  <div class="description-input"><textarea id="description" name="description" rows="2" maxlength="255" placeholder="Enter description of the income" required></textarea><span id="description-count">0/255</span></div>
-                </div>
-                <div class="income-field">
-                  <label for="invoice-date">Invoice Date <span class="required-mark">*</span></label>
-                  <input id="invoice-date" name="invoiceDate" type="date" required>
-                </div>
-                <div class="income-field">
-                  <label for="amount-received">Amount Received (₱)</label>
-                  <input id="amount-received" name="amountReceived" type="number" min="0" step="0.01" value="0.00">
-                </div>
-                <div class="income-field">
-                  <label for="due-date">Due Date <span class="required-mark">*</span></label>
-                  <input id="due-date" name="dueDate" type="date" required>
-                </div>
-                <div class="income-field">
-                  <label for="invoice-status">Invoice Status <span class="required-mark">*</span></label>
-                  <select id="invoice-status" name="invoiceStatus" required>
-                    <option value="Invoiced">Invoiced</option>
-                    <option value="Partially Paid">Partially Paid</option>
-                    <option value="Received">Received</option>
-                  </select>
-                </div>
-                <div class="income-field">
-                  <label for="invoice-amount">Invoice Amount (₱) <span class="required-mark">*</span></label>
-                  <input id="invoice-amount" name="invoiceAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required>
-                </div>
-                <div class="income-field balance-field">
-                  <label for="outstanding-balance">Outstanding Balance (₱)</label>
-                  <input id="outstanding-balance" name="outstandingBalance" type="text" value="0.00" readonly aria-live="polite">
-                </div>
-                <div class="form-actions">
-                  <button class="income-button income-button-secondary" id="reset-invoice" type="reset">Reset</button>
-                  <button class="income-button income-button-primary" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h12l3 3v13H5z"/><path d="M8 4v6h8V4m-8 16v-6h8v6"/></svg>Save Invoice</button>
+                <div class="checkout-payment">
+                  <h3>Payment summary</h3>
+                  <div class="income-field">
+                    <label for="invoice-amount">Invoice Amount (₱) <span class="required-mark">*</span></label>
+                    <input id="invoice-amount" name="invoiceAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+                  </div>
+                  <div class="income-field">
+                    <label for="amount-received">Down Payment (₱)</label>
+                    <input id="amount-received" name="amountReceived" type="number" min="0" step="0.01" value="0.00">
+                  </div>
+                  <div class="income-field balance-field">
+                    <label for="outstanding-balance">Amount Remaining (₱)</label>
+                    <input id="outstanding-balance" name="outstandingBalance" type="text" value="0.00" readonly aria-live="polite">
+                  </div>
+                  <div class="income-field">
+                    <label for="invoice-status">Invoice Status</label>
+                    <input id="invoice-status" type="text" value="Invoiced" readonly>
+                  </div>
+                  <div class="form-actions">
+                    <button class="income-button income-button-secondary" id="reset-invoice" type="reset">Reset</button>
+                    <button class="income-button income-button-primary" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h12l3 3v13H5z"/><path d="M8 4v6h8V4m-8 16v-6h8v6"/></svg>Save Invoice</button>
+                  </div>
                 </div>
               </form>
             </section>

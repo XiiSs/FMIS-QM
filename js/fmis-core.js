@@ -886,6 +886,37 @@
       String(date.getDate()).padStart(2, "0")].join("-");
   }
 
+  const demoPreparer = "preparer@fmis.example";
+  const demoApprover = "approver@fmis.example";
+
+  function recordOwner(record, kind) {
+    if (record.createdByEmail) return record.createdByEmail.toLowerCase();
+    const seedRecords = kind === "income" ? seedIncomeRecords : seedExpenseRecords;
+    const key = kind === "income" ? "invoice" : "expenseId";
+    return seedRecords.some((seed) => seed[key] === record[key]) ? demoPreparer : "";
+  }
+
+  function assignedApprover(request) {
+    return (request.assignedApproverEmail || demoApprover).toLowerCase();
+  }
+
+  function expectedCollectionDate(record) {
+    return record.expectedCollectionDate || record.dueDate || record.deliveryDate || "";
+  }
+
+  function nextInvoiceId(date, records) {
+    const prefix = `INV-${date.slice(0, 4)}-`;
+    const sequence = records.reduce((max, record) => {
+      const reference = record.invoice.toUpperCase();
+      const suffix = reference.slice(prefix.length);
+      const number = Number(suffix);
+      return reference.startsWith(prefix) && /^\d+$/.test(suffix) &&
+        Number.isSafeInteger(number) && number < Number.MAX_SAFE_INTEGER
+        ? Math.max(max, number) : max;
+    }, 0);
+    return prefix + String(sequence + 1).padStart(4, "0");
+  }
+
   function getCollections(record) {
     // Existing demo and saved records only tracked a cumulative amount.
     return record.collections || (record.received > 0 ? [{ date: record.date, amount: record.received }] : []);
@@ -939,6 +970,7 @@
       { key: "d61", label: "61+ Days Overdue", count: 0, amount: 0, records: [] },
     ];
 
+    const undated = { key: "undated", label: "Collection Date Unscheduled", count: 0, amount: 0, records: [] };
     let totalARCents = 0;
 
     records.forEach((r) => {
@@ -950,10 +982,16 @@
 
       totalARCents += balCents;
       const bal = fromCents(balCents);
-      const dueDate = r.dueDate || r.date;
+      const dueDate = expectedCollectionDate(r);
       const diffDays = Math.round((new Date(`${today}T00:00:00`) - new Date(`${dueDate}T00:00:00`)) / 86400000);
 
       let bucketIdx = 0;
+      if (!dueDate) {
+        undated.count++;
+        undated.amount = addMoney(undated.amount, bal);
+        undated.records.push({ ...r, balance: bal, daysOverdue: 0 });
+        return;
+      }
       if (diffDays <= 0) {
         bucketIdx = 0;
       } else if (diffDays <= 30) {
@@ -976,7 +1014,7 @@
     return {
       asOfDate: today,
       totalAR: fromCents(totalARCents),
-      buckets,
+      buckets: undated.count ? [...buckets, undated] : buckets,
     };
   }
 
@@ -1292,10 +1330,11 @@
         end,
         receipts: 0,
         payments: 0,
+        items: [],
       };
     });
 
-    function addToWeek(dateValue, amount, field) {
+    function addToWeek(dateValue, amount, field, reference, party) {
       if (typeof dateValue !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) return;
       const dueDate = new Date(`${dateValue}T00:00:00`);
       if (Number.isNaN(dueDate.valueOf())) return;
@@ -1303,6 +1342,7 @@
       const weekIndex = weeks.findIndex((week) => dueDate <= week.end);
       if (weekIndex >= 0) {
         weeks[weekIndex][field] = addMoney(weeks[weekIndex][field], amount);
+        weeks[weekIndex].items.push({ date: dateValue, amount, field, reference, party });
       }
     }
 
@@ -1313,14 +1353,14 @@
         .reduce((sum, { amount }) => addMoney(sum, amount), 0);
       const bal = subMoney(r.amount, collected);
       if (bal > 0) {
-        addToWeek(r.dueDate || r.date, bal, "receipts");
+        addToWeek(expectedCollectionDate(r), bal, "receipts", r.invoice, r.customer);
       }
     });
 
     // Populate from open expense payables
     read(keys.expenses, []).forEach((r) => {
       if (r.date <= todayDate(today) && (!paidDate(r) || paidDate(r) > todayDate(today)) && r.amount > 0) {
-        addToWeek(r.dueDate || r.date, r.amount, "payments");
+        addToWeek(r.dueDate || r.date, r.amount, "payments", r.expenseId, r.vendor);
       }
     });
 
@@ -1367,6 +1407,35 @@
     };
   }
 
+  document.addEventListener("DOMContentLoaded", () => {
+    const header = document.querySelector(".dashboard-topbar");
+    const avatar = header?.querySelector(".user-avatar");
+    const profile = header?.querySelector(".topbar-user");
+    const toggle = header?.querySelector(".profile-toggle");
+    if (!avatar || !profile || !toggle) return;
+
+    const menu = document.createElement("details");
+    menu.className = "profile-menu";
+    const summary = document.createElement("summary");
+    summary.setAttribute("aria-label", "Account menu");
+    const logout = document.createElement("a");
+    logout.href = "login.html";
+    logout.textContent = "Log out";
+    avatar.before(menu);
+    summary.append(avatar, profile, toggle);
+    menu.append(summary, logout);
+
+    document.addEventListener("click", (event) => {
+      if (!menu.contains(event.target)) menu.open = false;
+    });
+    menu.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menu.open) {
+        menu.open = false;
+        summary.focus();
+      }
+    });
+  });
+
   // Logout listener
   // Force sign-in again for sessions created by the earlier single-admin prototype.
   if (
@@ -1393,7 +1462,7 @@
       }
       sessionStorage.removeItem("fmisSession");
     }
-  });
+  }, { capture: true });
 
   function escapeHtml(str) {
     if (str === null || str === undefined) return "";
@@ -1427,6 +1496,10 @@
     getBudgetMetrics,
     getCashFlowMetrics,
     getCollections,
+    recordOwner,
+    assignedApprover,
+    expectedCollectionDate,
+    nextInvoiceId,
     todayDate,
     getReceivablesAging,
     getPayablesAging,

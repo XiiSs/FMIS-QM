@@ -198,7 +198,9 @@ function initializeIncomePage(session) {
         action.title = `View ${record.invoice}`;
         action.setAttribute("aria-label", `View ${record.invoice}`);
         action.addEventListener("click", () => {
-          showFeedback(`${record.invoice} · ${record.customer} · ${record.description}`);
+          const payments = window.FMIS.getCollections(record).map(({ id, date, amount }) =>
+            `${id ? id + " · " : ""}${formatDate(date)} · ${formatMoney(amount)}`).join(" | ");
+          showFeedback(`${record.invoice} · ${record.customer} · Delivery: ${formatDate(record.deliveryDate)} · ${record.description}${payments ? " · Collections: " + payments : ""}`);
         });
         cell.append(action);
       }
@@ -254,7 +256,7 @@ function initializeIncomePage(session) {
     const { records: periodRecords, totalRevenue: invoiced, totalCollected: received,
       outstandingAR: outstanding } = window.FMIS.getIncomeMetrics(period);
     const overdue = periodRecords.filter((record) =>
-      record.dueDate < window.FMIS.todayDate() && record.received < record.amount).length;
+      (record.dueDate || record.expectedCollectionDate || "9999") < window.FMIS.todayDate() && record.received < record.amount).length;
     const hasPeriodData = periodRecords.length > 0;
     document.querySelector("#summary-period").textContent = summaryPeriodSelect.selectedOptions[0].textContent;
     document.querySelector(".income-summary-list").hidden = !hasPeriodData;
@@ -363,12 +365,22 @@ function initializeIncomePage(session) {
   const amountReceivedInput = document.querySelector("#amount-received");
   const balanceInput = document.querySelector("#outstanding-balance");
   const invoiceStatusSelect = document.querySelector("#invoice-status");
-  const dueDateInput = document.querySelector("#due-date");
+  const invoiceDateInput = document.querySelector("#invoice-date");
+  invoiceDateInput.value = window.FMIS.todayDate();
+
+  function createCollection(date, amount) {
+    return {
+      id: `PAY-${date.slice(0, 4)}-${crypto.randomUUID().toUpperCase()}`,
+      date,
+      amount,
+      createdByEmail: session.email,
+    };
+  }
 
   function updateInvoiceBalance() {
     const amount = Number(invoiceAmountInput.value) || 0;
     const received = Number(amountReceivedInput.value) || 0;
-    balanceInput.value = formatMoney(Math.max(0, amount - received));
+    balanceInput.value = window.FMIS.money(Math.max(0, window.FMIS.subMoney(amount, received)), { maximumFractionDigits: 2 });
     amountReceivedInput.max = String(amount);
     if (amount > 0) {
       invoiceStatusSelect.value = received >= amount
@@ -376,6 +388,8 @@ function initializeIncomePage(session) {
         : received > 0
           ? "Partially Paid"
           : "Invoiced";
+    } else {
+      invoiceStatusSelect.value = "Invoiced";
     }
   }
 
@@ -383,7 +397,8 @@ function initializeIncomePage(session) {
   amountReceivedInput.addEventListener("input", updateInvoiceBalance);
   form.addEventListener("reset", () => {
     window.setTimeout(() => {
-      balanceInput.value = "₱ 0";
+      invoiceDateInput.value = window.FMIS.todayDate();
+      updateInvoiceBalance();
       document.querySelector("#description-count").textContent = "0/255";
       showFeedback("");
     }, 0);
@@ -404,35 +419,37 @@ function initializeIncomePage(session) {
     const formData = new FormData(form);
     const amount = Number(formData.get("invoiceAmount"));
     const received = Number(formData.get("amountReceived")) || 0;
-    const invoiceSuffix = String(formData.get("invoiceReference")).trim();
     if (!Number.isFinite(amount) || !Number.isFinite(received) || amount <= 0 || received < 0 || received > amount) {
       showFeedback("Enter a valid invoice amount and a received amount no greater than the invoice total.", true);
       return;
     }
-    if (String(formData.get("dueDate")) < String(formData.get("invoiceDate"))) {
-      showFeedback("The due date must fall on or after the invoice date.", true);
+    const invoiceDate = String(formData.get("invoiceDate"));
+    const deliveryDate = String(formData.get("deliveryDate"));
+    const expectedCollectionDate = String(formData.get("expectedCollectionDate") || "");
+    if (received > 0 && invoiceDate > window.FMIS.todayDate()) {
+      showFeedback("A down payment can only be recorded for today or an earlier date.", true);
       return;
     }
-    const invoice = invoiceSuffix.startsWith("INV-")
-      ? invoiceSuffix
-      : `INV-${String(formData.get("invoiceDate")).slice(0, 4)}-${invoiceSuffix}`;
-
-    if (records.some((record) => record.invoice.toLowerCase() === invoice.toLowerCase())) {
-      showFeedback("That invoice reference already exists. Enter a unique reference.", true);
+    if (deliveryDate < invoiceDate || (expectedCollectionDate && expectedCollectionDate < invoiceDate)) {
+      showFeedback("Delivery and expected collection dates must fall on or after the invoice date.", true);
       return;
     }
+    const invoice = window.FMIS.nextInvoiceId(invoiceDate, records);
+    const downPayment = received > 0 ? createCollection(invoiceDate, received) : null;
 
     const newRecord = {
       date: String(formData.get("invoiceDate")),
       invoice,
+      transactionId: invoice,
       customer: String(formData.get("customer")),
       category: String(formData.get("category")),
       description: String(formData.get("description")).trim(),
       amount,
       received,
-      collections: received > 0 ? [{ date: String(formData.get("invoiceDate")), amount: received }] : [],
-      status: getInvoiceStatus(amount, received, String(formData.get("dueDate"))),
-      dueDate: String(formData.get("dueDate")),
+      collections: downPayment ? [downPayment] : [],
+      status: getInvoiceStatus(amount, received),
+      deliveryDate,
+      expectedCollectionDate,
       createdAt: new Date().toISOString(),
       createdBy: fullName,
       createdByEmail: session.email,
@@ -501,9 +518,10 @@ function initializeIncomePage(session) {
       }
       const previousStatus = record.status;
       const priorCollections = record.collections;
-      record.collections = [...window.FMIS.getCollections(record), { date: collectionForm.elements.collectionDate.value, amount: payment }];
+      const collection = createCollection(collectionForm.elements.collectionDate.value, payment);
+      record.collections = [...window.FMIS.getCollections(record), collection];
       record.received = window.FMIS.addMoney(record.received, payment);
-      record.status = getInvoiceStatus(record.amount, record.received, record.dueDate);
+      record.status = getInvoiceStatus(record.amount, record.received, record.dueDate || record.expectedCollectionDate);
       if (!saveIncomeRecords(records, feedback)) {
         record.received = window.FMIS.subMoney(record.received, payment);
         record.status = previousStatus;
@@ -512,7 +530,7 @@ function initializeIncomePage(session) {
       }
       if (window.FMIS) window.FMIS.logActivity({
         action: "Recorded customer collection",
-        reference: invoice,
+        reference: collection.id,
         before: previousStatus,
         after: record.status,
         type: "Income",
@@ -538,9 +556,12 @@ function initializeIncomePage(session) {
     }));
   });
 
+  updateInvoiceBalance();
   renderRows();
+  if (location.hash === "#collections") selectTab("collections");
 
   function formatDate(dateString) {
+    if (!dateString) return "—";
     const [year, month, day] = dateString.split("-").map(Number);
     return new Intl.DateTimeFormat("en", {
       month: "short",
@@ -595,7 +616,7 @@ function getInvoiceStatus(amount, received, dueDate) {
   if (received >= amount) {
     return "Received";
   }
-  if (dueDate < window.FMIS.todayDate()) {
+  if (dueDate && dueDate < window.FMIS.todayDate()) {
     return "Overdue";
   }
   if (received > 0) {
@@ -605,13 +626,15 @@ function getInvoiceStatus(amount, received, dueDate) {
 }
 
 function exportIncomeRecords(records) {
-  const columns = ["Date", "Invoice No.", "Customer / Source", "Category", "Description", "Invoice Amount (PHP)", "Amount Received (PHP)", "Outstanding Balance (PHP)", "Status"];
+  const columns = ["Date", "Delivery Date", "Expected Collection Date", "Invoice No.", "Customer / Source", "Category", "Description", "Invoice Amount (PHP)", "Amount Received (PHP)", "Outstanding Balance (PHP)", "Status"];
   const escapeCell = (value) => {
     const safeValue = String(value).replace(/^[=+\-@]/, "'$&");
     return `"${safeValue.replace(/"/g, '""')}"`;
   };
   const rows = records.map((record) => [
     record.date,
+    record.deliveryDate || "",
+    window.FMIS.expectedCollectionDate(record),
     record.invoice,
     record.customer,
     record.category,

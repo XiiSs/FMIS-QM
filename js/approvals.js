@@ -82,7 +82,10 @@ function initializeApprovals(session) {
     }
   });
 
-  const requestSelect = document.querySelector("#approval-request-select");
+  const queueRows = document.querySelector("#request-queue-rows");
+  const requestSearch = document.querySelector("#request-search");
+  const requestStatus = document.querySelector("#request-status");
+  if (new URLSearchParams(location.search).get("status") === "all") requestStatus.value = "all";
   const feedback = document.querySelector("#approval-feedback");
   const historyBody = document.querySelector("#approval-history-rows");
   const historyEmpty = document.querySelector("#approval-history-empty");
@@ -186,31 +189,59 @@ function initializeApprovals(session) {
     return status === "Submitted" ? "Pending Approval" : status || "Pending Approval";
   }
 
-  function populateRequestSelect() {
-    requestSelect.replaceChildren();
-    if (!requests.length) {
-      const option = document.createElement("option");
-      option.value = "";
-      option.textContent = "No payment requests available";
-      requestSelect.append(option);
-      currentRequest = null;
-      renderRequest();
-      return;
-    }
+  function populateQueue(preferredId = currentRequest?.requestId) {
+    const query = requestSearch.value.trim().toLowerCase();
+    const status = requestStatus.value;
+    const visible = requests.filter((request) => {
+      if (isApprover && window.FMIS.assignedApprover(request) !== email) return false;
+      const matchesStatus = status === "all" || (status === "pending"
+        ? ["Pending Approval", "Submitted"].includes(request.status)
+        : request.status === status);
+      const fields = [request.requestId, request.vendor || relatedExpense(request)?.vendor, request.preparedBy];
+      return matchesStatus && fields.some((field) => String(field || "").toLowerCase().includes(query));
+    }).sort((left, right) => String(right.submittedAt || "").localeCompare(String(left.submittedAt || "")));
 
-    requests
-      .slice()
-      .sort((left, right) => String(right.submittedAt || "").localeCompare(String(left.submittedAt || "")))
-      .forEach((request) => {
-        const option = document.createElement("option");
-        option.value = request.requestId;
-        option.textContent = `${request.requestId} · ${request.vendor || relatedExpense(request)?.vendor || "Vendor"} · ${displayStatus(request.status)}`;
-        requestSelect.append(option);
+    document.querySelector("#request-queue-count").textContent =
+      `${visible.length} ${visible.length === 1 ? "request" : "requests"}`;
+    currentRequest = visible.find((request) => request.requestId === preferredId) || visible[0] || null;
+    queueRows.replaceChildren(...visible.map((request) => {
+      const expense = relatedExpense(request);
+      const row = document.createElement("tr");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "work-row-button";
+      button.textContent = request.requestId;
+      button.setAttribute("aria-pressed", String(request === currentRequest));
+      button.addEventListener("click", () => {
+        currentRequest = request;
+        queueRows.querySelectorAll("button").forEach((control) =>
+          control.setAttribute("aria-pressed", String(control === button)));
+        feedback.hidden = true;
+        decisionComment.value = "";
+        decisionComment.setCustomValidity("");
+        renderRequest();
       });
-
-    const pending = requests.find((request) => ["Pending Approval", "Submitted"].includes(request.status));
-    requestSelect.value = (pending || requests[0]).requestId;
-    currentRequest = requests.find((request) => request.requestId === requestSelect.value) || null;
+      const values = [
+        button, request.vendor || expense?.vendor, window.FMIS.money(request.amount ?? expense?.amount),
+        request.preparedBy || request.preparedByEmail, window.FMIS.assignedApprover(request),
+        formatDate(request.submittedAt || request.requestedDate),
+        formatDate(request.dueDate || expense?.dueDate), displayStatus(request.status),
+      ];
+      values.forEach((value, index) => {
+        const cell = document.createElement("td");
+        if (index === 0) cell.append(value);
+        else if (index === values.length - 1) {
+          const badge = document.createElement("span");
+          badge.className = "queue-status";
+          badge.dataset.status = value.toLowerCase().replace(/[^a-z]+/g, "-");
+          badge.textContent = value;
+          cell.append(badge);
+        } else cell.textContent = value || "—";
+        row.append(cell);
+      });
+      return row;
+    }));
+    document.querySelector("#request-queue-empty").hidden = visible.length > 0;
     renderRequest();
   }
 
@@ -352,6 +383,10 @@ function initializeApprovals(session) {
     }
     if (!storageReady || !currentRequest) {
       showFeedback("Approval data is unavailable. No decision was recorded.", true);
+      return;
+    }
+    if (window.FMIS.assignedApprover(currentRequest) !== email) {
+      showFeedback("This payment request is assigned to another approver.", true);
       return;
     }
     const expense = relatedExpense(currentRequest);
@@ -496,10 +531,7 @@ function initializeApprovals(session) {
 
     currentRequest = updatedRequest;
     decisionComment.value = "";
-    populateRequestSelect();
-    requestSelect.value = updatedRequest.requestId;
-    currentRequest = updatedRequest;
-    renderRequest();
+    populateQueue(updatedRequest.requestId);
     showFeedback(`${action} recorded for ${updatedRequest.requestId}. No money was transferred.`);
   }
 
@@ -515,12 +547,8 @@ function initializeApprovals(session) {
     }
   });
 
-  requestSelect.addEventListener("change", () => {
-    currentRequest = requests.find((request) => request.requestId === requestSelect.value) || null;
-    feedback.hidden = true;
-    decisionComment.value = "";
-    renderRequest();
-  });
+  requestSearch.addEventListener("input", () => populateQueue());
+  requestStatus.addEventListener("change", () => populateQueue());
   approveButton.addEventListener("click", () => persistDecision("Approved", "Approved"));
   rejectButton.addEventListener("click", () => persistDecision("Rejected", "Rejected"));
   returnButton.addEventListener("click", () => persistDecision("Returned for Correction", "Returned for Correction"));
@@ -538,5 +566,5 @@ function initializeApprovals(session) {
     }), text);
   }
 
-  populateRequestSelect();
+  populateQueue();
 }

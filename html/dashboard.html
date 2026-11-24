@@ -60,9 +60,7 @@
       <div class="sidebar-user">
         <span class="user-avatar user-avatar-small" aria-hidden="true"></span>
         <span class="sidebar-user-name" id="sidebar-user-name"></span>
-        <a class="sidebar-logout" href="login.html" aria-label="Sign out" title="Sign out">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5m5-3 4-4-4-4m4 4H9"/></svg>
-        </a>
+
       </div>
     </aside>
 
@@ -89,7 +87,7 @@
         <!-- 1. Dashboard Header Section -->
         <section class="dashboard-heading" aria-labelledby="dashboard-title">
           <div>
-            <h2 id="dashboard-title">Financial Dashboard</h2>
+            <h2 id="dashboard-title">Financial overview</h2>
             <p>Overview of financial performance and current financial position.</p>
             <div class="dashboard-header-meta">
               <span class="dashboard-period-badge" id="dashboard-period-badge">October 2026</span>
@@ -121,6 +119,20 @@
           </label>
           <button type="submit" class="custom-range-apply-btn">Apply Period</button>
         </form>
+
+        <section class="management-liquidity" aria-label="Liquidity outlook and historical indicators">
+          <article class="management-forecast">
+            <h3>13-week liquidity outlook</h3>
+            <p class="management-forecast-number" id="dashboard-forecast-value"></p>
+            <p class="management-forecast-caption">Projected closing cash · Week 13</p>
+            <p id="dashboard-liquidity-outlook"></p>
+            <a href="cashforecast.html">Open cash forecast</a>
+          </article>
+          <article class="role-panel management-ratios">
+            <header><h3>Historical liquidity</h3><a href="reports.html?view=ratios">Full ratio analysis</a></header>
+            <dl class="dashboard-liquidity-ratios" id="dashboard-liquidity-ratios"></dl>
+          </article>
+        </section>
 
         <p id="period-empty" class="period-empty" role="status" hidden>
           No transaction records found for the selected reporting period. Showing empty baseline state.
@@ -309,6 +321,8 @@
   </div>
 
   <script src="../js/fmis-core.js" defer></script>
+  <script src="../js/accounts.js" defer></script>
+  <script src="../js/ratio-analysis.js" defer></script>
   <script src="../js/dashboard.js" defer></script>
 </body>
 </html>

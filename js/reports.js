@@ -494,7 +494,7 @@
                   <th>Customer</th>
                   <th>Category</th>
                   <th>Description</th>
-                  <th>Due Date</th>
+                  <th>Delivery Date</th>
                   <th>Invoice Amount</th>
                   <th>Amount Received</th>
                   <th>Outstanding Balance</th>
@@ -511,7 +511,7 @@
                       <td>${r.customer}</td>
                       <td>${r.category}</td>
                       <td>${r.description || "-"}</td>
-                      <td>${r.dueDate || "-"}</td>
+                      <td>${window.FMIS.escapeHtml(r.deliveryDate || "—")}</td>
                       <td class="report-amount-cell">${window.FMIS.money(r.amount)}</td>
                       <td class="report-amount-cell">${window.FMIS.money(r.received)}</td>
                       <td class="report-amount-cell"><strong>${window.FMIS.money(bal)}</strong></td>
@@ -777,7 +777,7 @@
                   <th>Invoice No.</th>
                   <th>Customer</th>
                   <th>Date</th>
-                  <th>Due Date</th>
+                  <th>Expected Collection Date</th>
                   <th>Days Overdue</th>
                   <th>Outstanding Balance</th>
                   <th>Aging Bucket</th>
@@ -794,7 +794,7 @@
                       <td><strong>${r.invoice}</strong></td>
                       <td>${r.customer}</td>
                       <td>${r.date}</td>
-                      <td>${r.dueDate || "-"}</td>
+                      <td>${window.FMIS.escapeHtml(window.FMIS.expectedCollectionDate(r) || "—")}</td>
                       <td style="text-align:center;color:${r.daysOverdue > 0 ? "#b42318;" : "#5b6b80;"}">
                         ${r.daysOverdue > 0 ? `${r.daysOverdue} days` : "Current"}
                       </td>
@@ -1028,8 +1028,11 @@
       }
     }
 
-    // Initial render
-    generateCurrentReport();
+    if (new URLSearchParams(location.search).get("view") === "ratios") {
+      document.querySelector('[data-report-cat="ratios"]').click();
+    } else {
+      generateCurrentReport();
+    }
   }
 
   if (document.readyState === "loading") {

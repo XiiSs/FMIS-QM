@@ -146,6 +146,9 @@
 
   window.FMISAccounts = {
     authenticate,
+    listApprovers: () => [...demoAccounts, ...getAccounts()]
+      .filter(({ role }) => role === "Approver")
+      .map(({ fullName, email }) => ({ fullName, email })),
     canCreateAccounts,
     createAccount: (details) => saveAccount(details, true),
     registerAccount: ({ fullName, email, password }) =>

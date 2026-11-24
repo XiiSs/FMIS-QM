@@ -147,6 +147,8 @@ function initializeTransactionHistory(session) {
           amount: record.amount,
           received: record.received,
           dueDate: record.dueDate,
+          deliveryDate: record.deliveryDate,
+          expectedCollectionDate: record.expectedCollectionDate,
           status,
           description: record.description || `${category} — ${record.customer}`,
         };
@@ -211,7 +213,7 @@ function initializeTransactionHistory(session) {
     if (record.received >= record.amount) {
       return "Collected";
     }
-    if (record.dueDate && record.dueDate < formatDateValue(new Date())) {
+    if ((record.expectedCollectionDate || record.dueDate || "9999") < formatDateValue(new Date())) {
       return "Overdue";
     }
     if (record.received > 0) {
@@ -376,7 +378,9 @@ function initializeTransactionHistory(session) {
       rows.push(["Amount received", `₱${moneyFormat.format(received)}`]);
       rows.push(["Balance due", `₱${moneyFormat.format(Math.max(0, record.amount - received))}`]);
     } else {
-      if (record.dueDate) rows.push(["Due date", formatHistoryDate(record.dueDate)]);
+      if (record.deliveryDate) rows.push(["Delivery date", formatHistoryDate(record.deliveryDate)]);
+      if (record.deliveryDate) rows.push(["Expected collection date", formatHistoryDate(record.expectedCollectionDate || record.deliveryDate)]);
+      if (record.dueDate) rows.push([record.type === "Income" ? "Original collection due date" : "Due date", formatHistoryDate(record.dueDate)]);
       if (record.paymentRequestId) rows.push(["Payment request", record.paymentRequestId]);
       if (record.paidDate) rows.push(["Payment date", formatHistoryDate(record.paidDate)]);
       if (record.bankReference) rows.push(["Bank reference", record.bankReference]);

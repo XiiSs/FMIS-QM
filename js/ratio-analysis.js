@@ -1,5 +1,22 @@
 // Historical figures transcribed from Section IV of the Swift Foods proposal.
-window.renderRatioAnalysis = function (host) {
+(() => {
+  const liquiditySnapshot = [
+    ["Current ratio", "0.18 · September 30, 2026"],
+    ["Working capital", "−₱45.3 million · September 30, 2026"],
+    ["Cash ratio", "0.16 · FY2025 (latest available in the proposal)"],
+  ];
+
+  window.renderLiquiditySummary = function (host) {
+    host.replaceChildren(...liquiditySnapshot.flatMap(([label, value]) => {
+      const term = document.createElement("dt");
+      term.textContent = label;
+      const description = document.createElement("dd");
+      description.textContent = value;
+      return [term, description];
+    }));
+  };
+
+  window.renderRatioAnalysis = function (host) {
   const periods = ["2014", "2015", "2016", "FY2023", "FY2024", "FY2025", "Sep. 30, 2026"];
   const rows = [
     ["Liquidity", "Current ratio", "Current assets ÷ current liabilities", "0.65|0.61|0.57|0.49|0.31|0.27|0.18"],
@@ -62,3 +79,4 @@ window.renderRatioAnalysis = function (host) {
   rangeSelect.addEventListener("change", renderRows);
   renderRows();
 };
+})();

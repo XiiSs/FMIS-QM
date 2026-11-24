@@ -30,7 +30,7 @@
       <div class="sidebar-user">
         <span class="user-avatar user-avatar-small" aria-hidden="true"></span>
         <span class="sidebar-user-name" id="sidebar-user-name"></span>
-        <a class="sidebar-logout" href="login.html" aria-label="Sign out" title="Sign out"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5m5-3 4-4-4-4m4 4H9"/></svg></a>
+
       </div>
     </aside>
 
@@ -45,9 +45,9 @@
         <span class="profile-toggle" aria-hidden="true">⌄</span>
       </header>
 
-      <main class="history-content">
+      <main class="history-content module-workspace" data-module-tone="finance">
         <div class="history-breadcrumb"><a href="dashboard.html">Transaction History</a></div>
-        <section class="history-heading">
+        <section class="history-heading module-hero">
           <span class="history-heading-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 3"/></svg></span>
           <div><h2>Transaction History</h2><p>View and manage all income and expense transactions.</p></div>
           <a class="history-new-revenue" href="income.html" data-permission="transactions">＋ Record Income</a>
@@ -63,10 +63,6 @@
             <label class="history-filter"><span>Status / Collection Status</span><span class="history-filter-control"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg><select id="history-status" aria-label="Transaction or collection status"><option value="">All Statuses</option><option>Collected</option><option>Pending</option><option>Partially Collected</option><option>Overdue</option><option>Payment Requested</option><option>Paid</option></select></span></label>
           </div>
           <div class="history-custom-range" id="history-custom-range" hidden>
-  <label>From<input id="history-from" type="date" aria-label="From date"></label>
-  <label>To<input id="history-to" type="date" aria-label="To date"></label>
-</div>
-<div class="history-custom-range" id="history-custom-range" hidden>
   <label>From<input id="history-from" type="date" aria-label="From date"></label>
   <label>To<input id="history-to" type="date" aria-label="To date"></label>
 </div>

@@ -35,6 +35,10 @@ function initializeExpensePage(session) {
   const fullName = window.FMIS.getDisplayName(session);
   const initials = window.FMIS.getInitials(fullName);
   const canEdit = session.role === "Finance Preparer";
+  const approverSelect = document.querySelector("#assigned-approver");
+  approverSelect.replaceChildren(...window.FMISAccounts.listApprovers()
+    .map(({ fullName, email }) => new Option(fullName, email)));
+  approverSelect.disabled = !canEdit;
 
   document.querySelector("#profile-name").textContent = fullName;
   document.querySelector("#profile-role").textContent = session.role;
@@ -506,6 +510,7 @@ function initializeExpensePage(session) {
       comments: "",
       preparedBy: window.FMIS.getDisplayName(session),
       preparedByEmail: session.email,
+      assignedApproverEmail: approverSelect.value,
       preparedRole: session.role,
       submittedAt: new Date().toISOString(),
       history: [{
@@ -878,11 +883,11 @@ function createExpenseId(year, records) {
 
 function createPaymentRequestId(year, requests) {
   const numbers = requests
-    .map((request) => request.requestId.match(new RegExp(`^PAY-${year}-(\\d+)$`)))
+    .map((request) => request.requestId.match(new RegExp(`^REQ-${year}-(\\d+)$`)))
     .filter(Boolean)
     .map((match) => Number(match[1]));
   const nextNumber = numbers.length ? Math.max(...numbers) + 1 : 1;
-  return `PAY-${year}-${String(nextNumber).padStart(5, "0")}`;
+  return `REQ-${year}-${String(nextNumber).padStart(5, "0")}`;
 }
 
 function formatDateValue(date) {

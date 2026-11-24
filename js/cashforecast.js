@@ -70,6 +70,30 @@ function renderCashForecast() {
   const totalPayments = weeks.reduce((total, week) => window.FMIS.addMoney(total, week.payments), 0);
   const lowWeeks = weeks.filter((week) => week.low);
   const lastWeek = weeks[weeks.length - 1];
+  const firstLow = lowWeeks[0];
+  const weekSelect = document.querySelector("#forecast-week");
+  const details = document.querySelector("#forecast-week-items");
+  weekSelect.replaceChildren(...weeks.map((week) =>
+    new Option(`Week ${week.week} · ${formatForecastDate(week.start)} to ${formatForecastDate(week.end)}`, week.week)));
+  weekSelect.value = firstLow?.week || 1;
+  const renderWeek = () => {
+    const week = weeks[Number(weekSelect.value) - 1];
+    const items = week.items.slice().sort((left, right) => left.date.localeCompare(right.date));
+    details.replaceChildren(...items.map((entry) => {
+      const item = document.createElement("li");
+      const movement = entry.field === "receipts" ? "Expected collection" : "Planned payment";
+      item.textContent = `${entry.date} · ${movement} · ${entry.reference} · ${entry.party} · ${window.FMIS.money(entry.amount)}`;
+      return item;
+    }));
+    if (!items.length) {
+      const item = document.createElement("li");
+      item.textContent = "No receipts or payments scheduled.";
+      details.append(item);
+    }
+  };
+  weekSelect.addEventListener("change", renderWeek);
+  renderWeek();
+  window.renderLiquiditySummary(document.querySelector("#forecast-liquidity-ratios"));
 
   document.querySelector("#cashflow-opening").textContent = currency.format(openingBalance);
   document.querySelector("#cashflow-receipts").textContent = currency.format(totalReceipts);
@@ -127,7 +151,7 @@ function renderCashForecast() {
     const firstLowWeek = lowWeeks[0].week;
     const lowWeekLabels = lowWeeks.map((week) => week.week).join(", ");
     const warningText =
-      `Low Cash Warning: Projected closing cash falls below ${currency.format(minimumBalance)} in Week${lowWeeks.length === 1 ? "" : "s"} ${lowWeekLabels}. The first affected week closes at ${currency.format(weeks[firstLowWeek - 1].closing)}.`;
+      `Low Cash Warning: Projected closing cash falls below ${currency.format(minimumBalance)} in Week${lowWeeks.length === 1 ? "" : "s"} ${lowWeekLabels}. Week ${firstLowWeek} closes at ${currency.format(firstLow.closing)} and needs ${currency.format(window.FMIS.subMoney(minimumBalance, firstLow.closing))} to reach the minimum.`;
     document.querySelector("#cashflow-chart-alert-text").textContent =
       `Below minimum in week${lowWeeks.length === 1 ? "" : "s"} ${lowWeekLabels}`;
     chartAlert.hidden = false;
