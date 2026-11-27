@@ -51,7 +51,7 @@
         <section class="revenue-heading expense-heading module-hero">
           <span class="revenue-heading-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 3h12l4 4v14H4z"/><path d="M8 3v6h8V3m-8 18v-6h8v6"/><circle cx="18" cy="17" r="5"/><path d="M18 14.5v5m1.7-3.5c0-1.3-3.4-1.3-3.4 0s3.4.8 3.4 2-3.4 1.3-3.4 0"/></svg></span>
           <div><h2>Record Expenses and Payables</h2><p>Record a new expense and track the related expense/payable record.</p></div>
-          <span class="expense-role-badge">Role: <strong id="expense-role-badge">Finance Preparer</strong></span>
+          <span class="expense-role-badge">Role: <strong id="expense-role-badge">Bookkeeper</strong></span>
         </section>
 
         <section class="dashboard-panel revenue-entry-panel expense-entry-panel" aria-labelledby="expense-information-title">
@@ -84,9 +84,8 @@
                 <p class="revenue-field-error" data-error-for="dueDate" hidden></p>
               </div>
               <div class="revenue-field">
-                <label for="expense-reference">Reference / Invoice No. <span>*</span></label>
-                <div class="revenue-input-with-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5m-9 4h5m-5 4h5"/></svg><input id="expense-reference" name="reference" type="text" placeholder="INV-88214" maxlength="40" required></div>
-                <p class="revenue-field-error" data-error-for="reference" hidden></p>
+                <label for="expense-reference">Reference / Invoice No.</label>
+                <div class="revenue-input-with-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5m-9 4h5m-5 4h5"/></svg><input id="expense-reference" type="text" value="Assigned on save" readonly></div>
               </div>
               <div class="revenue-field expense-document-field">
                 <label for="expense-document">Supporting Document <span>*</span></label>

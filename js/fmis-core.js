@@ -283,16 +283,16 @@
       requestedDate: "2026-10-27",
       documentName: "supreme-packaging-311.pdf",
       status: "Submitted",
-      preparedBy: "Finance Preparer",
+      preparedBy: "Bookkeeper",
       preparedByEmail: "preparer@fmis.example",
-      preparedRole: "Finance Preparer",
+      preparedRole: "Bookkeeper",
       submittedAt: "2026-10-27T09:30:00.000Z",
       comments: "Payment request for packing materials supply.",
       history: [
         {
           at: "2026-10-27T09:30:00.000Z",
-          user: "Finance Preparer",
-          role: "Finance Preparer",
+          user: "Bookkeeper",
+          role: "Bookkeeper",
           action: "Submitted",
           status: "Pending Approval",
           comments: "Payment request created separately after payable was saved.",
@@ -309,9 +309,9 @@
       requestedDate: "2026-10-10",
       documentName: "heavyduty-job-order.pdf",
       status: "Approved",
-      preparedBy: "Finance Preparer",
+      preparedBy: "Bookkeeper",
       preparedByEmail: "preparer@fmis.example",
-      preparedRole: "Finance Preparer",
+      preparedRole: "Bookkeeper",
       submittedAt: "2026-10-10T14:15:00.000Z",
       decidedBy: "Approver",
       decidedByRole: "Approver",
@@ -320,8 +320,8 @@
       history: [
         {
           at: "2026-10-10T14:15:00.000Z",
-          user: "Finance Preparer",
-          role: "Finance Preparer",
+          user: "Bookkeeper",
+          role: "Bookkeeper",
           action: "Submitted",
           status: "Pending Approval",
           comments: "Submitted.",
@@ -346,9 +346,9 @@
       requestedDate: "2026-10-02",
       documentName: "water-district-receipt.pdf",
       status: "Approved",
-      preparedBy: "Finance Preparer",
+      preparedBy: "Bookkeeper",
       preparedByEmail: "preparer@fmis.example",
-      preparedRole: "Finance Preparer",
+      preparedRole: "Bookkeeper",
       submittedAt: "2026-10-02T10:00:00.000Z",
       decidedBy: "Approver",
       decidedByRole: "Approver",
@@ -366,9 +366,9 @@
       requestedDate: "2026-10-08",
       documentName: "packaging-batch-1.pdf",
       status: "Returned for Correction",
-      preparedBy: "Finance Preparer",
+      preparedBy: "Bookkeeper",
       preparedByEmail: "preparer@fmis.example",
-      preparedRole: "Finance Preparer",
+      preparedRole: "Bookkeeper",
       submittedAt: "2026-10-08T16:00:00.000Z",
       decidedBy: "Approver",
       decidedByRole: "Approver",
@@ -386,9 +386,9 @@
       requestedDate: "2026-10-06",
       documentName: "freight-quote.pdf",
       status: "Rejected",
-      preparedBy: "Finance Preparer",
+      preparedBy: "Bookkeeper",
       preparedByEmail: "preparer@fmis.example",
-      preparedRole: "Finance Preparer",
+      preparedRole: "Bookkeeper",
       submittedAt: "2026-10-06T11:30:00.000Z",
       decidedBy: "Approver",
       decidedByRole: "Approver",
@@ -435,10 +435,16 @@
   }
   initializeSeeds();
 
+  // Recognize the old role label in existing sessions, accounts and activity records.
+  function normalizeStoredRole(key, value) {
+    const roleFields = ["role", "preparedRole", "createdByRole", "decidedByRole", "preparedBy", "user"];
+    return value === "Finance Preparer" && roleFields.includes(key) ? "Bookkeeper" : value;
+  }
+
   /* ---------- Storage Read/Write ---------- */
   function read(key, fallback) {
     try {
-      const value = JSON.parse(localStorage.getItem(key));
+      const value = JSON.parse(localStorage.getItem(key), normalizeStoredRole);
       return Array.isArray(value) || (value && typeof value === "object") ? value : (fallback || []);
     } catch {
       return fallback || [];
@@ -501,7 +507,7 @@
   /* ---------- Session & User Identification ---------- */
   function getSession() {
     try {
-      return JSON.parse(sessionStorage.getItem("fmisSession"));
+      return JSON.parse(sessionStorage.getItem("fmisSession"), normalizeStoredRole);
     } catch {
       return null;
     }
@@ -1487,6 +1493,7 @@
     money,
     formatPercent,
     getSession,
+    normalizeStoredRole,
     getDisplayName,
     getInitials,
     logActivity,

@@ -2,7 +2,7 @@ function getHistorySession() {
   let session;
 
   try {
-    session = JSON.parse(sessionStorage.getItem("fmisSession"));
+    session = window.FMIS.getSession();
   } catch {
     sessionStorage.removeItem("fmisSession");
   }

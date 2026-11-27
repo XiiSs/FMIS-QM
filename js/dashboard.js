@@ -8,7 +8,7 @@
   function initDashboard() {
     let session;
     try {
-      session = JSON.parse(sessionStorage.getItem("fmisSession"));
+      session = window.FMIS.getSession();
     } catch {
       sessionStorage.removeItem("fmisSession");
     }
@@ -550,7 +550,7 @@
     const alerts = document.querySelector("#topbar-alerts-link");
     if (alerts) alerts.remove();
     const workspaces = {
-      "Finance Preparer": ["Finance workspace", "Record invoices, collections, and expenses.", "New invoice", "income.html"],
+      "Bookkeeper": ["Finance workspace", "Record invoices, collections, and expenses.", "New invoice", "income.html"],
       "Approver": ["Approval workspace", "Review assigned payment requests and track your decisions.", "Open approval queue", "approvals.html"],
       "Administrator": ["Administration", "Manage user accounts and budget allocations.", "Open budgets", "budgets.html"],
     };
@@ -643,7 +643,7 @@
       "Returned for Correction": "warning", Overdue: "danger",
     })[status] || "info";
 
-    if (session.role === "Finance Preparer") {
+    if (session.role === "Bookkeeper") {
       const income = read(keys.income, []);
       const invoices = income.filter((record) => recordOwner(record, "income") === email);
       const expenses = read(keys.expenses, []).filter((record) => recordOwner(record, "expense") === email);
@@ -702,7 +702,7 @@
       form.innerHTML = `
         <label>Full name <input name="fullName" required autocomplete="off"></label>
         <label>Email <input name="email" type="email" required autocomplete="off"></label>
-        <label>Temporary password <input name="password" type="password" minlength="8" required autocomplete="new-password"></label>
+        <label>Password <input name="password" type="password" minlength="8" required autocomplete="new-password"></label>
         <label>Role <select name="role"></select></label>
         <button type="submit">Create user</button>
         <p role="status"></p>`;

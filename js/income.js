@@ -9,7 +9,7 @@ function readIncomeSession() {
   let session;
 
   try {
-    session = JSON.parse(sessionStorage.getItem("fmisSession"));
+    session = window.FMIS.getSession();
   } catch {
     sessionStorage.removeItem("fmisSession");
   }
@@ -32,7 +32,7 @@ function initializeIncomePage(session) {
   const permissions = new Set(session.permissions);
   const fullName = window.FMIS.getDisplayName(session);
   const initials = window.FMIS.getInitials(fullName);
-  const canEdit = session.role === "Finance Preparer";
+  const canEdit = session.role === "Bookkeeper";
 
   document.querySelector("#profile-name").textContent = fullName;
   document.querySelector("#profile-role").textContent = session.role;
@@ -100,7 +100,7 @@ function initializeIncomePage(session) {
     document.querySelector("#invoice-form-title").textContent = "Income Records / Read-only";
     document.querySelector("#reset-invoice").hidden = true;
     document.querySelector("#invoice-form").querySelector('[type="submit"]').textContent = "Read-only access";
-    document.querySelector(".income-prototype-note").textContent = "Finance Preparer view is editable. Management has read-only access.";
+    document.querySelector(".income-prototype-note").textContent = "Bookkeeper view is editable. Management has read-only access.";
     document.querySelectorAll("[data-open-tab='record']").forEach((button) => {
       button.disabled = true;
     });

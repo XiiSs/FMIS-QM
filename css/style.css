@@ -8123,8 +8123,8 @@ body {
 .work-table th { background: #edf3f9; }
 .work-row-button { background: transparent; border: 0; cursor: pointer; white-space: nowrap; }
 .work-row-button[aria-pressed="true"] { font-weight: bold; }
-.forecast-details dl, .dashboard-liquidity-ratios { display: grid; grid-template-columns: minmax(8rem, auto) 1fr; gap: .5rem; }
-.forecast-details dd, .dashboard-liquidity-ratios dd { margin: 0; }
+.dashboard-liquidity-ratios { display: grid; grid-template-columns: minmax(8rem, auto) 1fr; gap: .5rem; }
+.dashboard-liquidity-ratios dd { margin: 0; }
 
 .invoice-form.checkout-form { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 1rem; }
 .checkout-details, .checkout-payment { display: grid; gap: .7rem; align-content: start; min-width: 0; }
@@ -8669,3 +8669,106 @@ body {
     .payment-queue .request-filters { grid-template-columns: minmax(0, 1fr); }
   }
 }
+
+/* Cash forecast details and historical ratio highlights */
+.forecast-details {
+  min-width: 0;
+  padding: clamp(14px, 2vw, 24px);
+}
+.forecast-detail-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.forecast-detail-header h2 {
+  margin: 0;
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+}
+.forecast-details .cashflow-reports-link { display: inline-flex; gap: 8px; }
+.finance-detail-note {
+  margin: 0 0 14px;
+  color: #465d70;
+  font-size: .875rem;
+  line-height: 1.5;
+}
+.finance-filter {
+  display: grid;
+  gap: 5px;
+  color: #24435a;
+  font-size: .8125rem;
+  font-weight: 600;
+  min-width: 0;
+  max-width: 100%;
+}
+.finance-filter select {
+  min-width: 0;
+  max-width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #bacbda;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #173454;
+  font: inherit;
+}
+.forecast-week-totals,
+.ratio-highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: 12px;
+  margin: 0 0 16px;
+}
+.forecast-week-totals > div,
+.ratio-highlights > div {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #d6e2ed;
+  border-radius: 10px;
+  background: #f5f9fc;
+}
+.forecast-week-totals dt,
+.ratio-highlights dt { color: #3d566d; font-size: .875rem; font-weight: 600; }
+.forecast-week-totals dd,
+.ratio-highlights dd { margin: 0; }
+.forecast-week-totals dd,
+.ratio-highlights .ratio-figure {
+  margin-top: 6px;
+  color: #153f59;
+  font-size: 1.125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.finance-detail-scroll {
+  border: 1px solid #d6e2ed;
+  border-radius: 10px;
+}
+.finance-detail-scroll:focus-visible { outline: 2px solid #216780; outline-offset: 2px; }
+.finance-detail-table { font-size: .875rem; }
+.finance-detail-table :is(th, td) { padding: 12px clamp(10px, 1.2vw, 16px); }
+.finance-detail-table tbody th { background: transparent; }
+.finance-detail-table tbody tr:last-child > * { border-bottom: 0; }
+.forecast-movements { min-width: 36rem; }
+.forecast-movements :is(th, td):first-child { white-space: nowrap; }
+.finance-detail-table .finance-number { text-align: right; white-space: nowrap; }
+.finance-number, .finance-figure { font-variant-numeric: tabular-nums; font-weight: 700; }
+.finance-detail-table .finance-empty { text-align: center; color: #465d70; padding: 22px 12px; }
+.forecast-movement {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.forecast-receipt { background: #e1f3ea; color: #145c41; }
+.forecast-payment { background: #fcefdc; color: #794a0d; }
+.ratio-highlights > div { border-top: 3px solid var(--module-accent, #24617b); }
+.ratio-highlights .ratio-figure { font-size: clamp(1.35rem, 2vw, 1.8rem); }
+.ratio-highlights .ratio-period { margin-top: 6px; color: #465d70; font-size: .8125rem; }
+.forecast-week-totals .finance-negative,
+.ratio-highlights .finance-negative,
+.finance-detail-table .finance-negative { color: #923039; }
+.ratio-filters { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-bottom: 10px; }

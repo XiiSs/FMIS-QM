@@ -1,6 +1,6 @@
 (() => {
   const permissionsByRole = {
-    "Finance Preparer": ["dashboard", "income", "transactions", "expenses"],
+    "Bookkeeper": ["dashboard", "income", "transactions", "expenses"],
     "Approver": ["dashboard", "approvals", "audit"],
     "Management / Read-only": [
       "dashboard", "income", "transactions", "budgets",
@@ -17,7 +17,7 @@
       email: "preparer@fmis.example",
       password: "Prepare2026!",
       fullName: "Maria G. Santos",
-      role: "Finance Preparer",
+      role: "Bookkeeper",
     },
     {
       email: "approver@fmis.example",
@@ -36,7 +36,7 @@
   const accountStorageKey = "fmisUserAccounts";
 
   function getAccounts() {
-    return JSON.parse(localStorage.getItem(accountStorageKey) || "[]");
+    return JSON.parse(localStorage.getItem(accountStorageKey) || "[]", window.FMIS.normalizeStoredRole);
   }
 
   function normalizeEmail(email) {

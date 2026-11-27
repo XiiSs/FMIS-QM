@@ -113,7 +113,7 @@ function initializeApprovals(session) {
     if (saved === null) {
       return [];
     }
-    const records = JSON.parse(saved);
+    const records = JSON.parse(saved, window.FMIS.normalizeStoredRole);
     if (!Array.isArray(records) || records.some((record) => !validator(record))) {
       throw new TypeError(`${label} have an invalid format.`);
     }
@@ -279,9 +279,9 @@ function initializeApprovals(session) {
     displayValue("detail-document", currentRequest.documentName || expense?.documentName || "No document attached");
     displayValue("detail-requested-date", formatDate(currentRequest.requestedDate || currentRequest.createdAt || currentRequest.submittedAt));
     displayValue("detail-comments", currentRequest.comments || "No comments provided.");
-    displayValue("detail-prepared-by", currentRequest.preparedBy || currentRequest.createdBy || "Finance Preparer");
+    displayValue("detail-prepared-by", currentRequest.preparedBy || currentRequest.createdBy || "Bookkeeper");
     displayValue("detail-submitted-date", formatDateTime(currentRequest.submittedAt || currentRequest.createdAt));
-    document.querySelector("#detail-prepared-role").textContent = currentRequest.preparedRole || "Finance Preparer";
+    document.querySelector("#detail-prepared-role").textContent = currentRequest.preparedRole || "Bookkeeper";
     evidenceButton.hidden = !expense;
     document.querySelector("#document-availability").textContent = "";
     displayStatusChips(status);
@@ -289,8 +289,8 @@ function initializeApprovals(session) {
       ? currentRequest.history
       : [{
         at: currentRequest.submittedAt || currentRequest.createdAt,
-        user: currentRequest.preparedBy || currentRequest.createdBy || "Finance Preparer",
-        role: currentRequest.preparedRole || "Finance Preparer",
+        user: currentRequest.preparedBy || currentRequest.createdBy || "Bookkeeper",
+        role: currentRequest.preparedRole || "Bookkeeper",
         action: "Submitted",
         status: "Pending Approval",
         comments: "Request created and submitted for approval.",
@@ -460,8 +460,8 @@ function initializeApprovals(session) {
       ? currentRequest.history
       : [{
         at: currentRequest.submittedAt || currentRequest.createdAt,
-        user: currentRequest.preparedBy || currentRequest.createdBy || "Finance Preparer",
-        role: currentRequest.preparedRole || "Finance Preparer",
+        user: currentRequest.preparedBy || currentRequest.createdBy || "Bookkeeper",
+        role: currentRequest.preparedRole || "Bookkeeper",
         action: "Submitted",
         status: "Pending Approval",
         comments: "Request created and submitted for approval.",

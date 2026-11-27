@@ -81,7 +81,7 @@ function initializeAuditPage() {
     if (saved === null) {
       return [];
     }
-    const records = JSON.parse(saved);
+    const records = JSON.parse(saved, window.FMIS.normalizeStoredRole);
     if (!Array.isArray(records)) {
       throw new TypeError(`${label} are not in the expected format.`);
     }
@@ -101,13 +101,13 @@ function initializeAuditPage() {
   function loadSavedActivity() {
     try {
       const sampleEvents = [
-        { at: "2026-10-20T08:14:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Finance Preparer", action: "Saved expense", module: "Expense", description: "Saved expense", reference: "EXP-2001", result: "Recorded", before: "", after: "Saved", type: "Expense", source: "sample" },
-        { at: "2026-10-20T09:32:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Finance Preparer", action: "Submitted payment request", module: "Payment Request", description: "Submitted payment request", reference: "PR-3001", result: "Recorded", before: "Saved", after: "Pending Approval", type: "Payment Request", source: "sample" },
+        { at: "2026-10-20T08:14:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Bookkeeper", action: "Saved expense", module: "Expense", description: "Saved expense", reference: "EXP-2001", result: "Recorded", before: "", after: "Saved", type: "Expense", source: "sample" },
+        { at: "2026-10-20T09:32:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Bookkeeper", action: "Submitted payment request", module: "Payment Request", description: "Submitted payment request", reference: "PR-3001", result: "Recorded", before: "Saved", after: "Pending Approval", type: "Payment Request", source: "sample" },
         { at: "2026-10-20T10:00:00", user: "M. Santos", account: "m.santos@swiftfoods.ph", role: "Approver", action: "Approved", module: "Approval", description: "Finance verified", reference: "PR-3001", result: "Recorded", before: "Pending Approval", after: "Approved", type: "Approval", source: "sample" },
         { at: "2026-10-21T10:41:00", user: "M. Santos", account: "m.santos@swiftfoods.ph", role: "Approver", action: "Returned", module: "Approval", description: "Missing attachment", reference: "PR-3002", result: "Recorded", before: "Pending Approval", after: "Returned for Correction", type: "Approval", source: "sample" },
-        { at: "2026-10-22T08:30:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Finance Preparer", action: "Self-approval attempt blocked", module: "Payment Request", description: "Self-approval attempt blocked", reference: "PR-3003", result: "Blocked", before: "Pending Approval", after: "Pending Approval", type: "Payment Request", source: "sample" },
-        { at: "2026-10-22T17:10:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Finance Preparer", action: "Corrected and resubmitted", module: "Payment Request", description: "Corrected and resubmitted", reference: "PR-3002", result: "Recorded", before: "Returned for Correction", after: "Pending Approval", type: "Payment Request", source: "sample" },
-        { at: "2026-10-23T11:06:00", user: "R. Tan", account: "r.tan@swiftfoods.ph", role: "Finance Preparer", action: "Marked paid after external payment", module: "Expense", description: "Marked paid after external payment (Oct 23, 2026); ref: BANK-REF-982131", reference: "EXP-2001", result: "Recorded", before: "Payable: Open", after: "Paid", type: "Expense", source: "sample" },
+        { at: "2026-10-22T08:30:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Bookkeeper", action: "Self-approval attempt blocked", module: "Payment Request", description: "Self-approval attempt blocked", reference: "PR-3003", result: "Blocked", before: "Pending Approval", after: "Pending Approval", type: "Payment Request", source: "sample" },
+        { at: "2026-10-22T17:10:00", user: "A. Reyes", account: "a.reyes@swiftfoods.ph", role: "Bookkeeper", action: "Corrected and resubmitted", module: "Payment Request", description: "Corrected and resubmitted", reference: "PR-3002", result: "Recorded", before: "Returned for Correction", after: "Pending Approval", type: "Payment Request", source: "sample" },
+        { at: "2026-10-23T11:06:00", user: "R. Tan", account: "r.tan@swiftfoods.ph", role: "Bookkeeper", action: "Marked paid after external payment", module: "Expense", description: "Marked paid after external payment (Oct 23, 2026); ref: BANK-REF-982131", reference: "EXP-2001", result: "Recorded", before: "Payable: Open", after: "Paid", type: "Expense", source: "sample" },
       ];
       sampleEvents.forEach((event) => {
         if (!eventExists(event.reference, event.action, event.at)) {

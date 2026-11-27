@@ -5,7 +5,7 @@ function getExpenseSession() {
   let session;
 
   try {
-    session = JSON.parse(sessionStorage.getItem("fmisSession"));
+    session = window.FMIS.getSession();
   } catch {
     sessionStorage.removeItem("fmisSession");
   }
@@ -34,7 +34,7 @@ function initializeExpensePage(session) {
   const permissions = new Set(session.permissions);
   const fullName = window.FMIS.getDisplayName(session);
   const initials = window.FMIS.getInitials(fullName);
-  const canEdit = session.role === "Finance Preparer";
+  const canEdit = session.role === "Bookkeeper";
   const approverSelect = document.querySelector("#assigned-approver");
   approverSelect.replaceChildren(...window.FMISAccounts.listApprovers()
     .map(({ fullName, email }) => new Option(fullName, email)));
@@ -263,7 +263,6 @@ function initializeExpensePage(session) {
       amount: Number(formData.get("amount")),
       category: String(formData.get("category") || ""),
       dueDate: String(formData.get("dueDate") || ""),
-      reference: String(formData.get("reference") || "").trim(),
       document: documentInput.files[0] || null,
     };
   }
@@ -287,13 +286,6 @@ function initializeExpensePage(session) {
       errors.push(["dueDate", "Enter a due date."]);
     } else if (data.date && data.dueDate < data.date) {
       errors.push(["dueDate", "Due date must be on or after the expense date."]);
-    }
-    if (!data.reference) {
-      errors.push(["reference", "Enter a reference or invoice number."]);
-    } else if (records.some((record) =>
-      record.reference.trim().toLowerCase() === data.reference.toLowerCase()
-    )) {
-      errors.push(["reference", "This reference / invoice number already exists."]);
     }
     if (!data.document || data.document.size === 0) {
       errors.push(["document", "Attach a supporting document before saving."]);
@@ -366,27 +358,20 @@ function initializeExpensePage(session) {
     if (editingExpenseId && (!previous || (previous.paymentRequestId && !returned) || previous.payableStatus === "Paid")) {
       throw new Error("This payable is no longer available for correction.");
     }
-    const expenseId = previous?.expenseId || createExpenseId(data.date.slice(0, 4), records);
-    const currentReference = data.reference.toLowerCase();
-    if (records.some((record) => record.expenseId !== expenseId && record.reference.trim().toLowerCase() === currentReference)) {
-      clearDuplicateWarning();
-      setFieldError("reference", "This reference / invoice number already exists.");
-      showFeedback("error", "Duplicate invoice reference", "Use a unique reference / invoice number for each expense.");
-      referenceInput.focus();
-      return;
-    }
-
     const documentKey = crypto.randomUUID();
     await window.FMISQM.saveDoc(documentKey, data.document);
     records = readRecords();
-    if (records.some((record) => record.expenseId !== expenseId && record.reference.trim().toLowerCase() === currentReference) ||
-        (!previous && records.some((record) => record.expenseId === expenseId)) ||
-        (previous && ((returned && !readPaymentRequests().some((request) => request.requestId === returned.requestId &&
-          request.status === returned.status && request.decidedAt === returned.decidedAt)) ||
-          !records.some((record) => record.expenseId === expenseId && record.documentKey === previous.documentKey &&
-            record.paymentRequestId === previous.paymentRequestId && record.payableStatus === previous.payableStatus)))) {
+    if (previous && (
+      (returned && !readPaymentRequests().some((request) => request.requestId === returned.requestId &&
+        request.status === returned.status && request.decidedAt === returned.decidedAt)) ||
+      !records.some((record) => record.expenseId === previous.expenseId && record.documentKey === previous.documentKey &&
+        record.paymentRequestId === previous.paymentRequestId && record.payableStatus === previous.payableStatus)
+    )) {
       throw new Error("The payable changed while its attachment was saved. Review the latest entry and try again.");
     }
+
+    const expenseId = previous?.expenseId || createExpenseId(data.date.slice(0, 4), records);
+    const reference = previous?.reference || expenseId;
     const newRecord = {
       expenseId,
       transactionId: expenseId,
@@ -395,7 +380,7 @@ function initializeExpensePage(session) {
       amount: data.amount,
       category: data.category,
       dueDate: data.dueDate,
-      reference: data.reference,
+      reference,
       documentKey,
       documentName: data.document.name,
       documentSize: data.document.size,
@@ -414,11 +399,11 @@ function initializeExpensePage(session) {
       localStorage.setItem(expenseRecordsKey, JSON.stringify(records));
       if (window.FMIS) window.FMIS.logActivity({
         action: previous ? "Corrected returned expense" : "Saved expense",
-        reference: data.reference,
+        reference,
         before: "",
         after: `Saved; ₱${data.amount.toFixed(2)}`,
         type: "Expense",
-        description: `Saved expense ${data.reference} for ${data.vendor}; amount ₱${data.amount.toFixed(2)}.`,
+        description: `Saved expense ${reference} for ${data.vendor}; amount ₱${data.amount.toFixed(2)}.`,
       });
     } catch (error) {
       records = previousRecords ? JSON.parse(previousRecords) : [];
@@ -874,7 +859,8 @@ function initializeExpensePage(session) {
 
 function createExpenseId(year, records) {
   const numbers = records
-    .map((record) => record.expenseId?.match(new RegExp(`^EXP-${year}-(\\d+)$`)))
+    .flatMap(({ expenseId, reference }) => [expenseId, reference])
+    .map((value) => value?.trim().toUpperCase().match(new RegExp(`^EXP-${year}-(\\d+)$`)))
     .filter(Boolean)
     .map((match) => Number(match[1]));
   const nextNumber = numbers.length ? Math.max(...numbers) + 1 : 1;

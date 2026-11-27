@@ -79,21 +79,37 @@ function renderCashForecast() {
   const renderWeek = () => {
     const week = weeks[Number(weekSelect.value) - 1];
     const items = week.items.slice().sort((left, right) => left.date.localeCompare(right.date));
+    document.querySelector("#forecast-week-receipts").textContent = window.FMIS.money(week.receipts);
+    document.querySelector("#forecast-week-payments").textContent = window.FMIS.money(week.payments);
+    const net = document.querySelector("#forecast-week-net");
+    net.textContent = window.FMIS.money(week.netCashFlow);
+    net.classList.toggle("finance-negative", week.netCashFlow < 0);
+
     details.replaceChildren(...items.map((entry) => {
-      const item = document.createElement("li");
-      const movement = entry.field === "receipts" ? "Expected collection" : "Planned payment";
-      item.textContent = `${entry.date} · ${movement} · ${entry.reference} · ${entry.party} · ${window.FMIS.money(entry.amount)}`;
-      return item;
+      const row = document.createElement("tr");
+      const receipt = entry.field === "receipts";
+      row.insertCell().textContent = formatForecastDate(new Date(`${entry.date}T00:00:00`));
+      const movement = document.createElement("span");
+      movement.className = receipt ? "forecast-movement forecast-receipt" : "forecast-movement forecast-payment";
+      movement.textContent = receipt ? "Expected collection" : "Planned payment";
+      row.insertCell().append(movement);
+      row.insertCell().textContent = entry.reference;
+      row.insertCell().textContent = entry.party;
+      const amount = row.insertCell();
+      amount.className = "finance-number";
+      amount.textContent = window.FMIS.money(entry.amount);
+      return row;
     }));
     if (!items.length) {
-      const item = document.createElement("li");
-      item.textContent = "No receipts or payments scheduled.";
-      details.append(item);
+      const cell = details.insertRow().insertCell();
+      cell.colSpan = 5;
+      cell.className = "finance-empty";
+      cell.textContent = "No receipts or payments scheduled for this week.";
     }
   };
   weekSelect.addEventListener("change", renderWeek);
   renderWeek();
-  window.renderLiquiditySummary(document.querySelector("#forecast-liquidity-ratios"));
+  window.renderLiquidityTable(document.querySelector("#forecast-liquidity-ratios"));
 
   document.querySelector("#cashflow-opening").textContent = currency.format(openingBalance);
   document.querySelector("#cashflow-receipts").textContent = currency.format(totalReceipts);

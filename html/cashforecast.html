@@ -70,16 +70,37 @@
           <a class="cashflow-reports-link" href="reports.html" data-permission="reports">Financial Reports <span aria-hidden="true">→</span></a>
         </div>
         <p class="cashflow-note">Forecasts are based on saved open invoices and unpaid expenses due within the next 13 weeks. They are estimates only; no payments are initiated from this forecast.</p>
-        <section class="dashboard-panel work-panel forecast-details">
-          <h2>Weekly receipts and payments</h2>
-          <label>Forecast week <select id="forecast-week"></select></label>
-          <p>Amounts scheduled before the first week are included in Week 1. Collection dates default to delivery for new invoices.</p>
-          <ul id="forecast-week-items"></ul>
+        <section class="dashboard-panel forecast-details" aria-labelledby="forecast-detail-title">
+          <div class="forecast-detail-header">
+            <h2 id="forecast-detail-title">Weekly receipts and payments</h2>
+            <label class="finance-filter" for="forecast-week">Forecast week
+              <select id="forecast-week"></select>
+            </label>
+          </div>
+          <p class="finance-detail-note">Amounts scheduled before the first week are included in Week 1. Collection dates default to delivery for new invoices.</p>
+          <dl class="forecast-week-totals" aria-live="polite">
+            <div><dt>Expected receipts</dt><dd id="forecast-week-receipts"></dd></div>
+            <div><dt>Planned payments</dt><dd id="forecast-week-payments"></dd></div>
+            <div><dt>Net cash flow</dt><dd id="forecast-week-net"></dd></div>
+          </dl>
+          <div class="work-table-scroll finance-detail-scroll" role="region" aria-labelledby="forecast-detail-title" tabindex="0">
+            <table class="work-table finance-detail-table forecast-movements" aria-labelledby="forecast-detail-title">
+              <thead><tr><th scope="col">Scheduled date</th><th scope="col">Type</th><th scope="col">Reference</th><th scope="col">Customer / Vendor</th><th scope="col" class="finance-number">Amount</th></tr></thead>
+              <tbody id="forecast-week-items"></tbody>
+            </table>
+          </div>
         </section>
-        <section class="dashboard-panel work-panel forecast-details" aria-labelledby="liquidity-ratios">
-          <h2 id="liquidity-ratios">Historical liquidity ratios</h2>
-          <dl id="forecast-liquidity-ratios"></dl>
-          <a href="reports.html?view=ratios">Open financial ratio analysis</a>
+        <section class="dashboard-panel forecast-details" aria-labelledby="liquidity-ratios">
+          <div class="forecast-detail-header">
+            <h2 id="liquidity-ratios">Historical liquidity ratios</h2>
+            <a class="cashflow-reports-link" href="reports.html?view=ratios">Financial ratio analysis <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="work-table-scroll finance-detail-scroll" role="region" aria-labelledby="liquidity-ratios" tabindex="0">
+            <table class="work-table finance-detail-table" aria-labelledby="liquidity-ratios">
+              <thead><tr><th scope="col">Indicator</th><th scope="col">Latest value</th><th scope="col">Reporting period</th></tr></thead>
+              <tbody id="forecast-liquidity-ratios"></tbody>
+            </table>
+          </div>
         </section>
       </main>
     </div>

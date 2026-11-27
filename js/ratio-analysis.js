@@ -1,18 +1,34 @@
 // Historical figures transcribed from Section IV of the Swift Foods proposal.
 (() => {
   const liquiditySnapshot = [
-    ["Current ratio", "0.18 · September 30, 2026"],
-    ["Working capital", "−₱45.3 million · September 30, 2026"],
-    ["Cash ratio", "0.16 · FY2025 (latest available in the proposal)"],
+    ["Current ratio", "0.18", "September 30, 2026"],
+    ["Working capital", "−₱45.3 million", "September 30, 2026"],
+    ["Cash ratio", "0.16", "FY2025 (latest available in the proposal)"],
   ];
 
   window.renderLiquiditySummary = function (host) {
-    host.replaceChildren(...liquiditySnapshot.flatMap(([label, value]) => {
+    host.replaceChildren(...liquiditySnapshot.flatMap(([label, value, period]) => {
       const term = document.createElement("dt");
       term.textContent = label;
       const description = document.createElement("dd");
-      description.textContent = value;
+      description.textContent = `${value} · ${period}`;
       return [term, description];
+    }));
+  };
+
+  window.renderLiquidityTable = function (host) {
+    host.replaceChildren(...liquiditySnapshot.map(([label, value, period]) => {
+      const row = document.createElement("tr");
+      const indicator = document.createElement("th");
+      indicator.scope = "row";
+      indicator.textContent = label;
+      row.append(indicator);
+      const figure = row.insertCell();
+      figure.className = "finance-figure";
+      figure.classList.toggle("finance-negative", value.startsWith("−"));
+      figure.textContent = value;
+      row.insertCell().textContent = period;
+      return row;
     }));
   };
 
@@ -38,22 +54,24 @@
   host.innerHTML = `
     <section class="report-section">
       <h3 class="report-section-title">Historical Financial Ratio Analysis</h3>
-      <p>Source: Swift Foods FMIS proposal, Section IV. Parentheses indicate negative values and dashes indicate unavailable figures. September 2026 net margin covers nine months.</p>
-      <div class="report-summary-grid">
-        <div class="dashboard-panel"><strong>0.18</strong><p>Current ratio · Sep. 30, 2026</p></div>
-        <div class="dashboard-panel"><strong>(₱45.3M)</strong><p>Working capital · Sep. 30, 2026</p></div>
-        <div class="dashboard-panel"><strong>(42.0%)</strong><p>Operating margin · FY2025</p></div>
-        <div class="dashboard-panel"><strong>0.05</strong><p>Asset turnover · FY2025</p></div>
+      <p class="finance-detail-note">Source: Swift Foods FMIS proposal, Section IV. Parentheses indicate negative values and dashes indicate unavailable figures. September 2026 net margin covers nine months.</p>
+      <dl class="ratio-highlights" aria-label="Latest values for key financial ratios">
+        <div><dt>Current ratio</dt><dd class="ratio-figure">0.18</dd><dd class="ratio-period">Sep. 30, 2026</dd></div>
+        <div><dt>Working capital</dt><dd class="ratio-figure finance-negative">(₱45.3M)</dd><dd class="ratio-period">Sep. 30, 2026</dd></div>
+        <div><dt>Operating margin</dt><dd class="ratio-figure finance-negative">(42.0%)</dd><dd class="ratio-period">FY2025</dd></div>
+        <div><dt>Asset turnover</dt><dd class="ratio-figure">0.05</dd><dd class="ratio-period">FY2025</dd></div>
+      </dl>
+      <div class="ratio-filters">
+        <label class="finance-filter">Ratio category <select data-ratio-category>
+          <option value="">All ratios</option>
+          ${categories.map((category) => `<option>${category}</option>`).join("")}
+        </select></label>
+        <label class="finance-filter">Comparison period <select data-ratio-range>
+          <option value="all">2014–September 2026</option>
+          <option value="recent">FY2023–September 2026</option>
+          <option value="early">2014–2016</option>
+        </select></label>
       </div>
-      <label>Ratio category <select data-ratio-category>
-        <option value="">All ratios</option>
-        ${categories.map((category) => `<option>${category}</option>`).join("")}
-      </select></label>
-      <label>Comparison period <select data-ratio-range>
-        <option value="all">2014–September 2026</option>
-        <option value="recent">FY2023–September 2026</option>
-        <option value="early">2014–2016</option>
-      </select></label>
       <div class="report-table-panel" style="overflow-x:auto">
         <table class="report-table">
           <caption>Ratio trend by reporting period</caption>
